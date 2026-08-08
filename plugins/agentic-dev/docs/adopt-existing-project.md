@@ -128,6 +128,24 @@ In `preferences/project-config.json`:
    runbook, **retire it explicitly** — one line at its top: "superseded by
    `.founder-os/workflows/autonomous-loop.md`" — so no agent follows two doctrines.
 
+## How updates reach the project afterwards
+
+Three channels, layered — nothing to do by hand:
+
+1. **The plugin itself** (skills, subagents, hooks): cloud sessions load the latest version
+   at every session start; terminal/desktop users run `/plugin update`. Always current.
+2. **The checked-in managed copy** (`.founder-os/` — what non-Claude agents and CI read):
+   the `founder-os-update.yml` workflow (shipped in the templates) checks the latest
+   founder-os **release** daily, runs `install.sh --update`, and opens a PR — the update
+   then passes the project's own CI and deploy gate like any other change.
+3. **The loop double-checks**: the autonomous loop's HEALTH step compares the loaded
+   plugin version against `.founder-os/VERSION` and refreshes the managed copy as its
+   first increment on mismatch — so even without the cron, staleness survives at most one
+   cycle.
+
+Releases are cut automatically upstream: a version bump in founder-os `plugin.json` on
+`main` creates the tag and release notes (`.github/workflows/release.yml` there).
+
 ## Adoption is done when
 
 - [ ] CI quality gate green on a real PR (lint, typecheck, tests, coverage measured)

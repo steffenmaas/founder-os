@@ -1,0 +1,66 @@
+# TEMPLATE — copy to .github/workflows/founder-os-update.yml
+# Daily check: is the managed rulebook (.founder-os/) behind the latest founder-os
+# release? If so, run the module's own installer in --update mode and open a PR — the
+# update then goes through the project's normal CI + deploy gate like any other change.
+#
+# The Claude Code plugin itself needs none of this: cloud sessions load the latest plugin
+# at session start. This workflow keeps the CHECKED-IN copy (.founder-os/) current, which
+# is what non-Claude agents and CI read.
+#
+# Requires founder-os to be readable by this repo's GITHUB_TOKEN (public repo, or same
+# owner). For a private cross-org module, use a fine-grained PAT as UPDATE_TOKEN instead.
+name: founder-os-update
+
+on:
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare installed vs latest release
+        id: cmp
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          installed=$(cat .founder-os/VERSION 2>/dev/null || echo "none")
+          tag=$(gh release view --repo steffenmaas/founder-os --json tagName -q .tagName 2>/dev/null || echo "")
+          latest="${tag##*/v}"
+          echo "installed=$installed  latest=$latest"
+          if [ -z "$latest" ] || [ "$installed" = "$latest" ]; then
+            echo "update=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "update=true"    >> "$GITHUB_OUTPUT"
+            echo "tag=$tag"       >> "$GITHUB_OUTPUT"
+            echo "latest=$latest" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Run the module updater
+        if: steps.cmp.outputs.update == 'true'
+        run: |
+          git clone --depth 1 --branch "${{ steps.cmp.outputs.tag }}" \
+            https://github.com/steffenmaas/founder-os /tmp/founder-os
+          bash /tmp/founder-os/plugins/agentic-dev/tools/install.sh --update
+      - name: Open the update PR
+        if: steps.cmp.outputs.update == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BRANCH="chore/founder-os-update"
+          git config user.name  "founder-os-update"
+          git config user.email "noreply@github.com"
+          git checkout -B "$BRANCH"
+          git add .founder-os
+          git diff --cached --quiet && { echo "no effective change"; exit 0; }
+          git commit -m "chore: update .founder-os to v${{ steps.cmp.outputs.latest }}"
+          git push -f origin "$BRANCH"
+          gh pr list --head "$BRANCH" --state open --json number -q '.[0].number' | grep -q . || \
+            gh pr create --head "$BRANCH" \
+              --title "chore: update .founder-os to v${{ steps.cmp.outputs.latest }}" \
+              --body "Automated daily check: founder-os released v${{ steps.cmp.outputs.latest }} (installed: previous). Managed rulebook refreshed via \`install.sh --update\`; project files untouched. Release notes: https://github.com/steffenmaas/founder-os/releases/tag/${{ steps.cmp.outputs.tag }}"
