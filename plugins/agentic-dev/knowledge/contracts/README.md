@@ -18,18 +18,8 @@ If you are asked to do something outside it, say so instead of doing it.
 
 **Dev and QA are separate contracts because an agent that writes and approves its own code
 has no verification loop — it has a rubber stamp.** Everything else in this module is
-downstream of that one structural decision.
-
-The same logic gives the other three their boundaries:
-
-- **QA does not fix.** A reviewer that repairs stops reporting, and the human never learns
-  what was wrong.
-- **Security holds no credentials.** A security reviewer with production access *is* the
-  lethal combination it exists to detect: sensitive access, untrusted input, outbound channel.
-- **Release is human-invoked.** No agent decides on its own that now is a good moment to
-  deploy.
-- **Product proposes, humans prioritise.** Priority is a business decision, and it is the one
-  thing an agent has no information to make well.
+downstream of that one structural decision. The full reasoning behind each boundary:
+`../../docs/rationale.md` (humans only — never loaded as agent context).
 
 ## Enforcement
 

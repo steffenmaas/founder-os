@@ -358,4 +358,15 @@ preventively. And when a rule does not work in practice, it gets **changed** —
 A rulebook that is quietly violated is worse than none: it manufactures the illusion of
 control.
 
-*Ocean One Ventures · Founder OS v2.0 · Module 16 · agentic-dev v0.3.0*
+## Lean by design
+
+Modern models already contain engineering knowledge — teaching it back to them wastes the
+context that the rules that matter need. So the rulebook carries only what a model cannot
+know: **policy** (where things live, limits, thresholds, role boundaries), **enforcement**
+(hooks, gates, guard tests — knowledge is not compliance), and **incident-tagged rules**
+(things a model got wrong here, stated tersely). All reasoning lives in
+[`docs/rationale.md`](docs/rationale.md), read by humans and never loaded as agent
+context. When cutting further: cut knowledge, never policy — and never remove a rule whose
+incident you cannot name as resolved.
+
+*Ocean One Ventures · Founder OS v2.0 · Module 16 · agentic-dev v0.4.0*
