@@ -17,12 +17,28 @@ handoff, dev/QA separation, the deploy gate, Conventional Commits from adoption 
 1. The module must be installable: `steffenmaas/founder-os` `main` must contain the plugin
    (merged marketplace layout). To test before a merge, add the marketplace from a local
    clone instead: `/plugin marketplace add /path/to/founder-os`.
-2. In Claude Code:
+2. In Claude Code (terminal or desktop app):
 
 ```
 /plugin marketplace add steffenmaas/founder-os
 /plugin install agentic-dev@founder-os
 ```
+
+   **Working in Claude Code on the web (cloud sessions)?** The `/plugin` commands are not
+   available there. Instead, commit `.claude/settings.json` to the project (the template
+   ships it — `templates/project/.claude/settings.json`): it declares the marketplace under
+   `extraKnownMarketplaces` and the plugin under `enabledPlugins`, and every cloud session
+   of the repo loads the module automatically. Commit that file as the *first* step of the
+   onboarding branch; the rest of this guide is identical in cloud and terminal.
+
+   **No manual file handling needed:** don't download or copy anything — tell the session
+   to do it. One paste-able prompt in a cloud session on the target repo covers this whole
+   step: *"Write `.claude/settings.json` declaring the `founder-os` marketplace
+   (`github: steffenmaas/founder-os`) and enabling `agentic-dev@founder-os`, commit and
+   push. Then clone `steffenmaas/founder-os` and follow
+   `plugins/agentic-dev/docs/adopt-existing-project.md` from step 1."* The clone gives the
+   *current* session the rulebook right away; the settings file makes every *future*
+   session load the plugin natively (plugins load at session start).
 
 3. Open the project, start from a clean tree, and create the onboarding branch:
 
