@@ -51,10 +51,12 @@ head_ "1. Managed rulebook → .founder-os/"
 if [ "$MODE" != "dry" ]; then
   rm -rf .founder-os
   mkdir -p .founder-os/tools
-  cp    "$ROOT/knowledge/blueprint.md"  .founder-os/
-  cp    "$ROOT/knowledge/harness.md"    .founder-os/
-  cp -r "$ROOT/knowledge/contracts"     .founder-os/
-  cp -r "$ROOT/workflows"               .founder-os/
+  cp    "$ROOT/knowledge/blueprint.md"    .founder-os/
+  cp    "$ROOT/knowledge/harness.md"      .founder-os/
+  cp    "$ROOT/knowledge/deploy-gate.md"  .founder-os/
+  cp    "$ROOT/knowledge/backlog.md"      .founder-os/
+  cp -r "$ROOT/knowledge/contracts"       .founder-os/
+  cp -r "$ROOT/workflows"                 .founder-os/
   cp    "$ROOT/tools/repo_metrics.py"   .founder-os/tools/
   cp    "$ROOT/tools/install.sh"        .founder-os/tools/
   printf '%s\n' "$VERSION" > .founder-os/VERSION
@@ -68,11 +70,13 @@ Version: $VERSION
 
 ## Contents
 
-- \`blueprint.md\`  — the binding rulebook
-- \`harness.md\`    — how to decide when the rules run out
-- \`contracts/\`    — one contract per agent role
-- \`workflows/\`    — the named sequence for each kind of work
-- \`tools/\`        — metrics and installer
+- \`blueprint.md\`   — the binding rulebook
+- \`harness.md\`     — how to decide when the rules run out
+- \`deploy-gate.md\` — auto-ship or human approval
+- \`backlog.md\`     — the live-backlog doctrine
+- \`contracts/\`     — one contract per agent role
+- \`workflows/\`     — the named sequence for each kind of work
+- \`tools/\`         — metrics and installer
 
 ## To change a rule
 
@@ -89,7 +93,7 @@ bash .founder-os/tools/install.sh --update   # without Claude Code
 EOF
 fi
 
-say "blueprint.md, harness.md, contracts/ (5), workflows/ (7), tools/"
+say "blueprint.md, harness.md, deploy-gate.md, backlog.md, contracts/ (5), workflows/ (9), tools/"
 [ "$MODE" = "update" ] && { head_ "Updated to v$VERSION. Project files untouched."; exit 0; }
 
 # --------------------------------------------------------------------------- #
@@ -118,10 +122,12 @@ copy_if_absent SECURITY.md                      SECURITY.md
 copy_if_absent docs/specs/_template.md          docs/specs/_template.md
 copy_if_absent docs/decisions/0000-template.md  docs/decisions/0000-template.md
 copy_if_absent docs/learnings/_template.md      docs/learnings/_template.md
+copy_if_absent docs/personas/_template.md       docs/personas/_template.md
+copy_if_absent .claude/settings.json            .claude/settings.json
 copy_if_absent .github/dependabot.yml           .github/dependabot.yml
 copy_if_absent .github/CODEOWNERS               .github/CODEOWNERS
-copy_if_absent .github/pull_request_template.md .github/pull_request_template.md
-for w in ci security preview deploy; do
+copy_if_absent .github/PULL_REQUEST_TEMPLATE.md .github/PULL_REQUEST_TEMPLATE.md
+for w in ci security preview deploy founder-os-update; do
   copy_if_absent ".github/workflows/$w.yml" ".github/workflows/$w.yml"
 done
 
