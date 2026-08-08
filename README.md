@@ -5,15 +5,17 @@
 Founder OS is a set of Claude Code plugins covering the work of building a startup from
 Pre-Seed to Series A: 28 AI agents across 7 modules.
 
+Stages: **PS** = Pre-Seed · **S** = Seed · **SA** = Series A
+
 | Module group | Agents |
 |---|---|
-| Strategy | Feasibility & Opportunity · Business Model · Competitor Analysis · Vision, Roadmap & OKRs |
-| Market | Customer Intelligence · Market Research · Journey Mapper · Customer Nurturing |
-| Sales & Distribution | GTM Playbook · Marketing & PR · B2B Sales Engine · B2C Growth Engine |
-| Product & Tech Delivery | Design Mockup · **Agentic Dev** · PMF Tracker · Scaling Architect |
-| Capital | Investor Matcher · Round Manager · Term Navigator · M&A Radar · Grant Navigator |
-| Finance & Legal | Unit Economics · Financial Model · Legal Guardrail · Financial Monitor |
-| Team & AI Agents | Team Development · AI Operations · Autonomous Ops · Founder Match |
+| Strategy | 01 `Fo` Feasibility & Opportunity (PS) · 02 `Bm` Business Model (PS) · 03 `Ca` Competitor Analysis (S) · 04 `Vr` Vision, Roadmap & OKRs (S) |
+| Market | 05 `Cu` Customer Intelligence (PS) · 06 `Mr` Market Research (S) · 07 `Jm` Journey Mapper (S) · 09 `Cn` Customer Nurturing (PS) |
+| Sales & Distribution | 08 `Rv` GTM Playbook (PS) · 10 `Mk` Marketing & PR (S) · 11 `Bs` B2B Sales Engine (S) · 12 `Bg` B2C Growth Engine (S) |
+| Product & Tech Delivery | 15 `Dm` Design Mockup (PS) · **16 `Ad` Agentic Dev (PS)** · 17 `Pm` PMF Tracker (S) · 18 `Sc` Scaling Architect (SA) |
+| Capital | 19 `Im` Investor Matcher (PS) · 20 `Rm` Round Manager (S) · 21 `Tn` Term Navigator (S) · 22 `Ma` M&A Radar (SA) · 32 `Gn` Grant Navigator (PS) |
+| Finance & Legal | 23 `Ue` Unit Economics (PS) · 24 `Fm` Financial Model (PS) · 25 `Lg` Legal Guardrail (S) · 26 `Mo` Financial Monitor (SA) |
+| Team & AI Agents | 27 `Td` Team Development (S) · 28 `Ao` AI Operations (PS) · 30 `Au` Autonomous Ops (SA) · 31 `Fx` Founder Match (PS) |
 
 This repository is a **Claude Code plugin marketplace**. One marketplace, one or more
 plugins inside it (`plugins/<name>/`).
