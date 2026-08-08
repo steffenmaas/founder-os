@@ -95,6 +95,21 @@ security → hook **and** CI gate.
 
 Run at a version cut, or whenever upstream learnings have accumulated.
 
+### 0. Consent — check before collecting anything
+
+Read `learnings.contribute_upstream` from `preferences/project-config.json` (set during
+onboarding, step 5b):
+
+- **`yes`** — proceed.
+- **`ask`** *(default)* — show what would be sent, then get explicit approval for this
+  batch before anything leaves the repository.
+- **`no`** — stop. Say that this project keeps its learnings local and where the setting
+  lives, so it can be changed deliberately rather than by accident.
+- **missing** — treat as `ask`, and note that onboarding never recorded a choice.
+
+**Never send without an answer here.** Consent that was assumed rather than given is the
+one failure this whole loop cannot recover from.
+
 ### 1. Collect
 
 Every file in `docs/learnings/` with `scope: upstream` and **no** `submitted:` value.

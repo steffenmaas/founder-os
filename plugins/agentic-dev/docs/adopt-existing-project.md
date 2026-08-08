@@ -108,6 +108,7 @@ In `preferences/project-config.json`:
 | `deploy_gate.mode` + `always_gate` | Which paths always need your approval? List the money/auth/data paths of *this* project. |
 | `testing.full_suite_budget_minutes` | How long may the full suite take? If the suite already blows the budget, trimming it becomes a backlog item on day one. |
 | `loop.bundle_max_items` | How much lands in one bundle before the full-suite + audit pass. |
+| `learnings.contribute_upstream` | Should this project send generalisable learnings back to the module? `yes` · `ask` (default) · `no`. Onboarding asks explicitly — upstreaming publishes, since the module repository is public. |
 
 ## Step 5 — Baseline, then switch the commits (10 minutes)
 

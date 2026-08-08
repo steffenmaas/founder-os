@@ -57,6 +57,8 @@
   },
   "learnings": {
     "upstream_repo": "steffenmaas/founder-os",
-    "auto_prompt_after_incident": true
+    "auto_prompt_after_incident": true,
+    "_contribute_upstream": "yes = send generalisable learnings as PRs | ask = confirm each batch | no = keep everything local. Set during onboarding, never assumed. Upstreaming publishes: the module repository is public.",
+    "contribute_upstream": "ask"
   }
 }

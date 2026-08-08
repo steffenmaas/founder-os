@@ -112,7 +112,24 @@ Report every row as **ticked**, **plan-limited**, or **postponed by the human** 
 silently skipped. This step is where adoption PRs go red for reasons that look like code
 but are configuration (see the adoption guide, step 6).
 
-### Step 6 — Baseline measurement
+### Step 5b — Learning contribution: ask, never assume
+
+The module improves through learnings travelling from projects back upstream. **That only
+happens if this project is allowed to send them — so ask, once, here.** Never assume
+consent: upstreaming is a **publication act**. `steffenmaas/founder-os` is a public
+repository, so anything sent becomes readable by anyone.
+
+Ask with `AskUserQuestion`, and state that consequence in the question:
+
+| Answer | What it means | Config |
+|---|---|---|
+| **Yes, contribute** | Generalisable learnings are bundled into a PR against the module. Each one is scrubbed first (blueprint §9.3): no unfixed security finding, no internals — the incident is described generically. | `"contribute_upstream": "yes"` |
+| **Ask me each time** *(default)* | Learnings are still written and marked `scope: upstream`, but nothing leaves the repository without your explicit go-ahead per batch. | `"contribute_upstream": "ask"` |
+| **No** | Everything stays local. `/dev-learn --upstream` refuses and says why. The project still benefits from incoming updates; it just does not send. | `"contribute_upstream": "no"` |
+
+Write the answer into `preferences/project-config.json` → `learnings.contribute_upstream`,
+and say in the onboarding report which mode is active. **A project running on `"ask"` or
+`"no"` is a perfectly good citizen** — an unwilling contributor who was never asked is not.
 
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/tools/repo_metrics.py .
