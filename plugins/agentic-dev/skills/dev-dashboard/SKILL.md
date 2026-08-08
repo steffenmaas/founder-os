@@ -28,7 +28,10 @@ The dashboard is operated top-down by one person in ten seconds. Needs-you-first
    it, the **preview URL**, and the rollback plan. Plus the decision queue (harness §5):
    question, options, recommendation, confidence. If both are empty, say exactly that.
 2. **Now** — the bundle in flight: its items, each increment's state
-   (building / verified / shipped), and what the loop does next.
+   (building / verified / shipped), what the loop does next, and **which background tasks
+   are running right now, by label** (`autonomous-loop.md` → *Visibility*). The dashboard
+   is the durable view of live work; the client's task list is the immediate one — the
+   labels must match so the two agree.
 3. **Version progress** — current product version from `PRODUCT.md`, its scope items each
    marked done / in progress / open. One glance answers "how far is this version?".
 4. **Roadmap & backlog** — Now / Next from `ROADMAP.md`, and the top 5 backlog items with
