@@ -15,6 +15,12 @@ jobs:
   secrets:
     name: secret scan (gitleaks)
     runs-on: ubuntu-latest
+    # gitleaks-action lists the PR's commits to scope its scan. Without
+    # pull-requests: read it exits 403 *before scanning anything* — a secret
+    # scan that crashes looks a lot like a secret scan that passed.
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
       - uses: actions/checkout@v4
         with:
@@ -36,15 +42,44 @@ jobs:
       - name: Audit (high and critical block)
         run: npm audit --audit-level=high
 
-  dependency-review:
-    name: dependency review (PRs)
-    if: github.event_name == 'pull_request'
+  vulnerabilities:
+    name: vulnerability scan (osv)
     runs-on: ubuntu-latest
+    # OSV-Scanner rather than GitHub's dependency-review: it runs on any
+    # repository regardless of plan or visibility, and it is multi-ecosystem, so
+    # stacks the npm audit above cannot see (pub, Cargo, Go, Maven, ...) are
+    # scanned too instead of silently going unchecked.
+    # Exclusions belong in .osv-scanner.toml, each with a reason and an expiry.
     permissions:
       contents: read
-      pull-requests: read
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/dependency-review-action@v4
+      - uses: google/osv-scanner-action/osv-scanner-action@v2.2.4
         with:
-          fail-on-severity: high
+          scan-args: |-
+            --recursive
+            ./
+
+# NOT enabled by default — GitHub dependency review.
+#
+# `actions/dependency-review-action` needs the Dependency graph, and on private
+# repositories additionally GitHub Code Security (a paid add-on). Neither can be
+# switched on from a workflow file, so on the typical pre-seed private repo the
+# job fails every run with "Dependency review is not supported on this
+# repository". `continue-on-error` does not rescue it: the check still reports
+# failure, and a permanently red check teaches people to ignore red checks.
+#
+# If the repository has both, add:
+#
+#   dependency-review:
+#     name: dependency review (PRs)
+#     if: github.event_name == 'pull_request'
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: read
+#       pull-requests: read
+#     steps:
+#       - uses: actions/checkout@v4
+#       - uses: actions/dependency-review-action@v4
+#         with:
+#           fail-on-severity: high

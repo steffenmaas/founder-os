@@ -103,7 +103,11 @@ In `preferences/project-config.json`:
 ## Step 6 — Merge, then run
 
 1. PR the onboarding branch through the new CI gate — this PR is the first test of the
-   pipeline itself. Merge.
+   pipeline itself. **Expect it to go red on gate configuration, not on your code**: missing
+   `GITHUB_TOKEN` permissions, security features the repository plan does not have, a lint
+   rule the existing code never followed. That is the gate working. Fixing it is adoption
+   work, budget for it — and never merge past a red check to "deal with it later", because
+   the first PR is exactly where that habit forms. Merge once green.
 2. Supervised warm-up (recommended for the first days): work item by item —
    `/dev-spec <item>` → fresh session `/dev-loop <item>` → `/dev-review` → `/dev-ship`.
 3. Autonomous operation: start an orchestrator session on
