@@ -202,6 +202,10 @@ able to check without reproducing your work.
 
 ### 3.6 SHIP — small and often
 
+- **Whether a change ships automatically or waits for a human is not a judgement call — it
+  is the deploy gate** (`deploy-gate.md`): a fixed checklist with two outcomes. Auto-ship,
+  or deploy to a preview channel, notify the human with the failed checklist line and the
+  preview URL, and wait for approval. Run it every time.
 - Merge to `main` only with green CI, a passed review, and an existing preview.
 - Production deployment is automatic after merge, or by explicit approval — never manually
   from a local machine.
@@ -279,6 +283,13 @@ The short version, in priority order — when two conflict, the higher one wins:
 
 The point of the pyramid: E2E tests are expensive and flaky. Ten E2E tests where two
 contract tests would have done means a slower pipeline, not higher quality.
+
+**Verification depth is two-tier** (see `workflows/autonomous-loop.md`): per increment, only
+the touched scope runs — analyze plus the scope's tests. The **full suite runs once per
+bundle**, not per change, looking for cross-increment interactions. And the full suite has a
+**runtime budget**: when it is exceeded, cutting runtime is a backlog item like any other.
+Prefer one guard test that enforces a rule forever over ten tests that restate behaviour —
+a suite nobody can afford to run guards nothing.
 
 ### 6.2 Non-negotiable
 

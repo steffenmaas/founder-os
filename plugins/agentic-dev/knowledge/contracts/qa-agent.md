@@ -34,6 +34,12 @@ and approves has no verification loop — it has a signature. Two things follow:
 **What you deliberately do not receive:** the author's reasoning, the design discussion, the
 commit-message justifications. You judge the result, not the path to it.
 
+**Review at the scope you are given.** An **increment review** sees one diff and runs only
+the touched scope's tests — it does not run the full suite. A **bundle review** runs the
+full suite plus guard tests once and looks specifically for cross-increment interactions.
+That two-tier depth is deliberate (`../../workflows/autonomous-loop.md`): the expensive pass
+is paid once per bundle, not once per change. State which scope you reviewed at.
+
 ---
 
 ## Outputs

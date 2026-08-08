@@ -3,7 +3,7 @@
 **Product & Tech Delivery · Pre-Seed**
 
 The development loop for startups where AI agents write the product code.
-10 skills, 5 agent contracts, 4 subagents, 7 workflows, 2 enforcement hooks, CI/CD templates
+10 skills, 5 agent contracts, 4 subagents, 9 workflows, 2 enforcement hooks, CI/CD templates
 and metrics tooling.
 
 ---
@@ -195,8 +195,16 @@ that one decision.
 ## The harness — deciding when the rules run out
 
 [`knowledge/harness.md`](knowledge/harness.md) holds the decision guidelines: the priority
-ladder, trade-off heuristics, stop conditions, ambiguity resolution order, and code judgement
-defaults.
+ladder, trade-off heuristics, stop conditions, ambiguity resolution order, **decision
+confidence** (score every open decision; above the project's threshold the agent decides
+and logs, below it the decision is queued for the human — bundled, never blocking), and
+code judgement defaults.
+
+Two companion doctrines: [`knowledge/deploy-gate.md`](knowledge/deploy-gate.md) — the
+checklist that decides, deterministically, whether a change auto-ships or waits on a preview
+channel for human approval — and [`knowledge/backlog.md`](knowledge/backlog.md) — the live,
+source-weighted backlog (admin → paying → free → anonymous; bugs always beat features;
+excellence before expansion) the autonomous loop pulls from.
 
 The ladder, when two things conflict — higher wins:
 
@@ -212,6 +220,7 @@ steps: **who** (contract), **what**, and **the gate** before the next step.
 
 | Workflow | Use when |
 |---|---|
+| [`autonomous-loop`](workflows/autonomous-loop.md) | Continuous development from a live backlog — the standing meta-workflow |
 | [`new-feature`](workflows/new-feature.md) | Building something that does not exist |
 | [`bug-fix`](workflows/bug-fix.md) | Behaves incorrectly, production stable |
 | [`hotfix`](workflows/hotfix.md) | Production is broken right now |
@@ -219,6 +228,7 @@ steps: **who** (contract), **what**, and **the gate** before the next step.
 | [`dependency-update`](workflows/dependency-update.md) | Adding or upgrading a dependency |
 | [`incident`](workflows/incident.md) | Something is on fire, cause unknown |
 | [`version-cut`](workflows/version-cut.md) | A product version is complete |
+| [`ux-audit`](workflows/ux-audit.md) | A bundle group shipped — simulated-user check of direction |
 
 ---
 
@@ -308,8 +318,10 @@ agentic-dev/
 ├── knowledge/
 │   ├── blueprint.md              The binding rulebook
 │   ├── harness.md                How to decide when the rules run out
+│   ├── deploy-gate.md            Auto-ship or human approval — the checklist
+│   ├── backlog.md                The live, source-weighted backlog
 │   └── contracts/                5 agent contracts
-├── workflows/                    7 named work sequences
+├── workflows/                    9 named work sequences
 ├── skills/dev-*/SKILL.md         10 skills
 ├── agents/                       4 subagents (read-only)
 ├── hooks/                        Guards + scripts
@@ -346,4 +358,4 @@ preventively. And when a rule does not work in practice, it gets **changed** —
 A rulebook that is quietly violated is worse than none: it manufactures the illusion of
 control.
 
-*Ocean One Ventures · Founder OS v2.0 · Module 16 · agentic-dev v0.2.0*
+*Ocean One Ventures · Founder OS v2.0 · Module 16 · agentic-dev v0.3.0*

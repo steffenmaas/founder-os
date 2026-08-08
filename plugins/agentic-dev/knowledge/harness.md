@@ -132,7 +132,42 @@ Confirm?"* — not *"What should happen with expired tokens?"*
 
 ---
 
-## 5. Estimating and scoping
+## 5. Decision confidence — deciding without stopping the loop
+
+The spec, the ADRs, and the product docs will leave decisions open — design details, copy,
+edge-case behaviour, defaults. Neither stopping for each one nor silently guessing scales.
+Instead: **score the decision, act or queue it, and log it either way.**
+
+Walk the resolution order (§4). Where the answer came from determines the confidence score:
+
+| Score | The answer came from | You |
+|---|---|---|
+| **90–100** | An explicit source: the spec, an ADR, a `PRODUCT.md` principle or non-goal | Act. Log the source. |
+| **70–89** | A clean derivation with one clear reading — the vision, the design system, the dominant existing pattern | Act. Log the derivation ("derived from …"). |
+| **40–69** | Several plausible options; the derivation is ambiguous | Act only if the choice is reversible **and** at or above the threshold. Otherwise queue. |
+| **0–39** | No basis in any source | Queue. Never guess here. |
+
+**The threshold is the human's dial, not yours.** `decisions.confidence_threshold` in the
+project config (default 70) says where the human wants to be involved. At or above it, you
+decide autonomously and log. Below it, the decision goes to the queue.
+
+**Queue, don't block.** A queued decision is one entry in `docs/decisions/QUEUE.md`: the
+question, the options, your recommendation, the score, and why it is not higher. If the work
+item cannot proceed without the answer, take the reversible default and mark it with the
+queue entry — the loop moves on either way. The check-in presents the queue **bundled**, so
+the human answers five decisions in one sitting instead of being interrupted five times.
+
+**Confidence is raised by information, not by rhetoric.** When a decision was queued — or a
+made decision gets overturned — the learning names **which missing source would have raised
+the score**: a design-tokens doc, a persona file, usage analytics, a missing ADR. Adding
+that source is how the human's involvement moves down over time. Adding courage is not.
+
+Never inflate a score to clear the threshold. An overturned 85 is a violation; a queued 60
+is the system working exactly as designed.
+
+---
+
+## 6. Estimating and scoping
 
 You are systematically over-optimistic about how long things take, in a specific way: you
 model the happy path and omit integration, edge cases, and verification.
@@ -152,7 +187,7 @@ small one.
 
 ---
 
-## 6. Working with the human
+## 7. Working with the human
 
 **Report in evidence, not adjectives.** "Tests pass" is an adjective. `npm test → 128 passed,
 0 failed` is evidence.
@@ -174,7 +209,7 @@ human real time.
 
 ---
 
-## 7. Working with other agents
+## 8. Working with other agents
 
 - **Delegate reading, not deciding.** Subagents are good at "find all the places X happens".
   They are bad at "decide whether we should do X".
@@ -188,7 +223,7 @@ human real time.
 
 ---
 
-## 8. Code judgement defaults
+## 9. Code judgement defaults
 
 Where the project has no opinion, these are the defaults:
 
@@ -210,7 +245,7 @@ These are defaults, not laws — but deviating from one is worth a line in the s
 
 ---
 
-## 9. What good work looks like
+## 10. What good work looks like
 
 If you want a single test for whether a unit of work is good, it is this:
 

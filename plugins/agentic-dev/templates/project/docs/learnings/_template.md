@@ -28,6 +28,13 @@ submitted: <PR URL, only when scope is upstream and it has been sent>
 <Concrete and actionable. Not "be more careful". Either a changed step, a new check,
 or a note that the next agent will read at the right moment.>
 
+## What would have raised confidence
+
+<Only when a decision was queued or overturned in this episode (harness §5).
+ Name the missing source that would have raised the score — a design-tokens doc,
+ a persona file, usage analytics, an ADR. Adding that source is how the human's
+ involvement threshold moves down over time; leave this out if no decision was involved.>
+
 ## Generalisable?
 
 <Only fill this in when `scope: upstream`.

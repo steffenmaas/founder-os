@@ -9,6 +9,7 @@ check-in that the workflow did not fit — that is a learning with `scope: upstr
 
 | Workflow | Use when | Entry point |
 |---|---|---|
+| [`autonomous-loop.md`](autonomous-loop.md) | Continuous development from a live backlog — the standing meta-workflow | standing orchestrator session |
 | [`new-feature.md`](new-feature.md) | Building something that does not exist yet | `/dev-loop` |
 | [`bug-fix.md`](bug-fix.md) | Something works incorrectly, but production is stable | `/dev-loop` |
 | [`hotfix.md`](hotfix.md) | Production is broken right now | `/dev-ship` after the fix |
@@ -16,6 +17,7 @@ check-in that the workflow did not fit — that is a learning with `scope: upstr
 | [`dependency-update.md`](dependency-update.md) | Upgrading or adding a dependency | `/dev-loop` |
 | [`incident.md`](incident.md) | Something is on fire and the cause is unknown | manual, then `hotfix` |
 | [`version-cut.md`](version-cut.md) | A product version is complete | `/dev-product` |
+| [`ux-audit.md`](ux-audit.md) | A bundle group shipped — check direction from the user's point of view | `autonomous-loop` step 8, or `/dev-review` |
 
 ## Reading a workflow
 
@@ -35,3 +37,8 @@ What differs between them is which phases compress, which gates tighten, and who
 to skip what. `hotfix.md` compresses SPEC and PLAN to near zero and tightens the SHIP gate.
 `refactor.md` inverts VERIFY: the test suite must pass **unchanged**, because unchanged
 behaviour is the whole point.
+
+`autonomous-loop.md` is the exception to the shape: it is the **standing meta-workflow**
+that pulls from the live backlog, bundles work, and runs the others inside its increments.
+Its SHIP phase is always the deploy gate (`../knowledge/deploy-gate.md`), and its VERIFY is
+two-tier — scoped per increment, full suite once per bundle.

@@ -25,7 +25,27 @@
     "spec_threshold_minutes": 30,
     "roadmap_now_max": 3,
     "ci_budget_minutes": 10,
-    "health_watch_minutes": 10
+    "health_watch_minutes": 10,
+    "bundle_max_items": 5,
+    "checkin_interval_minutes": 15
+  },
+  "deploy_gate": {
+    "mode": "standard",
+    "always_gate": []
+  },
+  "decisions": {
+    "confidence_threshold": 70,
+    "queue_file": "docs/decisions/QUEUE.md"
+  },
+  "backlog": {
+    "store": "",
+    "source_order": ["admin", "paying", "free", "anonymous"],
+    "excellence_before_expansion": true
+  },
+  "testing": {
+    "scoped_per_increment": true,
+    "full_suite_at": "bundle",
+    "full_suite_budget_minutes": 10
   },
   "review": {
     "require_separate_qa_contract": true,

@@ -19,6 +19,14 @@ reason this is a separate contract.
 
 ---
 
+## The deploy gate comes first
+
+Before anything else, run the deploy-gate checklist (`../deploy-gate.md`). Its outcome
+decides which mode you are in: **auto-ship** (all seven lines hold — proceed without human
+approval) or **human gate** (deploy to a preview channel, notify with the failed line and
+the preview URL, and refuse to merge until approval exists). You never argue a change from
+one mode into the other.
+
 ## Preconditions — every one, or you refuse
 
 - [ ] Working tree clean, everything committed
