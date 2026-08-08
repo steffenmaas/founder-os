@@ -17,7 +17,7 @@ does not ask for work.
 | 1 | Orchestrator | **HEALTH** — CI and deploy state on `main`: last pipeline run green, **deployed version marker matches the last shipped commit**, logs clean since the last cycle (`deploy-gate.md`, "after the deploy"). Analyze clean, watchdog armed. **Module current:** loaded plugin version vs. `.founder-os/VERSION` — on mismatch, refreshing the managed copy (`install.sh --update`, one commit) is the first increment of the cycle. | Healthy. A red `main` or a deploy that did not land is the task, nothing else. |
 | 2 | Product | **PULL** — top items per the backlog doctrine (`backlog.md`): security → bugs → improvements → features, weighted by source. | Item traces to `PRODUCT.md`. Contradiction → flag, pull the next. |
 | 3 | Product | **BUNDLE** — group 2–5 small related items (same feature area, shared verification path) into one bundle. One bundle = one branch. | Each item describable in one sentence. The bundle fits in one day. |
-| 4 | Dev | **BUILD** — one dispatch per increment: one increment = one commit, **named files, never `git add -A`**, max 3 attempts, heartbeat while running. | Increment's own check green. |
+| 4 | Dev | **BUILD** — one dispatch per increment, **spawned as a named background task** (see *Visibility* below): one increment = one commit, **named files, never `git add -A`**, max 3 attempts, heartbeat while running. | Increment's own check green. |
 | 5 | Dev + QA | **VERIFY (scoped)** — analyze plus the tests of the touched scope only. QA reviews the diff at increment scope. **The full suite does not run here.** | QA PASS at increment scope. |
 | 6 | Release | **DEPLOY GATE** — run the checklist (`deploy-gate.md`): auto-ship, or preview channel + notify + wait for approval. The loop continues with the next item either way. | Gate outcome recorded in the PR/commit. |
 | 7 | QA | **BUNDLE QA** — when the bundle is complete: full test suite plus guard tests, once, looking specifically for cross-increment interactions. | Full suite green. Red → fix enters the loop as the top item. |
@@ -38,6 +38,29 @@ raw logs. Every context-heavy step goes to a scoped subagent that returns a boun
 **Watchdog, always.** Every dispatch is covered by a stall watchdog. A dispatch with no
 heartbeat for its stall window is killed and salvaged — commit the green part, report
 `SPLIT`, re-plan. Kill by PID, never by pattern.
+
+### Visibility — the loop must be watchable while it runs
+
+**Everything delegated runs as a background task.** A founder looking at the session has to
+see *that* work is happening, not infer it from commits appearing later. So:
+
+- **Spawn, never block.** Every delegated unit — subagent dispatch, verification run,
+  script, watchdog — is started as a **background task** so it appears in the client's task
+  list while it runs. The orchestrator never blocks its turn waiting for one, and never
+  sleeps in the foreground: a session that looks frozen is indistinguishable from a session
+  that died.
+- **The task label is the status display.** Name every task for what it does and what it
+  touches — `build:water-tracking · increment 2/4`, `verify:nutrition-scope`,
+  `watchdog:build-2` — never `task` or `agent`. The list of running labels *is* what the
+  human reads to know where the loop stands.
+- **The orchestrator's turn stays short:** spawn, record, hand back. Results arrive as
+  completion notifications; the next step starts from those.
+- **No orphans.** Every background task is either finished, killed by its watchdog, or
+  reported at the end of the cycle. Nothing keeps running unnamed and unwatched.
+
+Two views, both required: **background tasks show that work is happening right now**; the
+**dashboard artifact** (`/dev-dashboard`, step 9) shows what it amounts to and what waits
+on the human. A loop with neither is invisible, and an invisible loop gets switched off.
 
 **Decisions are collected, not blocking** (harness §5). A below-threshold decision goes to
 the queue with a recommendation; the loop takes the reversible default or the next item.

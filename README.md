@@ -108,7 +108,9 @@ step by step — install, `/dev-onboard` with a prune pass, write the history do
 ```
 Work autonomously per .founder-os/workflows/autonomous-loop.md: pull from the backlog,
 bundle, ship through the deploy gate, refresh the dashboard, re-arm every ~15 minutes.
-Only contact me for deploy-gate approvals, queued decisions, or finished milestones.
+Spawn every delegated dispatch, check and watchdog as a named background task so I can
+see what is running. Only contact me for deploy-gate approvals, queued decisions, or
+finished milestones.
 ```
 
 ### In Codex, Cursor, or any other agent
