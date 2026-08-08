@@ -24,13 +24,13 @@ plugins inside it (`plugins/<name>/`).
 
 | Plugin | Module | Status |
 |---|---|---|
-| [`agentic-dev`](plugins/agentic-dev/) | 16 · Agentic Dev — Product & Tech Delivery, Pre-Seed | v0.3.0 |
+| [`agentic-dev`](plugins/agentic-dev/) | 16 · Agentic Dev — Product & Tech Delivery, Pre-Seed | v0.4.0 |
 
 ## How to use this — concretely
 
 ### In Claude Code (the primary way)
 
-**Install once** (per machine, takes effect in every project):
+**Terminal or desktop app — install once** (per machine, takes effect in every project):
 
 ```
 /plugin marketplace add steffenmaas/founder-os
@@ -39,6 +39,38 @@ plugins inside it (`plugins/<name>/`).
 
 Update later with `/plugin update`. That gives you 11 skills, 4 subagents, and the
 enforcement hooks — active immediately.
+
+**Claude Code on the web / cloud sessions:** the `/plugin` commands are terminal- and
+desktop-only. For cloud sessions, the plugin is declared in the **project repo** instead —
+commit this as `.claude/settings.json` (the onboarding templates ship it):
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "founder-os": {
+      "source": { "source": "github", "repo": "steffenmaas/founder-os" }
+    }
+  },
+  "enabledPlugins": ["agentic-dev@founder-os"]
+}
+```
+
+Commit once; every cloud session of that repo then loads the module automatically —
+skills, subagents, and hooks included. (Org-wide alternative for Team/Enterprise: server-
+managed settings under Admin Settings → Claude Code.)
+
+**You never create this file by hand.** In a cloud session on the target project, paste:
+
+> Set this project up for Founder OS: write `.claude/settings.json` declaring the
+> marketplace `github: steffenmaas/founder-os` under `extraKnownMarketplaces` and enabling
+> `agentic-dev@founder-os` under `enabledPlugins`, commit and push it. Then clone
+> `steffenmaas/founder-os` and follow
+> `plugins/agentic-dev/docs/adopt-existing-project.md` from step 1.
+
+The session writes and commits the file itself and runs the onboarding; the plugin's
+skills and hooks are active from the **next** session onward (plugins load at session
+start). Cloning the repo mid-session, as in the prompt above, is the bridge for the first
+session — it gives that session the full rulebook immediately.
 
 **Start a brand-new project:**
 

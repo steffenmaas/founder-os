@@ -1,0 +1,8 @@
+{
+  "extraKnownMarketplaces": {
+    "founder-os": {
+      "source": { "source": "github", "repo": "steffenmaas/founder-os" }
+    }
+  },
+  "enabledPlugins": ["agentic-dev@founder-os"]
+}
