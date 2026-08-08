@@ -1,4 +1,4 @@
-# Rationale — why the rules are what they are
+# Lean Rationale — why the rules are what they are
 
 > **This file is never loaded into agent context.** It exists for humans who want to
 > understand or challenge a rule. The rulebook itself (`knowledge/`) states decisions

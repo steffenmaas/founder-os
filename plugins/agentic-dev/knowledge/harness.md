@@ -2,7 +2,7 @@
 
 > The blueprint says *what*; this says *how to choose* when the blueprint, the spec, and
 > the ADRs leave the question open. Read once per session. Reasoning behind these rules:
-> `docs/rationale.md` (humans only).
+> `docs/lean-rationale.md` (humans only).
 
 ---
 

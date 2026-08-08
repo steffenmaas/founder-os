@@ -19,7 +19,7 @@ If you are asked to do something outside it, say so instead of doing it.
 **Dev and QA are separate contracts because an agent that writes and approves its own code
 has no verification loop — it has a rubber stamp.** Everything else in this module is
 downstream of that one structural decision. The full reasoning behind each boundary:
-`../../docs/rationale.md` (humans only — never loaded as agent context).
+`../../docs/lean-rationale.md` (humans only — never loaded as agent context).
 
 ## Enforcement
 

@@ -8,7 +8,7 @@
 >
 > **Lean by design.** This rulebook states *decisions* — where things live, who may do
 > what, what ships without a human — not engineering knowledge you already have. The
-> reasoning behind each rule lives in `docs/rationale.md` (for humans; never load it as
+> reasoning behind each rule lives in `docs/lean-rationale.md` (for humans; never load it as
 > an agent). Section numbers are stable — hooks and workflows reference them.
 
 ---

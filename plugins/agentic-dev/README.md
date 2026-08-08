@@ -365,7 +365,7 @@ context that the rules that matter need. So the rulebook carries only what a mod
 know: **policy** (where things live, limits, thresholds, role boundaries), **enforcement**
 (hooks, gates, guard tests — knowledge is not compliance), and **incident-tagged rules**
 (things a model got wrong here, stated tersely). All reasoning lives in
-[`docs/rationale.md`](docs/rationale.md), read by humans and never loaded as agent
+[`docs/lean-rationale.md`](docs/lean-rationale.md), read by humans and never loaded as agent
 context. When cutting further: cut knowledge, never policy — and never remove a rule whose
 incident you cannot name as resolved.
 
