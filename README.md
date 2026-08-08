@@ -108,7 +108,9 @@ step by step — install, `/dev-onboard` with a prune pass, write the history do
 ```
 Work autonomously per .founder-os/workflows/autonomous-loop.md: pull from the backlog,
 bundle, ship through the deploy gate, refresh the dashboard, re-arm every ~15 minutes.
-Only contact me for deploy-gate approvals, queued decisions, or finished milestones.
+Spawn every delegated dispatch, check and watchdog as a named background task so I can
+see what is running. Only contact me for deploy-gate approvals, queued decisions, or
+finished milestones.
 ```
 
 ### In Codex, Cursor, or any other agent
@@ -148,6 +150,12 @@ plugin wiring: [`plugins/agentic-dev/INSTALL.md`](plugins/agentic-dev/INSTALL.md
 Module versions are cut per `workflows/version-cut.md`: when a version's scope completes,
 the plugin version is bumped, tagged (`agentic-dev/vX.Y.Z`), and release notes are written
 from the shipped scope.
+
+## Licence
+
+[PolyForm Noncommercial 1.0.0](LICENSE) — free to use for founders, teams, non-profits,
+education and research; commercial exploitation by third parties is not licensed.
+Rationale: [ADR-0001](docs/decisions/0001-license-polyform-noncommercial.md).
 
 ## Self-checks
 

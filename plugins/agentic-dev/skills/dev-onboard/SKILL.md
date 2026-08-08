@@ -146,8 +146,9 @@ start, and ask which one they want:
 2. **Autonomous, this session** — paste:
    > Work autonomously per `.founder-os/workflows/autonomous-loop.md`: pull from the
    > backlog, bundle, ship through the deploy gate, refresh the dashboard, re-arm every
-   > ~15 minutes. Contact me only for deploy-gate approvals, queued decisions, or finished
-   > milestones.
+   > ~15 minutes. Spawn every delegated dispatch, check and watchdog as a **named
+   > background task** so I can see what is running. Contact me only for deploy-gate
+   > approvals, queued decisions, or finished milestones.
 3. **Autonomous, around the clock:** the ~15-minute re-arm lives only as long as its
    session. For 24/7 operation, create a scheduled task / Routine that starts or wakes the
    orchestrator session on a fixed cadence (e.g. hourly) with exactly the prompt from

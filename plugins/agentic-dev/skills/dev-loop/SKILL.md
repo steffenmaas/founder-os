@@ -74,9 +74,21 @@ proves it works, independently committable. Name explicitly what will **not** be
 
 ### Phase 4 — BUILD
 
+**Delegate each plan step to a `builder` subagent** — one dispatch per step, spawned as a
+**named background task** so the human can see what is running (`build:<slug> · step 2/4`).
+Give it three things or it stops: the plan step, the files in scope, the check that proves
+it. It returns a short report (BUILT / VERIFIED / SCOPE / BLOCKED), never its transcript.
+One builder at a time; three failed attempts → it reports `SPLIT` and you re-plan.
+
+Working directly instead of dispatching is fine only for a one-sentence change — the
+dispatch overhead would exceed the work.
+
+Each dispatch follows the same rules:
+
 - Short-lived branch, `<type>/<slug>`.
 - Where behaviour is clear: failing test first, then the code.
 - One commit per plan step, Conventional Commits, `Refs: docs/specs/<slug>.md` in the body.
+  **Named files, never `git add -A`.**
 - Unfinished work behind a feature flag, not in a long-lived branch.
 - Run the step's check after each step. Red → fix before continuing.
 
@@ -85,15 +97,17 @@ proves it works, independently committable. Name explicitly what will **not** be
 
 ### Phase 5 — VERIFY
 
-1. Full chain: lint, typecheck, test, build. **Put the output in your answer.**
+1. Full chain: lint, typecheck, test, build — **delegate to the `verifier` subagent**, which
+   runs the checks and reports what actually happened. **Put the output in your answer.**
 2. Change-specific:
    - UI → screenshot, compare to the reference, name the differences
    - API → real request against a running instance, show the response
    - Data model → migration forward **and** backward against a copy
    - Performance → before/after measurement
-3. **Hand to QA:** run `/dev-review`. The QA Agent works under a separate contract and sees
-   only the diff and the acceptance criteria — not your reasoning. **You do not review your
-   own work.**
+3. **Hand to QA:** run `/dev-review` (the `reviewer` subagent). It works under a separate
+   contract, is read-only by construction, and sees only the diff and the acceptance
+   criteria — not your reasoning. **You do not review your own work.** For diffs touching
+   auth, data access, CI, or dependencies, also dispatch `security-auditor`.
 4. Fix only findings affecting correctness or the stated requirements.
 
 **Gate:** verdict PASS or PASS WITH NOTES. BLOCKED goes back to Phase 4.
