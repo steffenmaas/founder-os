@@ -1,0 +1,70 @@
+# TEMPLATE — copy to .github/workflows/deploy.yml
+# Production deploy on push to main. Two proven rules baked in:
+#
+#   1. KEYLESS. Auth is OIDC / Workload Identity Federation — no long-lived deploy key
+#      exists anywhere. Secrets live in GitHub Actions secrets or a cloud secret manager
+#      (blueprint §8.2); nothing secret is in the repo.
+#   2. A DEPLOY IS NOT DONE WHEN THE COMMAND EXITS. The verify job checks that the deployed
+#      version actually serves — deployments that fail silently and are discovered days
+#      later in the Actions list are the incident this step exists for (deploy-gate.md,
+#      "after the deploy").
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Build (stamped with the commit)
+        run: npm run build
+        env:
+          BUILD_ID: ${{ github.sha }}
+      - name: Auth (keyless, WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: <projects/NNN/locations/global/workloadIdentityPools/github/providers/github-oidc>
+          service_account: <deployer@PROJECT.iam.gserviceaccount.com>
+      - name: Deploy
+        run: <npx firebase-tools@15 deploy --project PROJECT_ID --non-interactive>
+
+  verify:
+    name: post-deploy verification
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Health endpoint answers
+        run: |
+          for i in 1 2 3 4 5; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' <https://example.com/healthz>) && \
+            [ "$code" = "200" ] && exit 0
+            echo "attempt $i: HTTP $code — retrying in 15s"; sleep 15
+          done
+          echo "::error::Deployed site does not answer healthy after 5 attempts."
+          exit 1
+      - name: Deployed version matches this commit
+        # Serve the build id (e.g. /version.json written at build time) and compare —
+        # this catches the silent deploy failure where the old version keeps serving.
+        run: |
+          deployed=$(curl -s <https://example.com/version.json> | tr -d '"{} \n' || true)
+          echo "deployed: $deployed / expected: ${{ github.sha }}"
+          case "$deployed" in *"${GITHUB_SHA}"*) exit 0;; esac
+          echo "::error::Deployed version does not contain ${GITHUB_SHA} — the deploy did not land."
+          exit 1

@@ -1,0 +1,42 @@
+# TEMPLATE — copy to .github/workflows/ci.yml
+# Adapt the commands to the project's CLAUDE.md. The stage split and the budgets are the
+# contract: blocking part < 10 minutes, or the pipeline gets bypassed — by humans and
+# agents alike (blueprint §7.1).
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: lint + typecheck + test + build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Tests (with coverage)
+        # Coverage is measured, not gated on a global percentage (blueprint §6.2).
+        # The signal that matters: coverage must not DROP through a PR, and new files
+        # without a single test are a review finding.
+        run: npm test -- --coverage
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 14
+      - name: Build
+        run: npm run build

@@ -1,0 +1,14 @@
+# TEMPLATE — copy to .github/CODEOWNERS
+# The paths a human always sees, regardless of the deploy gate. Keep this list short —
+# it mirrors the gate's "untouchable surfaces" (deploy-gate.md checklist line 2).
+# Replace <owner> with the GitHub username of the human product owner.
+
+/.github/           @<owner>
+/.founder-os/       @<owner>
+SECURITY.md         @<owner>
+PRODUCT.md          @<owner>
+
+# Add the project's sensitive surfaces, e.g.:
+# /src/payments/    @<owner>
+# /src/auth/        @<owner>
+# /migrations/      @<owner>

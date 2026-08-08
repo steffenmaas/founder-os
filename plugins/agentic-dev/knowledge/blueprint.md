@@ -206,6 +206,11 @@ able to check without reproducing your work.
   is the deploy gate** (`deploy-gate.md`): a fixed checklist with two outcomes. Auto-ship,
   or deploy to a preview channel, notify the human with the failed checklist line and the
   preview URL, and wait for approval. Run it every time.
+- **Human review is not a standing requirement — autonomy is the point.** "Review" in this
+  blueprint means the QA Agent's fresh-context pass, which always happens. A *human* looks
+  at a change only when the deploy gate says so. A user reporting something in the app and
+  seeing it fixed within the hour — without a human in the loop — is the capability this
+  whole module exists to make safe.
 - Merge to `main` only with green CI, a passed review, and an existing preview.
 - Production deployment is automatic after merge, or by explicit approval — never manually
   from a local machine.
@@ -297,9 +302,10 @@ a suite nobody can afford to run guards nothing.
 - **Flaky test = bug.** A test that changes outcome twice without a code change is repaired,
   or quarantined with an issue reference and an expiry date
   (`// QUARANTINE #123 until 2026-09-01`). It is never simply retried.
-- **Coverage is a signal, not a target.** No global percentage gate — that produces tests
-  that assert nothing. Instead: coverage must not *drop* through a PR, and new files without
-  a single test get blocked in review.
+- **Coverage is a signal, not a target — but the signal must exist.** Coverage is *measured*
+  on every CI run (tooling is part of project setup; see `templates/project/.github/`). No
+  global percentage gate — that produces tests that assert nothing. Instead: coverage must
+  not *drop* through a PR, and new files without a single test get blocked in review.
 - **Agents do not delete tests to go green.** See §3.4.
 
 ### 6.3 Definition of done
@@ -380,6 +386,11 @@ In practice:
 
 ### 8.2 Hard rules for agents
 
+- **Secrets live in a managed store, never in the repo.** GitHub Actions secrets or a cloud
+  secret manager (e.g. Google Secret Manager / `defineSecret`) — the project picks one; the
+  rules are the same. **Deploys are keyless** (OIDC / Workload Identity Federation): no
+  long-lived deploy key exists anywhere, so none can leak. This is the proven default in
+  the deploy templates.
 - **Never** put secrets in code, commits, logs, or comments. Not "temporarily for testing".
   Not in `.env.example`.
 - **Never** commit `.env`, `*.pem`, `*.key`, or credential files. Check `.gitignore` first.

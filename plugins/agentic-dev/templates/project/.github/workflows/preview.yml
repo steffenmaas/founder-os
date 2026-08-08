@@ -1,0 +1,49 @@
+# TEMPLATE — copy to .github/workflows/preview.yml
+# Every PR gets an isolated preview with its own URL (blueprint §7.2). On Vercel, Netlify
+# or Cloudflare Pages this is native behaviour — DELETE this file there and let the platform
+# comment the URL. The example below is Firebase Hosting preview channels, keyless via WIF.
+#
+# Rule: previews never get production databases or production secrets. Seed data only.
+name: preview
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Auth (keyless, WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: <projects/NNN/locations/global/workloadIdentityPools/github/providers/github-oidc>
+          service_account: <deployer@PROJECT.iam.gserviceaccount.com>
+      - name: Deploy preview channel (expires)
+        run: |
+          npx firebase-tools@15 hosting:channel:deploy "pr-${{ github.event.number }}" \
+            --expires 7d --project <PROJECT_ID> --non-interactive \
+            | tee deploy.log
+      - name: Comment the preview URL on the PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const log = fs.readFileSync('deploy.log', 'utf8');
+            const url = (log.match(/https:\/\/\S+web\.app\S*/) || ['(URL not found in deploy log)'])[0];
+            github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body: `Preview: ${url}`
+            });

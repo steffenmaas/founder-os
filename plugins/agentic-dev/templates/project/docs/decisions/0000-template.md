@@ -1,6 +1,6 @@
 # ADR-0000: <Decision title>
 
-- **Status:** Proposed | Accepted | Superseded by ADR-XXXX
+- **Status:** Proposed | Accepted | Superseded by ADR-XXXX | Revoked (see ADR-XXXX)
 - **Date:** <YYYY-MM-DD>
 - **Deciders:** <names>
 
@@ -9,6 +9,13 @@
 >
 > If what you want to record is an observation rather than a constraint, it is a learning —
 > write it in `docs/learnings/` instead. Confusing the two is the most common mistake here.
+>
+> **Decisions get revised — by a new ADR, never by editing this one.** When testing or
+> production shows a decision was wrong, write a new ADR that states what was observed,
+> supersedes this one, and sets the new constraint; mark this one `Superseded by` (or
+> `Revoked` if nothing replaces it). The wrong decision stays on record — it is the context
+> that stops the next agent from making it again. Silently editing history is how the same
+> wrong decision gets made twice.
 
 ## Context
 

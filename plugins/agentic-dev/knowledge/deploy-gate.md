@@ -55,6 +55,31 @@ Per project, in `project-config.json` (`deploy_gate`):
 Tightening is a config change. **Loosening is an ADR** — it removes a human from a loop, and
 that decision must be written down with its reasoning.
 
+## After the deploy — verify from the source
+
+**A deploy is not done when the command exits.** Deploys fail silently: the pipeline goes
+red after you stopped watching, the CDN keeps serving the old version, a function fails to
+roll out. Discovering that days later, by accident, in the Actions list, is an incident that
+has already happened. So after **every** ship, verify from the primary sources — never from
+the assumption:
+
+1. **The pipeline run** for your commit: completed and green. Not "started".
+2. **The deployed version marker** (e.g. `/version.json` with the build id): matches your
+   commit. This is the check that catches "old version still serving".
+3. **The health endpoint** answers healthy.
+
+After a **major deploy** (new feature area, migration, dependency major), additionally,
+over the first ~10 minutes:
+
+4. **Runtime logs** (functions, server) clean of new errors.
+5. **Error rate** at baseline.
+6. **The user feedback channel** — reports arriving right after a deploy are the fastest
+   signal there is; route them into the backlog as bugs immediately.
+
+Anything found here is handled as `hotfix.md` or `incident.md` — never as "watch it for a
+while". The deploy template (`templates/project/.github/workflows/deploy.yml`) automates
+checks 1–3; 4–6 are the loop's HEALTH step until the project automates them too.
+
 ## The audit trail
 
 Every auto-ship records its checklist result (7 lines, pass/fail) in the PR or commit body.
