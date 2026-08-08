@@ -31,6 +31,15 @@ handoff, dev/QA separation, the deploy gate, Conventional Commits from adoption 
    of the repo loads the module automatically. Commit that file as the *first* step of the
    onboarding branch; the rest of this guide is identical in cloud and terminal.
 
+   **No manual file handling needed:** don't download or copy anything — tell the session
+   to do it. One paste-able prompt in a cloud session on the target repo covers this whole
+   step: *"Write `.claude/settings.json` declaring the `founder-os` marketplace
+   (`github: steffenmaas/founder-os`) and enabling `agentic-dev@founder-os`, commit and
+   push. Then clone `steffenmaas/founder-os` and follow
+   `plugins/agentic-dev/docs/adopt-existing-project.md` from step 1."* The clone gives the
+   *current* session the rulebook right away; the settings file makes every *future*
+   session load the plugin natively (plugins load at session start).
+
 3. Open the project, start from a clean tree, and create the onboarding branch:
 
 ```bash

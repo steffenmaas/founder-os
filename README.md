@@ -59,6 +59,19 @@ Commit once; every cloud session of that repo then loads the module automaticall
 skills, subagents, and hooks included. (Org-wide alternative for Team/Enterprise: server-
 managed settings under Admin Settings → Claude Code.)
 
+**You never create this file by hand.** In a cloud session on the target project, paste:
+
+> Set this project up for Founder OS: write `.claude/settings.json` declaring the
+> marketplace `github: steffenmaas/founder-os` under `extraKnownMarketplaces` and enabling
+> `agentic-dev@founder-os` under `enabledPlugins`, commit and push it. Then clone
+> `steffenmaas/founder-os` and follow
+> `plugins/agentic-dev/docs/adopt-existing-project.md` from step 1.
+
+The session writes and commits the file itself and runs the onboarding; the plugin's
+skills and hooks are active from the **next** session onward (plugins load at session
+start). Cloning the repo mid-session, as in the prompt above, is the bridge for the first
+session — it gives that session the full rulebook immediately.
+
 **Start a brand-new project:**
 
 ```bash
