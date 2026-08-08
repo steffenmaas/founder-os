@@ -26,18 +26,96 @@ plugins inside it (`plugins/<name>/`).
 |---|---|---|
 | [`agentic-dev`](plugins/agentic-dev/) | 16 · Agentic Dev — Product & Tech Delivery, Pre-Seed | v0.3.0 |
 
-## Install
+## How to use this — concretely
+
+### In Claude Code (the primary way)
+
+**Install once** (per machine, takes effect in every project):
 
 ```
 /plugin marketplace add steffenmaas/founder-os
 /plugin install agentic-dev@founder-os
 ```
 
-To update: `/plugin update`
+Update later with `/plugin update`. That gives you 11 skills, 4 subagents, and the
+enforcement hooks — active immediately.
 
-See [`plugins/agentic-dev/README.md`](plugins/agentic-dev/README.md) for what the module
-does and how to use it, and [`plugins/agentic-dev/INSTALL.md`](plugins/agentic-dev/INSTALL.md)
-for how plugins are wired into this repository.
+**Start a brand-new project:**
+
+```bash
+gh repo create my-product --private --clone && cd my-product
+git commit --allow-empty -m "chore: init" && git push -u origin main
+claude
+```
+
+then, inside Claude Code: `/dev-onboard` — it interviews you and writes `PRODUCT.md`,
+`ROADMAP.md`, `CLAUDE.md`, the docs structure, and the CI templates.
+
+**Switch an existing project to this way of working:** follow
+[`plugins/agentic-dev/docs/adopt-existing-project.md`](plugins/agentic-dev/docs/adopt-existing-project.md)
+step by step — install, `/dev-onboard` with a prune pass, write the history down
+(retro ADRs, learnings), wire the backlog, set the dials, switch to Conventional Commits.
+
+**Day-to-day commands:**
+
+| You want | Type |
+|---|---|
+| Decide what to build next | `/dev-product` |
+| Specify one unit of work | `/dev-spec <item>` |
+| Build it (fresh session) | `/dev-loop <item>` |
+| Review with fresh context | `/dev-review` |
+| Ship it (you, never the agent) | `/dev-ship` |
+| See where development stands | `/dev-dashboard` |
+| End-of-day status | `/dev-checkin` |
+| Capture what you learned | `/dev-learn` |
+| Speed / quality numbers | `/dev-metrics` |
+| Security pass | `/dev-security` |
+
+**Run it autonomously:** start a session and say —
+
+```
+Work autonomously per .founder-os/workflows/autonomous-loop.md: pull from the backlog,
+bundle, ship through the deploy gate, refresh the dashboard, re-arm every ~15 minutes.
+Only contact me for deploy-gate approvals, queued decisions, or finished milestones.
+```
+
+### In Codex, Cursor, or any other agent
+
+There is no plugin system there, so use the file-based fallback — once per project:
+
+```bash
+git clone https://github.com/steffenmaas/founder-os /tmp/founder-os
+cd ~/Repository/<your-project>
+bash /tmp/founder-os/plugins/agentic-dev/tools/install.sh
+```
+
+That writes the managed rulebook into `.founder-os/` (blueprint, harness, contracts,
+workflows) and creates any missing project files from the templates. Codex reads the rules
+through `AGENTS.md` automatically; for other agents, start every task with:
+
+```
+Read .founder-os/blueprint.md in full. Act under .founder-os/contracts/<role>.md.
+Follow .founder-os/workflows/<workflow>.md for this kind of work.
+```
+
+Command equivalents — instead of a skill, state the contract:
+`/dev-loop` → *"Work as Dev Agent per `.founder-os/contracts/dev-agent.md` on
+`docs/specs/<slug>.md`."* · `/dev-review` → *"Review this diff as QA Agent per
+`.founder-os/contracts/qa-agent.md` against the spec's acceptance criteria."*
+
+What you keep: the rulebook, workflows, templates, and `tools/repo_metrics.py`
+(`python3 .founder-os/tools/repo_metrics.py .`). What you lose without Claude Code:
+skills, read-only subagents, and the enforcement hooks — the rules then bind by being
+read, not mechanically.
+
+Full detail: [`plugins/agentic-dev/README.md`](plugins/agentic-dev/README.md) ·
+plugin wiring: [`plugins/agentic-dev/INSTALL.md`](plugins/agentic-dev/INSTALL.md)
+
+## Releases
+
+Module versions are cut per `workflows/version-cut.md`: when a version's scope completes,
+the plugin version is bumped, tagged (`agentic-dev/vX.Y.Z`), and release notes are written
+from the shipped scope.
 
 ## Self-checks
 
