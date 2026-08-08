@@ -106,6 +106,22 @@ Several learnings often point at the same rule. Group them — one proposed chan
 citing all the incidents behind it. A rule backed by three incidents is far more persuasive
 than three separate PRs.
 
+### 2b. Scrub — the module repository is public
+
+**Upstreaming is publishing.** Before a learning leaves the project, check every group
+against blueprint §9.3, and refuse rather than guess:
+
+- [ ] **No unfixed security finding.** Is the vulnerability's fix deployed? If not, the
+      learning stays `scope: project` — say so and exclude it from this PR.
+- [ ] **No project internals quoted:** credentials, infrastructure identifiers, hostnames,
+      personal or customer data, revenue, user counts or other business metrics,
+      unreleased product plans. Generalise the mechanism; drop the specifics.
+- [ ] **Stands alone.** If the rule only makes sense with internal context, it is not
+      generalisable — keep it local.
+
+Report what was scrubbed or held back. A learning silently sent with internals in it is a
+disclosure, not a contribution.
+
 ### 3. Build the change
 
 For each group, produce the concrete diff against the module:

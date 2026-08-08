@@ -149,6 +149,12 @@ Module versions are cut per `workflows/version-cut.md`: when a version's scope c
 the plugin version is bumped, tagged (`agentic-dev/vX.Y.Z`), and release notes are written
 from the shipped scope.
 
+## Licence
+
+[PolyForm Noncommercial 1.0.0](LICENSE) — free to use for founders, teams, non-profits,
+education and research; commercial exploitation by third parties is not licensed.
+Rationale: [ADR-0001](docs/decisions/0001-license-polyform-noncommercial.md).
+
 ## Self-checks
 
 ```bash

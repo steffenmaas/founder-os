@@ -267,6 +267,21 @@ rule change and its enforcement level; on merge, `/plugin update` carries it eve
 the learning is marked `submitted:`. **A rule is created after an incident, never
 preventively.**
 
+**Upstream is public. Scrub before sending** — the module repository is public, so an
+upstream learning is a publication, not an internal note:
+
+- **Never upstream an unfixed security finding.** A vulnerability travels only after its
+  fix is deployed; until then the learning stays `scope: project`.
+- **Generalise, never quote, project internals:** no credentials or infrastructure
+  identifiers, no personal or customer data, no revenue, user counts, or other business
+  metrics, no unreleased product plans. "A dependency advisory the npm audit job could not
+  see" — not the customer, the number, or the account.
+- **The rule must stand on its own.** If a learning only makes sense with internal context,
+  it is not generalisable — keep it in the project.
+
+Same test for anything the module publishes: a dashboard artifact may be shared onward, so
+it carries aggregates, never identifying detail.
+
 ---
 
 ## 10. Context hygiene
