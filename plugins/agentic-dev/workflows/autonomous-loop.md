@@ -17,10 +17,10 @@ does not ask for work.
 | 1 | Orchestrator | **HEALTH** — CI and deploy state on `main`: last pipeline run green, **deployed version marker matches the last shipped commit**, logs clean since the last cycle (`deploy-gate.md`, "after the deploy"). Analyze clean, watchdog armed. **Module current:** loaded plugin version vs. `.founder-os/VERSION` — on mismatch, refreshing the managed copy (`install.sh --update`, one commit) is the first increment of the cycle. | Healthy. A red `main` or a deploy that did not land is the task, nothing else. |
 | 2 | Product | **PULL** — top items per the backlog doctrine (`backlog.md`): security → bugs → improvements → features, weighted by source. | Item traces to `PRODUCT.md`. Contradiction → flag, pull the next. |
 | 3 | Product | **BUNDLE** — group 2–5 small related items (same feature area, shared verification path) into one bundle. One bundle = one branch. | Each item describable in one sentence. The bundle fits in one day. |
-| 4 | Dev | **BUILD** — one dispatch per increment, **spawned as a named background task** (see *Visibility* below): one increment = one commit, **named files, never `git add -A`**, max 3 attempts, heartbeat while running. | Increment's own check green. |
-| 5 | Dev + QA | **VERIFY (scoped)** — analyze plus the tests of the touched scope only. QA reviews the diff at increment scope. **The full suite does not run here.** | QA PASS at increment scope. |
+| 4 | Dev | **BUILD** — one `builder` dispatch per increment, **spawned as a named background task** (see below): one increment = one commit, **named files, never `git add -A`**, max 3 attempts, heartbeat while running. | Increment's own check green. |
+| 5 | Dev + QA | **VERIFY (scoped)** — `verifier` runs analyze plus the tests of the touched scope; `reviewer` judges the diff at increment scope. **The full suite does not run here.** | QA PASS at increment scope. |
 | 6 | Release | **DEPLOY GATE** — run the checklist (`deploy-gate.md`): auto-ship, or preview channel + notify + wait for approval. The loop continues with the next item either way. | Gate outcome recorded in the PR/commit. |
-| 7 | QA | **BUNDLE QA** — when the bundle is complete: full test suite plus guard tests, once, looking specifically for cross-increment interactions. | Full suite green. Red → fix enters the loop as the top item. |
+| 7 | QA | **BUNDLE QA** — when the bundle is complete: `verifier` runs the full test suite plus guard tests, once; `reviewer` looks specifically for cross-increment interactions. | Full suite green. Red → fix enters the loop as the top item. |
 | 8 | QA | **UX AUDIT** — after a bundle group or milestone: simulated-user audit (`ux-audit.md`). | Findings filed to the backlog (`source: ux-audit`). |
 | 9 | Dev | **LEARN + RE-ARM** — queued decisions into the check-in, learnings written, **dashboard artifact refreshed** (`/dev-dashboard`, same URL), next cycle armed. | **The loop never ends a cycle without re-arming the next one** — including blocked and no-op paths. |
 
@@ -28,8 +28,8 @@ does not ask for work.
 
 ## Loop rules
 
-**Strictly sequential dev agents.** One dev agent at a time per codebase. Parallel is for
-read-only exploration only. Two agents writing produce merge conflicts, not speed.
+**Strictly sequential builders.** One `builder` at a time per codebase. Parallel is for
+read-only work only. Two agents writing produce merge conflicts, not speed.
 
 **Thin orchestrator.** The orchestrator writes no code, reads no large files, and pastes no
 raw logs. Every context-heavy step goes to a scoped subagent that returns a bounded report
@@ -38,6 +38,25 @@ raw logs. Every context-heavy step goes to a scoped subagent that returns a boun
 **Watchdog, always.** Every dispatch is covered by a stall watchdog. A dispatch with no
 heartbeat for its stall window is killed and salvaged — commit the green part, report
 `SPLIT`, re-plan. Kill by PID, never by pattern.
+
+### Who does what — the delegation map
+
+The orchestrator delegates every step; it implements nothing itself. Each dispatch is one
+subagent, under one contract, as one background task:
+
+| Step | Subagent | Contract | Writes? |
+|---|---|---|---|
+| PLAN | `planner` | product-agent | no |
+| BUILD (one increment) | **`builder`** | dev-agent | **yes — code and tests** |
+| VERIFY (scoped) | `verifier` | qa-agent | no |
+| REVIEW | `reviewer` | qa-agent | no |
+| SECURITY (when the diff touches auth, data, CI, deps) | `security-auditor` | security-agent | no |
+| Exploration ("where does X happen?") | any read-only explorer | — | no |
+
+**Only `builder` may write.** That is what makes the dev/QA separation structural rather
+than a promise: the reviewing agents physically cannot change the code they judge, and the
+writing agent never issues a verdict on its own work. One `builder` at a time per codebase;
+the read-only ones may run in parallel.
 
 ### Visibility — the loop must be watchable while it runs
 
