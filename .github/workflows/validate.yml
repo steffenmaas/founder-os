@@ -1,0 +1,19 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Module self-check
+        run: python3 plugins/agentic-dev/tools/validate.py
+      - name: Hook guard regression tests
+        run: bash plugins/agentic-dev/tools/test_hooks.sh

@@ -1,0 +1,17 @@
+{
+  "name": "founder-os",
+  "owner": { "name": "Ocean One Ventures", "url": "https://github.com/steffenmaas" },
+  "metadata": {
+    "description": "Founder OS — the AI agent stack for startup building. 28 agents, 7 modules, Pre-Seed to Series A.",
+    "version": "2.0.0"
+  },
+  "plugins": [
+    {
+      "name": "agentic-dev",
+      "source": "./plugins/agentic-dev",
+      "description": "Module 16 (Agentic Dev) — continuous agentic software development: product-anchored roadmap, specs, separated dev and QA contracts, CI/CD with preview channels, security gate, DORA metrics, and a learning loop back into this repo.",
+      "version": "0.2.0",
+      "category": "product-tech-delivery"
+    }
+  ]
+}
