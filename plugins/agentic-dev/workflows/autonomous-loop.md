@@ -14,7 +14,7 @@ does not ask for work.
 
 | # | Who | What | Gate before the next step |
 |---|---|---|---|
-| 1 | Orchestrator | **HEALTH** — CI and deploy state on `main`: last pipeline run green, **deployed version marker matches the last shipped commit**, logs clean since the last cycle (`deploy-gate.md`, "after the deploy"). Analyze clean, watchdog armed. | Healthy. A red `main` or a deploy that did not land is the task, nothing else. |
+| 1 | Orchestrator | **HEALTH** — CI and deploy state on `main`: last pipeline run green, **deployed version marker matches the last shipped commit**, logs clean since the last cycle (`deploy-gate.md`, "after the deploy"). Analyze clean, watchdog armed. **Module current:** loaded plugin version vs. `.founder-os/VERSION` — on mismatch, refreshing the managed copy (`install.sh --update`, one commit) is the first increment of the cycle. | Healthy. A red `main` or a deploy that did not land is the task, nothing else. |
 | 2 | Product | **PULL** — top items per the backlog doctrine (`backlog.md`): security → bugs → improvements → features, weighted by source. | Item traces to `PRODUCT.md`. Contradiction → flag, pull the next. |
 | 3 | Product | **BUNDLE** — group 2–5 small related items (same feature area, shared verification path) into one bundle. One bundle = one branch. | Each item describable in one sentence. The bundle fits in one day. |
 | 4 | Dev | **BUILD** — one dispatch per increment: one increment = one commit, **named files, never `git add -A`**, max 3 attempts, heartbeat while running. | Increment's own check green. |
