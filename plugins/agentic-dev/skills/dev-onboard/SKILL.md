@@ -80,7 +80,8 @@ Then write, from the templates in `${CLAUDE_PLUGIN_ROOT}/templates/project/`:
 | `.github/workflows/*.yml` | **Yes — commands and hosting provider** |
 | `.github/dependabot.yml` | Ecosystem |
 | `.github/CODEOWNERS` | Names |
-| `.github/pull_request_template.md` | No |
+| `.github/PULL_REQUEST_TEMPLATE.md` | No |
+| `.claude/settings.json` | No — makes every cloud session load the plugin |
 
 **`CLAUDE.md` and `PRODUCT.md` are the two that matter.** A template left full of
 `<PLACEHOLDERS>` is worse than no file at all — it produces agents that guess commands and
@@ -92,17 +93,24 @@ Write ADRs for the three to five most significant architectural decisions alread
 Without them, every new agent re-litigates them. Each needs the "**binding for agents:**"
 line filled in.
 
-### Step 5 — Repository settings (manual, with the human)
+### Step 5 — Repository settings (manual, with the human — do it NOW, step 7 tests exactly these)
 
-No repository content can enforce these. Walk the human through them:
+No repository content can set these; they live in GitHub. Do not just list them — walk the
+human through each one with the exact path (or `gh` command), wait for confirmation, and
+record the outcome:
 
-- Branch protection on `main`: PR required, status checks required, no force pushes,
-  administrators included
-- Secret scanning + push protection enabled
-- Dependabot security updates enabled
-- Actions default permission set to "read repository contents"
-- Environments `preview` / `staging` / `production` created, secrets bound to the right one
-- Optional: required reviewer on `production` as the manual approval gate
+| Setting | Exactly where / how | Caveat |
+|---|---|---|
+| **Branch protection on `main`** | Settings → Branches → *Add branch ruleset* for `main`: require PR, require status checks **by the job names just installed** (e.g. `quality`, `secret scan (gitleaks)`), block force pushes, include administrators. CLI: `gh api -X PUT repos/<owner>/<repo>/branches/main/protection --input protection.json` | Check names must match the workflow job names or "required checks" never turn green. |
+| **Actions may create PRs** | Settings → Actions → General → Workflow permissions → tick **"Allow GitHub Actions to create and approve pull requests"** | **Required by `founder-os-update.yml`** — without it the daily update PR dies with 403. |
+| **Actions default permissions** | Same page → *Read repository contents* | Individual jobs widen per-workflow `permissions:` blocks. |
+| **Secret scanning + push protection** | Settings → Advanced Security → enable both | **Private repos need the paid Secret Protection add-on.** Without it, the gitleaks CI job plus the local scan hook are the working control — report this box as *plan-limited*, never as ticked. |
+| **Dependabot alerts + security updates** | Settings → Advanced Security → enable both | Free on all plans. |
+| **Environments** | Settings → Environments → create `preview` / `staging` / `production`; bind secrets to the right one; optional **required reviewer on `production`** | The required reviewer is the manual approval gate for deploy-gated changes. |
+
+Report every row as **ticked**, **plan-limited**, or **postponed by the human** — never
+silently skipped. This step is where adoption PRs go red for reasons that look like code
+but are configuration (see the adoption guide, step 6).
 
 ### Step 6 — Baseline measurement
 
@@ -126,3 +134,24 @@ Write the result to `docs/checkins/baseline-YYYY-MM-DD.md`. Every gap it surface
 
 Report which boxes are ticked and which are not. Do not claim the setup is complete with open
 boxes.
+
+### Step 8 — Start the loop (setup does not start it)
+
+**Onboarding ends with a configured repository and a *stopped* loop.** Say that explicitly —
+a human who assumes the loop is now running loses a day waiting. Offer the three ways to
+start, and ask which one they want:
+
+1. **Supervised** (recommended for the first days): `/dev-spec <first item>` → fresh session
+   `/dev-loop` → `/dev-review` → `/dev-ship`, item by item.
+2. **Autonomous, this session** — paste:
+   > Work autonomously per `.founder-os/workflows/autonomous-loop.md`: pull from the
+   > backlog, bundle, ship through the deploy gate, refresh the dashboard, re-arm every
+   > ~15 minutes. Contact me only for deploy-gate approvals, queued decisions, or finished
+   > milestones.
+3. **Autonomous, around the clock:** the ~15-minute re-arm lives only as long as its
+   session. For 24/7 operation, create a scheduled task / Routine that starts or wakes the
+   orchestrator session on a fixed cadence (e.g. hourly) with exactly the prompt from
+   option 2 — the schedule is the heartbeat, the session is the loop.
+
+**The onboarding report's final line is always one of:**
+`LOOP: not started — awaiting the human's choice` · `LOOP: started (supervised | autonomous | scheduled)`.

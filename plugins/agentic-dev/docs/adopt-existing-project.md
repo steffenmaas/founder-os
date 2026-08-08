@@ -118,6 +118,13 @@ In `preferences/project-config.json`:
 
 ## Step 6 — Merge, then run
 
+0. **Repository settings first** — they live in GitHub, not in the repo, and the next item
+   tests exactly them. Work through the settings table in the onboarding skill (step 5):
+   branch protection with the *installed job names* as required checks, **"Allow GitHub
+   Actions to create and approve pull requests"** (the daily update PR needs it), Actions
+   default read-only, secret scanning (plan-limited on private repos — then gitleaks + the
+   local hook are the control), Dependabot, environments. Record each as ticked /
+   plan-limited / postponed.
 1. PR the onboarding branch through the new CI gate — this PR is the first test of the
    pipeline itself. **Expect it to go red on gate configuration, not on your code**: missing
    `GITHUB_TOKEN` permissions, security features the repository plan does not have, a lint
@@ -126,10 +133,13 @@ In `preferences/project-config.json`:
    the first PR is exactly where that habit forms. Merge once green.
 2. Supervised warm-up (recommended for the first days): work item by item —
    `/dev-spec <item>` → fresh session `/dev-loop <item>` → `/dev-review` → `/dev-ship`.
-3. Autonomous operation: start an orchestrator session on
-   `.founder-os/workflows/autonomous-loop.md`. It pulls from the backlog, bundles, ships
-   through the deploy gate, and re-arms itself. If the project had a home-grown loop
-   runbook, **retire it explicitly** — one line at its top: "superseded by
+3. Autonomous operation — **the loop does not start by itself after onboarding; you start
+   it, once, explicitly.** Either paste the starter prompt from the onboarding skill
+   (step 8) into a session, or — for 24/7 — create a scheduled task / Routine that wakes
+   the orchestrator session on a fixed cadence with that prompt: the ~15-minute re-arm
+   lives only as long as its session, so the schedule is the heartbeat. It pulls from the
+   backlog, bundles, ships through the deploy gate, and re-arms. If the project had a
+   home-grown loop runbook, **retire it explicitly** — one line at its top: "superseded by
    `.founder-os/workflows/autonomous-loop.md`" — so no agent follows two doctrines.
 
 ## How updates reach the project afterwards
