@@ -119,3 +119,24 @@ Worth adding one line to the onboarding checklist in
 `docs/adopt-existing-project.md` → *Step 6*: the first PR through the new gate should be
 expected to surface gate-configuration defects, and those count as adoption work rather than
 project work.
+
+### Proposed change 3 — say where the settings are
+
+A second, smaller observation from the same session. When the agent reported the failure it
+said the fix required enabling a feature "in the repository settings", and the human replied:
+*"I did not know that you were talking about GitHub."* Fair — they were looking at their
+editor, and half of Founder OS's setup genuinely does live in files.
+
+`dev-onboard` Step 5 has the same gap: it lists the settings to enable but never names the
+surface. Someone following it has to already know that "repository settings" means a page on
+github.com, which page, and which of these cost money.
+
+Proposed: turn that bullet list into a table with the concrete
+`github.com/<owner>/<repo>/settings/...` URL per setting and a why-column, plus an explicit
+free-vs-paid note (Dependency graph, Dependabot alerts, secret scanning and push protection
+are free on private repos; GitHub's dependency review needs Code Security). Add a short
+Step 4b to `docs/adopt-existing-project.md` pointing at it, so the web-UI work is a visible
+step in the adoption sequence rather than a detail inside a skill.
+
+Level: **workflow/docs** — no rule changes, the instruction was simply not actionable without
+prior knowledge the reader is not guaranteed to have.

@@ -94,15 +94,30 @@ line filled in.
 
 ### Step 5 — Repository settings (manual, with the human)
 
-No repository content can enforce these. Walk the human through them:
+No repository content can enforce these — they live in the **GitHub web UI**, not in any
+file. Do not say "enable it in the repository settings" and leave it there: name the page,
+give the URL, and say which button. The human is not necessarily thinking about GitHub at
+that moment; they may be looking at their editor.
 
-- Branch protection on `main`: PR required, status checks required, no force pushes,
-  administrators included
-- Secret scanning + push protection enabled
-- Dependabot security updates enabled
-- Actions default permission set to "read repository contents"
-- Environments `preview` / `staging` / `production` created, secrets bound to the right one
-- Optional: required reviewer on `production` as the manual approval gate
+Substitute `<owner>/<repo>` and walk them through it:
+
+| Setting | Where | Why |
+|---|---|---|
+| Branch protection on `main` (PR required, status checks required, no force pushes, administrators included) | `github.com/<owner>/<repo>/settings/branches` | Without it, "merge only through the gate" is a convention, not a rule |
+| Secret scanning + push protection | `github.com/<owner>/<repo>/settings/security_analysis` | Blocks a leaked credential at push time, before it is in history |
+| Dependency graph · Dependabot alerts · Dependabot security updates | same page | Free on private repos too; drives the automated fix PRs `dependabot.yml` configures |
+| Actions default permission → "read repository contents" | `github.com/<owner>/<repo>/settings/actions` | Least privilege for `GITHUB_TOKEN`; jobs that need more declare it per job |
+| Environments `preview` / `staging` / `production`, secrets bound to the right one | `github.com/<owner>/<repo>/settings/environments` | Keeps production secrets out of PR builds |
+| Optional: required reviewer on `production` | same page | The manual approval gate, enforced by GitHub rather than by discipline |
+
+**Free vs. paid — say this out loud, it saves a support round:** Dependency graph, Dependabot
+alerts, secret scanning and push protection are available on private repositories at no cost.
+GitHub's **dependency review** action is different: on a private repo it additionally requires
+GitHub Code Security (formerly Advanced Security), a paid add-on. That is why the shipped
+`security.yml` uses OSV-Scanner instead — it needs none of this and covers more ecosystems.
+
+Afterwards, confirm each one with the human rather than assuming. A setting nobody verified is
+a setting that is off.
 
 ### Step 6 — Baseline measurement
 

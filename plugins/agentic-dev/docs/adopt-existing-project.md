@@ -17,28 +17,12 @@ handoff, dev/QA separation, the deploy gate, Conventional Commits from adoption 
 1. The module must be installable: `steffenmaas/founder-os` `main` must contain the plugin
    (merged marketplace layout). To test before a merge, add the marketplace from a local
    clone instead: `/plugin marketplace add /path/to/founder-os`.
-2. In Claude Code (terminal or desktop app):
+2. In Claude Code:
 
 ```
 /plugin marketplace add steffenmaas/founder-os
 /plugin install agentic-dev@founder-os
 ```
-
-   **Working in Claude Code on the web (cloud sessions)?** The `/plugin` commands are not
-   available there. Instead, commit `.claude/settings.json` to the project (the template
-   ships it — `templates/project/.claude/settings.json`): it declares the marketplace under
-   `extraKnownMarketplaces` and the plugin under `enabledPlugins`, and every cloud session
-   of the repo loads the module automatically. Commit that file as the *first* step of the
-   onboarding branch; the rest of this guide is identical in cloud and terminal.
-
-   **No manual file handling needed:** don't download or copy anything — tell the session
-   to do it. One paste-able prompt in a cloud session on the target repo covers this whole
-   step: *"Write `.claude/settings.json` declaring the `founder-os` marketplace
-   (`github: steffenmaas/founder-os`) and enabling `agentic-dev@founder-os`, commit and
-   push. Then clone `steffenmaas/founder-os` and follow
-   `plugins/agentic-dev/docs/adopt-existing-project.md` from step 1."* The clone gives the
-   *current* session the rulebook right away; the settings file makes every *future*
-   session load the plugin natively (plugins load at session start).
 
 3. Open the project, start from a clean tree, and create the onboarding branch:
 
@@ -109,6 +93,17 @@ In `preferences/project-config.json`:
 | `testing.full_suite_budget_minutes` | How long may the full suite take? If the suite already blows the budget, trimming it becomes a backlog item on day one. |
 | `loop.bundle_max_items` | How much lands in one bundle before the full-suite + audit pass. |
 
+## Step 4b — The GitHub settings nobody can commit (10 minutes)
+
+Half the security posture is not in the repository at all; it is in the **GitHub web UI**.
+`/dev-onboard` Step 5 lists the pages and buttons — do it there with the human present, and
+confirm each switch rather than assuming. The free ones (Dependency graph, Dependabot alerts
+and security updates, secret scanning with push protection) apply to private repositories too
+and take about a minute in total.
+
+Be explicit that this happens on github.com. "Enable it in the repository settings" reads as
+"something in the repo" to someone who is looking at their editor.
+
 ## Step 5 — Baseline, then switch the commits (10 minutes)
 
 1. `/dev-metrics` once, for the record — the before-picture.
@@ -131,24 +126,6 @@ In `preferences/project-config.json`:
    through the deploy gate, and re-arms itself. If the project had a home-grown loop
    runbook, **retire it explicitly** — one line at its top: "superseded by
    `.founder-os/workflows/autonomous-loop.md`" — so no agent follows two doctrines.
-
-## How updates reach the project afterwards
-
-Three channels, layered — nothing to do by hand:
-
-1. **The plugin itself** (skills, subagents, hooks): cloud sessions load the latest version
-   at every session start; terminal/desktop users run `/plugin update`. Always current.
-2. **The checked-in managed copy** (`.founder-os/` — what non-Claude agents and CI read):
-   the `founder-os-update.yml` workflow (shipped in the templates) checks the latest
-   founder-os **release** daily, runs `install.sh --update`, and opens a PR — the update
-   then passes the project's own CI and deploy gate like any other change.
-3. **The loop double-checks**: the autonomous loop's HEALTH step compares the loaded
-   plugin version against `.founder-os/VERSION` and refreshes the managed copy as its
-   first increment on mismatch — so even without the cron, staleness survives at most one
-   cycle.
-
-Releases are cut automatically upstream: a version bump in founder-os `plugin.json` on
-`main` creates the tag and release notes (`.github/workflows/release.yml` there).
 
 ## Adoption is done when
 
