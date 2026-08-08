@@ -3,7 +3,7 @@
 **Product & Tech Delivery · Pre-Seed**
 
 The development loop for startups where AI agents write the product code.
-10 skills, 5 agent contracts, 4 subagents, 9 workflows, 2 enforcement hooks, CI/CD templates
+11 skills, 5 agent contracts, 4 subagents, 9 workflows, 2 enforcement hooks, CI/CD templates
 and metrics tooling.
 
 ---
@@ -54,7 +54,7 @@ That is the whole installation. No `git clone`, no `git pull`, no submodule, no 
 
 | | |
 |---|---|
-| Skills | `/dev-onboard` `/dev-product` `/dev-spec` `/dev-loop` `/dev-review` `/dev-ship` `/dev-security` `/dev-metrics` `/dev-checkin` `/dev-learn` |
+| Skills | `/dev-onboard` `/dev-product` `/dev-spec` `/dev-loop` `/dev-review` `/dev-ship` `/dev-security` `/dev-metrics` `/dev-checkin` `/dev-learn` `/dev-dashboard` |
 | Subagents | `planner` `reviewer` `verifier` `security-auditor` |
 | Hooks | active immediately — force-push to `main`, `--no-verify`, local deploys and `.env` printing are blocked |
 
@@ -322,7 +322,7 @@ agentic-dev/
 │   ├── backlog.md                The live, source-weighted backlog
 │   └── contracts/                5 agent contracts
 ├── workflows/                    9 named work sequences
-├── skills/dev-*/SKILL.md         10 skills
+├── skills/dev-*/SKILL.md         11 skills
 ├── agents/                       4 subagents (read-only)
 ├── hooks/                        Guards + scripts
 ├── templates/project/            Copied into a project by /dev-onboard

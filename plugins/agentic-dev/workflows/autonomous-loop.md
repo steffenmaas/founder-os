@@ -22,7 +22,7 @@ does not ask for work.
 | 6 | Release | **DEPLOY GATE** — run the checklist (`deploy-gate.md`): auto-ship, or preview channel + notify + wait for approval. The loop continues with the next item either way. | Gate outcome recorded in the PR/commit. |
 | 7 | QA | **BUNDLE QA** — when the bundle is complete: full test suite plus guard tests, once, looking specifically for cross-increment interactions. | Full suite green. Red → fix enters the loop as the top item. |
 | 8 | QA | **UX AUDIT** — after a bundle group or milestone: simulated-user audit (`ux-audit.md`). | Findings filed to the backlog (`source: ux-audit`). |
-| 9 | Dev | **LEARN + RE-ARM** — queued decisions into the check-in, learnings written, next cycle armed. | **The loop never ends a cycle without re-arming the next one** — including blocked and no-op paths. |
+| 9 | Dev | **LEARN + RE-ARM** — queued decisions into the check-in, learnings written, **dashboard artifact refreshed** (`/dev-dashboard`, same URL), next cycle armed. | **The loop never ends a cycle without re-arming the next one** — including blocked and no-op paths. |
 
 ---
 
