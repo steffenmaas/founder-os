@@ -3,8 +3,12 @@
 **Use when:** continuous development from a live backlog, with no human dispatching
 individual tasks. This is the standing meta-workflow: it pulls work, bundles it, and runs
 the other workflows inside its increments.
-**Entry:** a standing orchestrator session on a ~15-minute rhythm. It re-arms itself; it
-does not ask for work.
+**Entry:** a standing orchestrator session on a ~15-minute rhythm, driven by a **recurring
+scheduled trigger** (a cron the agent cannot forget). It does not ask for work.
+
+> The recurring trigger is the loop's spine, not an optimisation. Self-re-arming — the agent
+> scheduling its own next tick at the end of a cycle — is a fast path *on top of* it, never
+> the only mechanism. See **"The loop needs a watchdog too"** below for why.
 
 > Distilled from two production systems that ran this loop for months. The speed comes from
 > three things: **bundling** related small items, **scoping** verification per increment,
@@ -14,7 +18,7 @@ does not ask for work.
 
 | # | Who | What | Gate before the next step |
 |---|---|---|---|
-| 1 | Orchestrator | **HEALTH** — CI and deploy state on `main`: last pipeline run green, **deployed version marker matches the last shipped commit**, logs clean since the last cycle (`deploy-gate.md`, "after the deploy"). Analyze clean, watchdog armed. **Module current:** loaded plugin version vs. `.founder-os/VERSION` — on mismatch, refreshing the managed copy (`install.sh --update`, one commit) is the first increment of the cycle. | Healthy. A red `main` or a deploy that did not land is the task, nothing else. |
+| 1 | Orchestrator | **HEALTH** — CI and deploy state on `main`: last pipeline run green, **deployed version marker matches the last shipped commit**, logs clean since the last cycle (`deploy-gate.md`, "after the deploy"). Analyze clean, dispatch watchdogs armed, **and the loop's own recurring trigger present and last fired within one interval**. **Module current:** loaded plugin version vs. `.founder-os/VERSION` — on mismatch, refreshing the managed copy (`install.sh --update`, one commit) is the first increment of the cycle. | Healthy. A red `main` or a deploy that did not land is the task, nothing else. |
 | 2 | Product | **PULL** — top items per the backlog doctrine (`backlog.md`): security → bugs → improvements → features, weighted by source. | Item traces to `PRODUCT.md`. Contradiction → flag, pull the next. |
 | 3 | Product | **BUNDLE** — group 2–5 small related items (same feature area, shared verification path) into one bundle. One bundle = one branch. | Each item describable in one sentence. The bundle fits in one day. |
 | 4 | Dev | **BUILD** — one `builder` dispatch per increment, **spawned as a named background task** (see below): one increment = one commit, **named files, never `git add -A`**, max 3 attempts, heartbeat while running. | Increment's own check green. |
@@ -22,7 +26,7 @@ does not ask for work.
 | 6 | Release | **DEPLOY GATE** — run the checklist (`deploy-gate.md`): auto-ship, or preview channel + notify + wait for approval. The loop continues with the next item either way. | Gate outcome recorded in the PR/commit. |
 | 7 | QA | **BUNDLE QA** — when the bundle is complete: `verifier` runs the full test suite plus guard tests, once; `reviewer` looks specifically for cross-increment interactions. | Full suite green. Red → fix enters the loop as the top item. |
 | 8 | QA | **UX AUDIT** — after a bundle group or milestone: simulated-user audit (`ux-audit.md`). | Findings filed to the backlog (`source: ux-audit`). |
-| 9 | Dev | **LEARN + RE-ARM** — queued decisions into the check-in, learnings written, **dashboard artifact refreshed** (`/dev-dashboard`, same URL), next cycle armed. | **The loop never ends a cycle without re-arming the next one** — including blocked and no-op paths. |
+| 9 | Dev | **LEARN + RE-ARM** — queued decisions into the check-in, learnings written, **dashboard artifact refreshed** (`/dev-dashboard`, same URL), next cycle armed. | **The loop never ends a cycle without re-arming the next one** — including blocked and no-op paths. Re-arming is *checked*, not assumed, and it never replaces the recurring trigger. |
 
 ---
 
@@ -38,6 +42,32 @@ raw logs. Every context-heavy step goes to a scoped subagent that returns a boun
 **Watchdog, always.** Every dispatch is covered by a stall watchdog. A dispatch with no
 heartbeat for its stall window is killed and salvaged — commit the green part, report
 `SPLIT`, re-plan. Kill by PID, never by pattern.
+
+**The loop needs a watchdog too.** The rule above covers every *dispatch*. Nothing covers the
+*loop itself* — and a loop that only continues because the agent remembered to schedule the
+next tick has a single point of failure with no alarm on it. One missed re-arm and the loop
+is dead, silently, until a human notices the absence of commits.
+
+This is not hypothetical. In a production project running this module, the loop was a chain
+of one-shot timers, each scheduled by the previous cycle: `09:30 → 10:05 → 10:47 → 13:18 →
+14:28 → nothing`. At 14:28 the agent stated it would re-arm and did not. **Four hours of
+development were lost**, and nothing reported a fault — every timer in the chain had
+completed successfully, so every health signal was green. In the same environment, a
+*recurring* trigger on a sibling loop kept firing for days without attention.
+
+So:
+
+- The loop is driven by a **recurring scheduled trigger** — a cron entry, a queue, anything
+  that fires without the agent's participation. Create it once, at adoption.
+- Self-re-arming may run *on top* for a finer cadence than the scheduler supports (many
+  schedulers have a one-hour floor; the loop wants ~15 minutes). When it works, the recurring
+  tick finds work already done and exits quietly. When it fails, the recurring tick is what
+  resumes the loop instead of nothing.
+- Step 1 checks that the recurring trigger exists and fired within one interval. **A loop
+  whose own heartbeat has stopped cannot detect that by running** — which is exactly why the
+  check belongs to the tick that the agent does not control.
+- Recording "next cycle armed" is not the same as arming it. Verify the trigger exists;
+  do not trust the intent.
 
 ### Who does what — the delegation map
 
