@@ -83,8 +83,17 @@ on the human. A loop with neither is invisible, and an invisible loop gets switc
 
 **Decisions are collected, not blocking** (harness §5). A below-threshold decision goes to
 the queue with a recommendation; the loop takes the reversible default or the next item.
-The check-in presents the queue bundled. The loop stops for a red `main` and for the deploy
-gate — for nothing else.
+The check-in presents the queue bundled.
+
+**A gate stops the increment, not the loop.** When a change hits the deploy gate, finish it,
+commit it to **its own branch** (`<dev-branch>-gate-<slug>`), open its PR, leave it for the
+human — then reset the development branch to `origin/main` and take the next item in the same
+cycle. Two failure modes this avoids: idling for hours until a human wakes up, and — worse —
+stacking later work onto the gated PR, where a single approval silently covers changes the
+human never looked at. That destroys the gate it was meant to respect.
+
+**A red `main` is the one hard stop.** If shipping is broken, fixing it *is* the work;
+anything else just piles up increments that cannot ship.
 
 **Human contact is an event, not a rhythm.** Message the human when a milestone is done, a
 real blocker exists, or a gate needs approval. Everything else goes in the check-in.
