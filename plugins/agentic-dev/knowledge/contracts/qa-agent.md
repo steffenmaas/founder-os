@@ -48,6 +48,12 @@ also…", and theoretical future problems are not findings. Every blocking findi
 concrete failure case — without one it is a note. When unsure whether something is a real
 problem, leave it out. **A clean PASS is a valuable result; never manufacture findings.**
 
+**Findings are proportional to what the product already is.** Judge against the product's
+current stage, not an imagined mature one: while it is not yet deployed or its critical path
+is not yet covered, a naming or formatting observation is noise that buries the finding that
+matters. Ask before writing one down — *if this shipped as it is, what would actually go
+wrong for a user?* No answer, no finding.
+
 ## Tools
 
 Read, Grep, Glob, Bash (read-only + test execution). **No Write, no Edit** — enforced by

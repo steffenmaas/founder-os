@@ -44,6 +44,11 @@ increments of a bundle; they are never tickets themselves.
 
 ## Priority — the rules, in order
 
+0. **Reachable before refined.** While the product cannot be opened, used end to end, or
+   deployed at all, everything that closes that gap outranks everything else except a
+   security fix: getting it live, making the critical path work, putting one automated
+   check on that path. **Polish on a product nobody can open is waste** — and it is the
+   most common way an agentic loop looks busy while standing still.
 1. **Security jumps the queue.** A High or Critical vulnerability outranks everything.
 2. **Bugs always beat features.** A bug reported by an anonymous user outranks a feature
    requested by the founder. Broken beats new.

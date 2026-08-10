@@ -15,14 +15,14 @@ does not ask for work.
 | # | Who | What | Gate before the next step |
 |---|---|---|---|
 | 1 | Orchestrator | **HEALTH** — CI and deploy state on `main`: last pipeline run green, **deployed version marker matches the last shipped commit**, logs clean since the last cycle (`deploy-gate.md`, "after the deploy"). Analyze clean, watchdog armed. **Module current:** loaded plugin version vs. `.founder-os/VERSION` — on mismatch, refreshing the managed copy (`install.sh --update`, one commit) is the first increment of the cycle. | Healthy. A red `main` or a deploy that did not land is the task, nothing else. |
-| 2 | Product | **PULL** — top items per the backlog doctrine (`backlog.md`): security → bugs → improvements → features, weighted by source. | Item traces to `PRODUCT.md`. Contradiction → flag, pull the next. |
-| 3 | Product | **BUNDLE** — group 2–5 small related items (same feature area, shared verification path) into one bundle. One bundle = one branch. | Each item describable in one sentence. The bundle fits in one day. |
+| 2 | Product | **GROOM + PULL** — sweep the backlog first (merge duplicates, drop what no longer serves `PRODUCT.md`, cut items to user-observable size), then pull the top items per the backlog doctrine (`backlog.md`): **reachable before refined** → security → bugs → improvements → features, weighted by source. | Item traces to `PRODUCT.md`. State the yardstick in one line: *closest gap to the current version scope*. |
+| 3 | Product | **BUNDLE** — group 2–5 related items (same feature area, shared verification path) into one bundle. One bundle = one branch. | Each item describable in one sentence. The bundle fits in one day. |
 | 4 | Dev | **BUILD** — one `builder` dispatch per increment, **spawned as a named background task** (see below): one increment = one commit, **named files, never `git add -A`**, max 3 attempts, heartbeat while running. | Increment's own check green. |
 | 5 | Dev + QA | **VERIFY (scoped)** — `verifier` runs analyze plus the tests of the touched scope; `reviewer` judges the diff at increment scope. **The full suite does not run here.** | QA PASS at increment scope. |
 | 6 | Release | **DEPLOY GATE** — run the checklist (`deploy-gate.md`): auto-ship, or preview channel + notify + wait for approval. The loop continues with the next item either way. | Gate outcome recorded in the PR/commit. |
 | 7 | QA | **BUNDLE QA** — when the bundle is complete: `verifier` runs the full test suite plus guard tests, once; `reviewer` looks specifically for cross-increment interactions. | Full suite green. Red → fix enters the loop as the top item. |
 | 8 | QA | **UX AUDIT** — after a bundle group or milestone: simulated-user audit (`ux-audit.md`). | Findings filed to the backlog (`source: ux-audit`). |
-| 9 | Dev | **LEARN + RE-ARM** — queued decisions into the check-in, learnings written, **dashboard artifact refreshed** (`/dev-dashboard`, same URL), next cycle armed. | **The loop never ends a cycle without re-arming the next one** — including blocked and no-op paths. |
+| 9 | Dev | **LEARN + RE-ARM** — queued decisions into the check-in, learnings written, **dashboard artifact refreshed** (`/dev-dashboard`, same URL), next cycle armed. **Re-anchor:** restate the mandate for the next cycle in one line — *stay brief, groom the backlog, work in bundles, keep the version scope in sight* — so the loop corrects itself instead of waiting to be corrected. | **The loop never ends a cycle without re-arming the next one** — including blocked and no-op paths. |
 
 ---
 
@@ -31,9 +31,13 @@ does not ask for work.
 **Strictly sequential builders.** One `builder` at a time per codebase. Parallel is for
 read-only work only. Two agents writing produce merge conflicts, not speed.
 
-**Thin orchestrator.** The orchestrator writes no code, reads no large files, and pastes no
-raw logs. Every context-heavy step goes to a scoped subagent that returns a bounded report
-(≤ 15 lines). The orchestrator that starts reading files stops orchestrating.
+**Thin orchestrator — under contract.** The orchestrator runs under
+`../knowledge/contracts/orchestrator-agent.md`: it acts as the **standing product owner**
+between the founder's decisions, writes no product code and no tests, never goes deeper than
+the bundle, and decides everything the standing defaults already answer instead of asking.
+It reads no large files and pastes no raw logs; every context-heavy step goes to a scoped
+subagent that returns a bounded report (≤ 15 lines). **The orchestrator that starts editing
+files has stopped orchestrating** — that is the single most common way this loop degrades.
 
 **Watchdog, always.** Every dispatch is covered by a stall watchdog. A dispatch with no
 heartbeat for its stall window is killed and salvaged — commit the green part, report

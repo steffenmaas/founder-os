@@ -131,6 +131,8 @@ Write the answer into `preferences/project-config.json` → `learnings.contribut
 and say in the onboarding report which mode is active. **A project running on `"ask"` or
 `"no"` is a perfectly good citizen** — an unwilling contributor who was never asked is not.
 
+### Step 6 — Baseline measurement
+
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/tools/repo_metrics.py .
 ```
