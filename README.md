@@ -24,7 +24,7 @@ plugins inside it (`plugins/<name>/`).
 
 | Plugin | Module | Status |
 |---|---|---|
-| [`agentic-dev`](plugins/agentic-dev/) | 16 · Agentic Dev — Product & Tech Delivery, Pre-Seed | v0.4.1 |
+| [`agentic-dev`](plugins/agentic-dev/) | 16 · Agentic Dev — Product & Tech Delivery, Pre-Seed | v0.5.0 |
 
 ## How to use this — concretely
 
@@ -37,7 +37,7 @@ plugins inside it (`plugins/<name>/`).
 /plugin install agentic-dev@founder-os
 ```
 
-Update later with `/plugin update`. That gives you 11 skills, 4 subagents, and the
+Update later with `/plugin update`. That gives you 11 skills, 5 subagents, and the
 enforcement hooks — active immediately.
 
 **Claude Code on the web / cloud sessions:** the `/plugin` commands are terminal- and
