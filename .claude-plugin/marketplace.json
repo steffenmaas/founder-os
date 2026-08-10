@@ -10,7 +10,7 @@
       "name": "agentic-dev",
       "source": "./plugins/agentic-dev",
       "description": "Module 16 (Agentic Dev) — continuous agentic software development: product-anchored roadmap, specs, separated dev and QA contracts, CI/CD with preview channels, security gate, DORA metrics, and a learning loop back into this repo.",
-      "version": "0.4.1",
+      "version": "0.5.0",
       "category": "product-tech-delivery"
     }
   ]
