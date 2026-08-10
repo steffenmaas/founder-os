@@ -8,6 +8,7 @@ If you are asked to do something outside it, say so instead of doing it.
 
 | Contract | Role | Invoked by | The boundary that matters |
 |---|---|---|---|
+| [`orchestrator-agent.md`](orchestrator-agent.md) | Runs the loop; acting product owner | the standing loop | Writes no product code; never deeper than the bundle |
 | [`product-agent.md`](product-agent.md) | Product, roadmap, specs | `/dev-product`, `/dev-spec` | Proposes priority, never sets it |
 | [`dev-agent.md`](dev-agent.md) | Writes production code | `/dev-loop` | Never approves or merges its own work |
 | [`qa-agent.md`](qa-agent.md) | Verifies and reviews | `/dev-review` | Never fixes what it finds |

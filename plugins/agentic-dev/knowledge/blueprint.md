@@ -150,6 +150,7 @@ One contract at a time; read yours before starting (`contracts/`).
 
 | Contract | Role | Key boundary |
 |---|---|---|
+| `orchestrator-agent` | Runs the loop; **acting product owner** between the founder's decisions | Writes no product code; never goes deeper than the bundle |
 | `product-agent` | Product, roadmap, specs | Proposes priority, never sets it |
 | `dev-agent` | Writes production code | Never approves or merges its own work |
 | `qa-agent` | Verifies and reviews | Never fixes what it finds |

@@ -85,6 +85,12 @@ queued — never silently guessed, never a one-question interruption:
 | **40–69** | Several plausible options | Act only if reversible **and** at/above threshold; else queue. |
 | **0–39** | No basis in any source | Queue. Never guess here. |
 
+**Standing defaults count as an explicit source** (score 90+, never queued): simplest thing
+that works · make it work before making it nice · no speculative generality · boring over
+clever · between two reversible options, the smaller one · convention over configuration.
+See `contracts/orchestrator-agent.md`. Asking the human to choose between two options that
+these already settle is a failure, not diligence.
+
 **The threshold is the human's dial:** `decisions.confidence_threshold` in the project
 config (default 70). At/above → decide autonomously and log; below → one entry in
 `docs/decisions/QUEUE.md` (question, options, recommendation, score, why not higher). If

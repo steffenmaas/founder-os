@@ -58,11 +58,31 @@ Always say this when you report numbers:
 | No CI files, no security files | Infrastructure gap, highest priority |
 | Conventional-commit share under 30% | Every other number here is a trend, not a value |
 
+### The two headline numbers
+
+Everything else is diagnosis; these two are the score. Report them first, always, and track
+them over time — the point is the trend, not the absolute value.
+
+| KPI | What it is | Read it as |
+|---|---|---|
+| **Delivery pace** | Bundles shipped per active development hour (from the backlog store: items moved to `done`, grouped by bundle, over the loop's running time) | How fast the loop converts intent into working product |
+| **First-pass quality** | Share of bundles that reached production **without** a follow-up fix, revert, or red pipeline | Whether the pace is real or borrowed from tomorrow |
+
+**Pace without first-pass quality is not speed, it is debt** — always report the pair, never
+one alone.
+
+**Guard against gaming.** Pace rises trivially if bundles get smaller, so the number is only
+honest while the sizing rule holds (`backlog.md`): one item = one change a user could
+notice. Report the **median items per bundle** alongside the pace. If it falls while pace
+rises, say so plainly — that is measurement drift, not improvement.
+
+Lines of code are not a metric here, in either direction.
+
 ### Output
 
-Short report: three sentences of assessment per repository, then a table of the numbers, then
-**at most five** concrete actions, prioritised. **No action without a reference to a number
-in the report.**
+Short report: the two headline numbers with their trend, three sentences of assessment per
+repository, then a table of the remaining numbers, then **at most five** concrete actions,
+prioritised. **No action without a reference to a number in the report.**
 
 Close by naming what these metrics cannot see: real incidents, user satisfaction, and work
 that happened outside git.
