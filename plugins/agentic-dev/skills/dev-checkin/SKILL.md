@@ -41,7 +41,23 @@ Run this skill when the user says any of:
 
 ## Output
 
-Write to `docs/checkins/YYYY-MM-DD.md` **and** print it in the answer:
+**Lead with the founder-facing block** — four lines, nothing below the surface
+(`contracts/orchestrator-agent.md` → Reporting). This is what gets read; the detail below
+it is the record, not the message:
+
+```
+DONE:      <what a user can now do that they could not before>
+IN FLIGHT: <current bundle, how far>
+DECISIONS: <needing the founder — PRODUCT (what/for whom) and TECHNICAL (only when
+            architectural or costly), each with options and your recommendation.
+            "none" is a valid and good answer.>
+PROGRESS:  <version scope: x of y · delivery pace · first-pass quality>
+```
+
+Never explain package internals, settings, or which line changed. If they want that, they
+open the diff.
+
+Then write the full record to `docs/checkins/YYYY-MM-DD.md` **and** print it below:
 
 ```markdown
 # Check-in <date>

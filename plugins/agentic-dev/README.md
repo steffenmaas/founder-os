@@ -3,7 +3,7 @@
 **Product & Tech Delivery · Pre-Seed**
 
 The development loop for startups where AI agents write the product code.
-11 skills, 5 agent contracts, 5 subagents, 9 workflows, 2 enforcement hooks, CI/CD templates
+11 skills, 6 agent contracts, 5 subagents, 9 workflows, 2 enforcement hooks, CI/CD templates
 and metrics tooling.
 
 ---
@@ -182,6 +182,7 @@ definition of done, escalation. An agent works under exactly one at a time.
 
 | Contract | Role | The boundary that matters |
 |---|---|---|
+| [`orchestrator-agent`](knowledge/contracts/orchestrator-agent.md) | Runs the loop, acting product owner | Writes no product code; never deeper than the bundle |
 | [`product-agent`](knowledge/contracts/product-agent.md) | Product, roadmap, specs | Proposes priority, never sets it |
 | [`dev-agent`](knowledge/contracts/dev-agent.md) | Writes production code | Never approves or merges its own work |
 | [`qa-agent`](knowledge/contracts/qa-agent.md) | Verifies and reviews | Never fixes what it finds |
@@ -320,7 +321,7 @@ agentic-dev/
 │   ├── harness.md                How to decide when the rules run out
 │   ├── deploy-gate.md            Auto-ship or human approval — the checklist
 │   ├── backlog.md                The live, source-weighted backlog
-│   └── contracts/                5 agent contracts
+│   └── contracts/                6 agent contracts
 ├── workflows/                    9 named work sequences
 ├── skills/dev-*/SKILL.md         11 skills
 ├── agents/                       5 subagents (only `builder` may write)
