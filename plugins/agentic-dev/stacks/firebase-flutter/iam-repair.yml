@@ -1,0 +1,59 @@
+# Founder OS · Module 16 — stack blueprint: firebase-flutter
+# Copy to .github/workflows/iam-repair.yml and replace the <…> values.
+#
+# Fixes missing Google Cloud permissions WITHOUT a human login: runs the
+# idempotent setup script as a dedicated admin identity, keyless via WIF.
+#
+# Deliberately narrow — read iam-repair.md before adopting:
+#   - workflow_dispatch ONLY. A human click is the gate; nothing automatic
+#     ever wakes this identity.
+#   - The only payload is the reviewed script on this branch. No inputs, no
+#     free-form gcloud. Changing what this can do requires a merge to main.
+#   - The admin SA is owner-equivalent (projectIamAdmin). Whoever can merge
+#     to main can reach it — that is the trust boundary, stated out loud.
+#
+# For teams: add `environment: iam-admin` to the job and give that GitHub
+# environment a required reviewer — then every run needs a second person.
+
+name: iam-repair
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # WIF (OIDC)
+
+concurrency:
+  group: iam-repair
+  cancel-in-progress: false
+
+jobs:
+  converge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud (WIF, admin SA)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: <projects/NNN/locations/global/workloadIdentityPools/github/providers/github-oidc>
+          service_account: <github-iam-admin@PROJECT_ID.iam.gserviceaccount.com>
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Converge IAM to the declared state
+        run: |
+          chmod +x scripts/setup-keyless-deploy.sh
+          ./scripts/setup-keyless-deploy.sh 2>&1 | tee /tmp/converge.out
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## IAM repair run"
+            echo '```'
+            tail -40 /tmp/converge.out
+            echo '```'
+            echo "Idempotent: every line above either already existed or was created now."
+          } >> "$GITHUB_STEP_SUMMARY"

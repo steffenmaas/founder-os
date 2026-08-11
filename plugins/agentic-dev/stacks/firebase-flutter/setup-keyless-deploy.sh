@@ -230,6 +230,45 @@ run gcloud iam service-accounts add-iam-policy-binding "${MONITOR_EMAIL}" \
   --role="roles/iam.workloadIdentityUser" \
   --member="principalSet://iam.googleapis.com/projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/${POOL_ID}/attribute.repository/${REPO}"
 
+# --------------------------------------------------------------------------- #
+# 6. Admin identity for keyless IAM repair (iam-repair.yml) — OPT-IN
+# --------------------------------------------------------------------------- #
+# This one is different in kind, not degree: projectIamAdmin is owner in
+# practice — it can grant anyone anything, including itself. It exists so that
+# "deploy failed on a missing role" is fixed by ONE CLICK (workflow_dispatch →
+# this script) instead of a laptop login. The trust boundary, stated out loud:
+# whoever can merge to main can reach this identity. Read iam-repair.md and
+# decide; skip by leaving CREATE_IAM_ADMIN unset.
+if [ "${CREATE_IAM_ADMIN:-0}" = "1" ]; then
+  SA_ADMIN="${SA_ADMIN:-github-iam-admin}"
+  ADMIN_EMAIL="${SA_ADMIN}@${PROJECT_ID}.iam.gserviceaccount.com"
+
+  echo "==> IAM-admin service account (keyless repair — owner-equivalent, see iam-repair.md)"
+  if gcloud iam service-accounts describe "${ADMIN_EMAIL}" >/dev/null 2>&1; then
+    echo "    already exists: ${ADMIN_EMAIL}"
+  else
+    run gcloud iam service-accounts create "${SA_ADMIN}" \
+      --display-name="GitHub Actions IAM Repair (owner-equivalent)"
+  fi
+
+  for ROLE in \
+    roles/resourcemanager.projectIamAdmin \
+    roles/iam.serviceAccountAdmin \
+    roles/iam.workloadIdentityPoolAdmin \
+    roles/serviceusage.serviceUsageAdmin
+  do
+    run gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+      --member="serviceAccount:${ADMIN_EMAIL}" \
+      --role="${ROLE}" \
+      --condition=None
+  done
+
+  echo "==> Allowing only ${REPO} to impersonate the IAM admin"
+  run gcloud iam service-accounts add-iam-policy-binding "${ADMIN_EMAIL}" \
+    --role="roles/iam.workloadIdentityUser" \
+    --member="principalSet://iam.googleapis.com/projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/${POOL_ID}/attribute.repository/${REPO}"
+fi
+
 WIF_PROVIDER="projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/${POOL_ID}/providers/${PROVIDER_ID}"
 
 cat <<EOF
@@ -246,6 +285,16 @@ access is restricted server-side by the provider's attribute-condition
   ops-watch.yml (read-only watch — see ops-watch.md):
     workload_identity_provider: ${WIF_PROVIDER}
     service_account:            ${MONITOR_EMAIL}
+EOF
+if [ "${CREATE_IAM_ADMIN:-0}" = "1" ]; then
+cat <<EOF
+
+  iam-repair.yml (keyless IAM repair — see iam-repair.md):
+    workload_identity_provider: ${WIF_PROVIDER}
+    service_account:            ${SA_ADMIN}@${PROJECT_ID}.iam.gserviceaccount.com
+EOF
+fi
+cat <<EOF
 
 Still to do by hand, once per project:
   - Blaze billing enabled (2nd-gen Functions require it)
