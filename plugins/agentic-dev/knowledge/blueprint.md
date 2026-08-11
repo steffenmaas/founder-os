@@ -32,6 +32,7 @@ step, not your last.
 | What is my mandate and my limits? | `.founder-os/contracts/<role>.md` | Founder OS (upstream) |
 | Which steps does this work take? | `.founder-os/workflows/<name>.md` | Founder OS (upstream) |
 | Ship automatically or ask? | `.founder-os/deploy-gate.md` | Founder OS (upstream) |
+| What does this stack run on, and how does it deploy? | `.founder-os/stacks/<name>/` | Founder OS (upstream) |
 | What feeds the loop? | live backlog, per `.founder-os/backlog.md` | Users, agents, human |
 | Decided, not re-litigated | `docs/decisions/NNNN-*.md` (ADR) | Agent, human approves |
 | Decisions awaiting the human | `docs/decisions/QUEUE.md` | Agent |
@@ -212,6 +213,11 @@ Pipeline per PR: lint + typecheck + unit → integration → security scan → b
 On `main`: the same, then deploy and post-deploy verification. **Blocking part under 10
 minutes** — a slower pipeline gets bypassed. Templates: `templates/project/.github/`.
 
+**Deploy credentials are keyless** (OIDC / workload identity). No long-lived deploy key or
+service-account key exists in the repository, in CI secrets, or on a laptop. Where the stack
+has a blueprint (`.founder-os/stacks/`), the deploy path is taken from it rather than written
+by hand — and a deploy failure it does not already describe is written back upstream (§9.3).
+
 Previews: every gated PR gets an isolated URL; **previews never get production data or
 production secrets.** Feature flags make trunk-based work: unfinished code ships dark; a
 flag older than 90 days is tech debt on the roadmap.
@@ -232,6 +238,11 @@ with deploy rights read no untrusted sources; fork-PR CI gets no repository secr
 - Secrets live in a managed store (GitHub Actions secrets or a cloud secret manager);
   **deploys are keyless** (OIDC/WIF). Never in code, commits, logs, or `.env.example`.
 - Never commit `.env`, `*.pem`, `*.key`, or credential files.
+- **In a public repository, nothing project-specific.** No project id or number, no
+  service-account address, no deployed hostname, no private repository name — not even in a
+  comment or an example. Shared material states the *shape* (`${PROJECT_ID}`, `<hostname>`)
+  and derives the value at setup time. A guard test enforces this; prose alone does not
+  survive the first file copied out of a working project.
 - Never force-push to `main`; `--force` only as `--force-with-lease` with approval.
 - Never bypass branch protection. Never production data on a local machine or preview.
 - New dependencies: justification in the commit body, pinned version, committed lockfile.
