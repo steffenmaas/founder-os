@@ -22,6 +22,7 @@ the work that decides whether the product runs and can legally be published.
 | [`observability.md`](observability.md) | Error reporting (the piece most often missing entirely), the visible build id, analytics behind one consent gate, what to check after every deploy |
 | [`keyless-deploy.md`](keyless-deploy.md) | Merge to production with no stored credential — the OIDC exchange, the one-time setup, and the table of failures already paid for |
 | [`ops-watch.md`](ops-watch.md) | Watching the deploy path and the runtime **without any human login** — public signals, a scheduled read-only CI watch that files issues into the backlog, managed uptime checks |
+| [`iam-repair.md`](iam-repair.md) | Fixing missing Google Cloud permissions by **one click instead of a laptop login** — a dispatch-only workflow whose sole payload is the reviewed setup script, and the honest trust analysis of an owner-equivalent identity |
 | [`going-live.md`](going-live.md) | Legal pages, account deletion, caching and service workers, the pre-launch checklist, store submission |
 
 ---
