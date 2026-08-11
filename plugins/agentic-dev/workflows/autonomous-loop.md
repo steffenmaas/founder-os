@@ -80,6 +80,7 @@ subagent, under one contract, as one background task:
 
 | Step | Subagent | Contract | Writes? |
 |---|---|---|---|
+| The loop itself — groom, bundle, dispatch, gate, report | `orchestrator` | orchestrator-agent | backlog, specs, check-ins, dashboard — **never product code** |
 | PLAN | `planner` | product-agent | no |
 | BUILD (one increment) | **`builder`** | dev-agent | **yes — code and tests** |
 | VERIFY (scoped) | `verifier` | qa-agent | no |
@@ -87,7 +88,7 @@ subagent, under one contract, as one background task:
 | SECURITY (when the diff touches auth, data, CI, deps) | `security-auditor` | security-agent | no |
 | Exploration ("where does X happen?") | any read-only explorer | — | no |
 
-**Only `builder` may write.** That is what makes the dev/QA separation structural rather
+**Only `builder` may write product code.** That is what makes the dev/QA separation structural rather
 than a promise: the reviewing agents physically cannot change the code they judge, and the
 writing agent never issues a verdict on its own work. One `builder` at a time per codebase;
 the read-only ones may run in parallel.
