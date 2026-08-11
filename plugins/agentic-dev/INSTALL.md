@@ -92,6 +92,20 @@ Plugin install state is machine-level: it lives in `~/.claude/plugins/installed_
 A cloud session, a CI job, or a scheduled run gets a **fresh container**, so that file starts
 empty and any earlier installation — terminal or app — never reaches it.
 
+> **Do not commit `extraKnownMarketplaces` into a project.** A marketplace declared by
+> project settings is not one the human added, so the client refuses to let them manage it:
+> removing it in the plugin UI has no effect (the setting re-declares it on the next
+> session, and the add dialog answers *"this marketplace was already added"*), and the
+> **Update button stays greyed out** because there is no user-owned entry to update. Both
+> symptoms were hit in production, and both look like client bugs rather than a committed
+> setting. The template therefore ships `enabledPlugins` only — the marketplace is added
+> once, by the human, wherever they actually work. Recovery when it is already committed:
+> remove the block, then use **Synchronise** in the add dialog to refresh the cache.
+>
+> `enabledPlugins` is an **object** (`{"agentic-dev@founder-os": true}`), not an array. The
+> template shipped the array form while the running production project carried the object
+> form — they must not diverge.
+
 Committing `.claude/settings.json` with `extraKnownMarketplaces` and `enabledPlugins` is not a
 substitute: measured in a project that had exactly that committed, `installed_plugins.json` was
 still `{"version": 2, "plugins": {}}` on a live container. Measured again on a second cloud
