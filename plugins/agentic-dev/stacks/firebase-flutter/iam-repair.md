@@ -60,8 +60,46 @@ The residual trust statement, said out loud: **whoever can merge to `main` can r
 project-owner power via this workflow.** For a solo founder with branch protection that is
 the same trust boundary the deployer already sits behind (whoever merges can ship code to
 production). If that boundary is not acceptable, do not create this identity — keep the
-one-time human `gcloud auth login` for IAM changes, or use Google's **Privileged Access
-Manager** (just-in-time, approval-gated, auto-expiring elevation) instead.
+one-time human `gcloud auth login` for IAM changes, or use Privileged Access Manager
+(next section).
+
+## The complement: Privileged Access Manager (JIT elevation)
+
+Google's **Privileged Access Manager** (IAM & Admin → Privileged Access Manager, no extra
+cost) solves a *different* half of the problem, and the two compose:
+
+- **This workflow removes the human from the routine path** — converging IAM to the
+  script's declared state needs nobody's login.
+- **PAM removes the *standing* privilege from the human** — for everything the script
+  does not cover: ad-hoc console work, debugging, one-off grants.
+
+How PAM works, concretely:
+
+1. **An entitlement** is configured once: *this person may request `roles/owner` (or
+   `projectIamAdmin`) on this project, for at most N hours, with a written justification,
+   with or without a second person's approval.*
+2. **Day to day the account holds almost nothing** — viewer-level roles. There is no
+   standing owner to steal, phish, or fat-finger.
+3. **When elevation is needed**, the person requests it (console, or
+   `gcloud pam grants create`), states the reason, and — if configured — an approver
+   confirms. The role is bound temporarily and **expires by itself**. Request,
+   justification, approval and expiry all land in the audit log.
+
+The honest assessment for a solo founder: without a second person, approval is
+self-approval, so PAM does not protect against your account being compromised — the
+attacker can request elevation too (it is at least logged). Its solo value is **damage
+limitation and hygiene**: no standing owner for a stolen laptop to inherit, no accidental
+production change from an account that is owner all day, and a written record of every
+elevation. With a co-founder as approver it becomes a real four-eyes control.
+
+What PAM does **not** do: remove logins from automation. A scheduled job cannot "request
+elevation" without credentials to ask with — automation stays on WIF. Rule of thumb:
+
+| Need | Tool |
+|---|---|
+| Routine IAM convergence, no human involved | this workflow |
+| Ad-hoc human work without standing owner rights | PAM |
+| Automation of any kind | WIF — never PAM, never a key |
 
 ## Bootstrap — the one unavoidable human act
 
