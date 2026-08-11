@@ -48,9 +48,9 @@ Committing `.claude/settings.json` with `extraKnownMarketplaces` is not a substi
 declaring a marketplace is not fetching it.
 
 What does work is the repository. `install.sh` **mirrors the runtime into `.claude/`** — the
-6 subagents, the 12 skills, the 2 hook scripts, with the hooks merged into
-`.claude/settings.json`. Commit that directory and every session of that repo has a working
-`builder`, anywhere.
+6 subagents, 11 of the 12 skills (`dev-onboard` is deliberately left out — see below), the 2
+hook scripts, with the hooks merged into `.claude/settings.json`. Commit that directory and
+every session of that repo has a working `builder`, anywhere.
 
 In a cloud session on the target project, paste:
 
