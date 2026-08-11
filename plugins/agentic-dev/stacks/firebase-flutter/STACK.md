@@ -9,6 +9,20 @@ without a single long-lived credential existing anywhere.
 product live in front of users this week, and cannot afford an afternoon of infrastructure
 per feature.
 
+## The whole programme
+
+Building the app is the part that is easy to start. These five files are the rest of it —
+the work that decides whether the product runs and can legally be published.
+
+| | Covers |
+|---|---|
+| **This file** | The building blocks, what was deliberately not chosen, the architecture, the repository layout |
+| [`auth-and-data.md`](auth-and-data.md) | Anonymous-to-linked sign-in, the demo/no-backend switch, the four security-rule shapes, Storage, data-model conventions, emulators |
+| [`payments.md`](payments.md) | Client sends an id and nothing else; signed idempotent webhook; grant and record in one transaction; refunds and revocation; test/live secret separation |
+| [`observability.md`](observability.md) | Error reporting (the piece most often missing entirely), the visible build id, analytics behind one consent gate, what to check after every deploy |
+| [`keyless-deploy.md`](keyless-deploy.md) | Merge to production with no stored credential — the OIDC exchange, the one-time setup, and the table of failures already paid for |
+| [`going-live.md`](going-live.md) | Legal pages, account deletion, caching and service workers, the pre-launch checklist, store submission |
+
 ---
 
 ## The building blocks

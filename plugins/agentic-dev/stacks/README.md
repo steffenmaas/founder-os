@@ -16,10 +16,17 @@ A blueprint turns that into a script, a diagram and a table of known failures.
 
 ## What a blueprint contains
 
+A blueprint covers the **whole programme** for a product that runs and is published — not
+just the happy path of writing code.
+
 | File | What it is for |
 |---|---|
-| `STACK.md` | The building blocks: what is used, which version, and **why** — including what was deliberately not chosen. The architecture diagram lives here. |
+| `STACK.md` | The building blocks: what is used, which version, and **why** — including what was deliberately not chosen. The architecture diagram and the index of the rest live here. |
+| `auth-and-data.md` | Identity, the security-rule shapes that carry the authorisation, storage, data-model conventions. |
+| `payments.md` | Taking money without the client deciding what anything costs or grants. |
+| `observability.md` | Error reporting, the visible build id, consent-gated analytics, what to check after a deploy. |
 | `keyless-deploy.md` | How code gets from a merge to production without a single long-lived credential. Diagram, one-time setup, and the failure-mode table. |
+| `going-live.md` | The publishing project: legal pages, account deletion, the pre-launch checklist, store submission. |
 | `setup-keyless-deploy.sh` | The one-time setup, idempotent, parameterless — it reads the project from the repo. |
 | `deploy-main.yml` | The deploy workflow, ready to copy. |
 
