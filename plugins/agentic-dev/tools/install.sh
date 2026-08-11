@@ -88,9 +88,13 @@ come from the loaded plugin.
 
 **Without the plugin loaded, this project can read the rules but cannot delegate.** The loop
 would then write its own code and review its own diff — the thing the separated contracts
-exist to prevent. Check with \`/plugin list\` before trusting the loop, and note that plugin
-install state is machine-level: in ephemeral CI or cloud containers it does not survive to
-the next session.
+exist to prevent.
+
+Confirm before trusting the loop — and note that the check differs by environment: in a
+terminal, \`/plugin list\`; in the Claude Code app, the Plugins screen; in a cloud or CI
+session, neither exists, so dispatch a one-line task to \`builder\` and see whether anything
+comes back. Plugin install state is machine-level (\`~/.claude/plugins/\`), so in ephemeral
+containers it does not survive to the next session at all.
 
 ## To change a rule
 
