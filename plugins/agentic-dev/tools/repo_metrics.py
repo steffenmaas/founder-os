@@ -118,22 +118,30 @@ FIELD = "\x1f"  # field separator
 
 def load_commits(repo: Path, since: str | None) -> list[dict]:
     """Read commit history including numstat."""
-    fmt = SEP + FIELD.join(["%H", "%an", "%aI", "%s", "%b", "%P"])
+    # %b is multi-line, so it must be LAST and must be followed by a field separator.
+    # With %b anywhere else, the record cannot be parsed by looking at its first line —
+    # see the trailing FIELD below, which is what ends the body and begins the numstat.
+    fmt = SEP + FIELD.join(["%H", "%an", "%aI", "%s", "%P", "%b"]) + FIELD
     args = ["log", "--no-merges", f"--pretty=format:{fmt}", "--numstat", "--date=iso-strict"]
     if since:
         args.append(f"--since={since}")
     raw = git(repo, *args)
     commits: list[dict] = []
+    dropped: list[str] = []
 
     for chunk in raw.split(SEP):
         chunk = chunk.strip("\n")
         if not chunk:
             continue
-        head, _, stat_block = chunk.partition("\n")
-        parts = head.split(FIELD)
-        if len(parts) < 6:
+        # Split on the field separator, never on a newline: the body legitimately
+        # contains newlines, and the trailing FIELD emitted after %b is what separates
+        # it from git's --numstat block. \x1f cannot occur in a commit message.
+        parts = chunk.split(FIELD)
+        if len(parts) < 7:
+            dropped.append(chunk[:40])
             continue
-        sha, author, date, subject, body, parents = parts[:6]
+        sha, author, date, subject, parents, body = parts[:6]
+        stat_block = parts[6]
         try:
             ts = datetime.fromisoformat(date)
         except ValueError:
@@ -162,6 +170,15 @@ def load_commits(repo: Path, since: str | None) -> list[dict]:
                 "parents": parents.split(),
                 "files": files,
             }
+        )
+
+    # A parser that silently `continue`s past malformed input is a data filter, not error
+    # handling: 98% loss and 0% loss look identical from the outside. Say so.
+    if dropped:
+        print(
+            f"  ! {len(dropped)} of {len(dropped) + len(commits)} commits could not be "
+            f"parsed and were skipped — the numbers below cover the rest.",
+            file=sys.stderr,
         )
     return commits
 
