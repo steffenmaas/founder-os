@@ -24,7 +24,7 @@ plugins inside it (`plugins/<name>/`).
 
 | Plugin | Module | Status |
 |---|---|---|
-| [`agentic-dev`](plugins/agentic-dev/) | 16 · Agentic Dev — Product & Tech Delivery, Pre-Seed | v0.8.2 |
+| [`agentic-dev`](plugins/agentic-dev/) | 16 · Agentic Dev — Product & Tech Delivery, Pre-Seed | v0.8.3 |
 
 ## How to use this — concretely
 
@@ -45,7 +45,10 @@ desktop-only, and **installing the plugin does not reach a cloud session at all.
 install state is machine-level (`~/.claude/plugins/`), and every cloud session, CI job and
 scheduled run gets a fresh container — measured on a live one, that directory did not exist.
 Committing `.claude/settings.json` with `extraKnownMarketplaces` is not a substitute:
-declaring a marketplace is not fetching it.
+declaring a marketplace is not fetching it — and it makes things worse in the clients where
+plugins *do* work, because a marketplace the project declares is one the human can no longer
+remove or update from the UI. Add the marketplace once, by hand, where you work; the project
+settings carry `enabledPlugins` only.
 
 What does work is the repository. `install.sh` **mirrors the runtime into `.claude/`** — the
 6 subagents, 11 of the 12 skills (`dev-onboard` is deliberately left out — see below), the 2

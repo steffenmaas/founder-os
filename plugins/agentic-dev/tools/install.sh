@@ -279,6 +279,18 @@ try:
 except (FileNotFoundError, json.JSONDecodeError):
     settings = {}
 
+# Seed enabledPlugins here, not from the template. Section 1b creates this file,
+# so by the time section 2 tried to copy the template the file already existed and
+# differed — copy_if_absent then dropped it alongside as .founder-os-new and a fresh
+# install never enabled the plugin at all. Seed only when absent: re-enabling on
+# every update would override a deliberate disable.
+#
+# NOT declared here: extraKnownMarketplaces. A marketplace declared by project
+# settings cannot be removed or updated by the human in the plugin UI — it reappears
+# on the next session and the Update button greys out. The marketplace is added once,
+# by hand, where the person works.
+settings.setdefault("enabledPlugins", {}).setdefault("agentic-dev@founder-os", True)
+
 d = "$CLAUDE_PROJECT_DIR/.claude/hooks"
 managed = {
     "PreToolUse": ("Bash", f"{d}/guard-bash.sh"),
@@ -346,7 +358,6 @@ copy_if_absent docs/specs/_template.md          docs/specs/_template.md
 copy_if_absent docs/decisions/0000-template.md  docs/decisions/0000-template.md
 copy_if_absent docs/learnings/_template.md      docs/learnings/_template.md
 copy_if_absent docs/personas/_template.md       docs/personas/_template.md
-copy_if_absent .claude/settings.json            .claude/settings.json
 copy_if_absent .github/dependabot.yml           .github/dependabot.yml
 copy_if_absent .github/CODEOWNERS               .github/CODEOWNERS
 copy_if_absent .github/PULL_REQUEST_TEMPLATE.md .github/PULL_REQUEST_TEMPLATE.md
