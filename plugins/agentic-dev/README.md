@@ -3,7 +3,7 @@
 **Product & Tech Delivery · Pre-Seed**
 
 The development loop for startups where AI agents write the product code.
-11 skills, 6 agent contracts, 5 subagents, 9 workflows, 2 enforcement hooks, CI/CD templates
+11 skills, 6 agent contracts, 6 subagents, 9 workflows, 2 enforcement hooks, CI/CD templates
 and metrics tooling.
 
 ---
@@ -55,7 +55,7 @@ That is the whole installation. No `git clone`, no `git pull`, no submodule, no 
 | | |
 |---|---|
 | Skills | `/dev-onboard` `/dev-product` `/dev-spec` `/dev-loop` `/dev-review` `/dev-ship` `/dev-security` `/dev-metrics` `/dev-checkin` `/dev-learn` `/dev-dashboard` |
-| Subagents | `planner` `builder` `reviewer` `verifier` `security-auditor` |
+| Subagents | `orchestrator` (acting PO) `planner` `builder` `reviewer` `verifier` `security-auditor` |
 | Hooks | active immediately — force-push to `main`, `--no-verify`, local deploys and `.env` printing are blocked |
 
 ### If you are not using Claude Code
@@ -324,7 +324,7 @@ agentic-dev/
 │   └── contracts/                6 agent contracts
 ├── workflows/                    9 named work sequences
 ├── skills/dev-*/SKILL.md         11 skills
-├── agents/                       5 subagents (only `builder` may write)
+├── agents/                       6 subagents (only `builder` writes product code)
 ├── hooks/                        Guards + scripts
 ├── templates/project/            Copied into a project by /dev-onboard
 │   ├── PRODUCT.md  ROADMAP.md  CLAUDE.md  AGENTS.md

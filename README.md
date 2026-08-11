@@ -37,7 +37,7 @@ plugins inside it (`plugins/<name>/`).
 /plugin install agentic-dev@founder-os
 ```
 
-Update later with `/plugin update`. That gives you 11 skills, 5 subagents, and the
+Update later with `/plugin update`. That gives you 11 skills, 6 subagents, and the
 enforcement hooks — active immediately.
 
 **Claude Code on the web / cloud sessions:** the `/plugin` commands are terminal- and
