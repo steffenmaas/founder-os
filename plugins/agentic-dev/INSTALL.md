@@ -55,6 +55,33 @@ three weeks.
 | **Claude Code app** (desktop/mobile) | Customize → Plugins → add → add marketplace → the `steffenmaas/founder-os` GitHub repo → enable `agentic-dev` | The account, on the devices that sync it |
 | **Cloud sessions** (`claude.ai/code`, scheduled runs) | **Neither of the above reaches them.** See below. | — |
 
+### Updating: the marketplace cache is refreshed separately from the plugin
+
+**A greyed-out "Update" button usually means the client's copy of the marketplace is stale,
+not that you are current.** The client caches the marketplace file when you add it, and
+compares your installed version against that *cache* — not against the repository. If the
+cache still says `0.5.0` and you have `0.5.0`, the button is correctly disabled and you are
+six releases behind.
+
+Symptom that identifies it precisely: the panel shows an **old version together with an old
+description**. Metadata and version travel in the same file, so both go stale together.
+
+| Where | How to refresh |
+|---|---|
+| Terminal | `/plugin marketplace update founder-os`, then `/plugin update` |
+| App (desktop/mobile) | the plugin's or marketplace's `⋮` menu → refresh/update the marketplace |
+| Anywhere, guaranteed | remove the marketplace and add it again — that forces a fresh fetch |
+
+Toggling the plugin off and on does **not** refetch metadata; neither does restarting the
+app. Compare against the source of truth before assuming the client is right:
+
+```bash
+curl -sS https://raw.githubusercontent.com/steffenmaas/founder-os/main/.claude-plugin/marketplace.json
+```
+
+None of this affects cloud sessions or CI — those never load the plugin at all and take
+their runtime from the committed `.claude/` mirror (below).
+
 The `/plugin` slash commands do not exist outside the terminal. The app's plugin screen is the
 equivalent path there, and it is the one most adopters will actually use — it was missing from
 this document entirely.
