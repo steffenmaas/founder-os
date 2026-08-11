@@ -24,7 +24,7 @@ plugins inside it (`plugins/<name>/`).
 
 | Plugin | Module | Status |
 |---|---|---|
-| [`agentic-dev`](plugins/agentic-dev/) | 16 · Agentic Dev — Product & Tech Delivery, Pre-Seed | v0.5.0 |
+| [`agentic-dev`](plugins/agentic-dev/) | 16 · Agentic Dev — Product & Tech Delivery, Pre-Seed | v0.6.0 |
 
 ## How to use this — concretely
 
@@ -37,40 +37,35 @@ plugins inside it (`plugins/<name>/`).
 /plugin install agentic-dev@founder-os
 ```
 
-Update later with `/plugin update`. That gives you 11 skills, 5 subagents, and the
-enforcement hooks — active immediately.
+Update later with `/plugin update`. That gives you 12 skills, 6 subagents, the stack
+blueprints, and the enforcement hooks — active immediately.
 
 **Claude Code on the web / cloud sessions:** the `/plugin` commands are terminal- and
-desktop-only. For cloud sessions, the plugin is declared in the **project repo** instead —
-commit this as `.claude/settings.json` (the onboarding templates ship it):
+desktop-only, and **installing the plugin does not reach a cloud session at all.** Plugin
+install state is machine-level (`~/.claude/plugins/`), and every cloud session, CI job and
+scheduled run gets a fresh container — measured on a live one, that directory did not exist.
+Committing `.claude/settings.json` with `extraKnownMarketplaces` is not a substitute:
+declaring a marketplace is not fetching it.
 
-```json
-{
-  "extraKnownMarketplaces": {
-    "founder-os": {
-      "source": { "source": "github", "repo": "steffenmaas/founder-os" }
-    }
-  },
-  "enabledPlugins": ["agentic-dev@founder-os"]
-}
-```
+What does work is the repository. `install.sh` **mirrors the runtime into `.claude/`** — the
+6 subagents, the 12 skills, the 2 hook scripts, with the hooks merged into
+`.claude/settings.json`. Commit that directory and every session of that repo has a working
+`builder`, anywhere.
 
-Commit once; every cloud session of that repo then loads the module automatically —
-skills, subagents, and hooks included. (Org-wide alternative for Team/Enterprise: server-
-managed settings under Admin Settings → Claude Code.)
+In a cloud session on the target project, paste:
 
-**You never create this file by hand.** In a cloud session on the target project, paste:
+> Set this project up for Founder OS: clone `steffenmaas/founder-os` and follow
+> `plugins/agentic-dev/docs/adopt-existing-project.md` from step 1. Commit `.claude/`
+> together with the rest — it carries the subagents, skills and hooks into every future
+> session.
 
-> Set this project up for Founder OS: write `.claude/settings.json` declaring the
-> marketplace `github: steffenmaas/founder-os` under `extraKnownMarketplaces` and enabling
-> `agentic-dev@founder-os` under `enabledPlugins`, commit and push it. Then clone
-> `steffenmaas/founder-os` and follow
-> `plugins/agentic-dev/docs/adopt-existing-project.md` from step 1.
+The session runs the onboarding and commits both `.founder-os/` (the rulebook) and
+`.claude/` (the runtime). Cloning the repo mid-session is the bridge for that first session.
 
-The session writes and commits the file itself and runs the onboarding; the plugin's
-skills and hooks are active from the **next** session onward (plugins load at session
-start). Cloning the repo mid-session, as in the prompt above, is the bridge for the first
-session — it gives that session the full rulebook immediately.
+Why this matters more than it sounds: without a `builder` to dispatch to, the loop writes
+the code itself and reviews its own diff — the single thing the separated contracts exist to
+prevent — and nothing reports a fault. **`.claude/agents/builder.md` present is a health
+check**, not a detail.
 
 **Start a brand-new project:**
 
@@ -92,6 +87,7 @@ step by step — install, `/dev-onboard` with a prune pass, write the history do
 
 | You want | Type |
 |---|---|
+| Put the project on a proven stack + keyless deploy | `/dev-stack` |
 | Decide what to build next | `/dev-product` |
 | Specify one unit of work | `/dev-spec <item>` |
 | Build it (fresh session) | `/dev-loop <item>` |
@@ -124,7 +120,7 @@ bash /tmp/founder-os/plugins/agentic-dev/tools/install.sh
 ```
 
 That writes the managed rulebook into `.founder-os/` (blueprint, harness, contracts,
-workflows) and creates any missing project files from the templates. Codex reads the rules
+workflows, stack blueprints) and creates any missing project files from the templates. Codex reads the rules
 through `AGENTS.md` automatically; for other agents, start every task with:
 
 ```

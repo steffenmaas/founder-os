@@ -1,6 +1,11 @@
 {
   "name": "agentic-dev",
-  "description": "Module 16 (Agentic Dev) — continuous agentic software development: product-anchored roadmap, specs, separated dev and QA contracts, CI/CD with preview channels, security gate, DORA metrics, and a learning loop back into this repo.",
-  "version": "0.5.0",
-  "author": { "name": "Ocean One Ventures", "url": "https://github.com/steffenmaas" }
+  "description": "Module 16 (Agentic Dev) — the loop for building product with agents: an orchestrator that acts as product owner, separate contracts for dev, QA, security and release, a deploy gate that decides what ships without a human, a source-weighted live backlog, two-tier verification and simulated-user audits. Ships a stack blueprint with a keyless, self-configuring deploy. An incident in one project becomes a rule in all of them.",
+  "version": "0.6.0",
+  "author": {
+    "name": "Ocean One Ventures",
+    "url": "https://github.com/steffenmaas"
+  },
+  "homepage": "https://github.com/steffenmaas/founder-os",
+  "license": "PolyForm-Noncommercial-1.0.0"
 }

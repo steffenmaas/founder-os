@@ -78,4 +78,7 @@ What is deliberately NOT built the way you would expect.>
 - `docs/decisions/` — ADRs. Binding. Not re-litigated.
 - `docs/learnings/` — what we learned the hard way
 - `docs/checkins/` — running log
-- `.founder-os/` — blueprint, harness, contracts, workflows. **Managed — never edit locally.**
+- `.founder-os/` — blueprint, harness, contracts, workflows, stack blueprints. **Managed — never edit locally.**
+- `.claude/agents/`, `.claude/skills/dev-*/`, `.claude/hooks/` — the runtime: subagents,
+  skills, guards. **Managed and committed** — it is what makes the loop work in cloud and CI
+  sessions, which cannot install a plugin. Never edit here; changes travel upstream.

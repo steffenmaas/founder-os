@@ -45,10 +45,51 @@ This mirrors how `fund-os` is structured: one marketplace, one or more plugins i
 
 ## Install
 
-```
-/plugin marketplace add steffenmaas/founder-os
-/plugin install agentic-dev@founder-os
-```
+The module is adopted from three different places, and they do **not** behave the same. Only
+the first was documented, which is how a project ended up with the rulebook and no runtime for
+three weeks.
+
+| Where you work | How to install | Reach |
+|---|---|---|
+| **Terminal / CLI** | `/plugin marketplace add steffenmaas/founder-os` then `/plugin install agentic-dev@founder-os` | The machine you ran it on |
+| **Claude Code app** (desktop/mobile) | Customize → Plugins → add → add marketplace → the `steffenmaas/founder-os` GitHub repo → enable `agentic-dev` | The account, on the devices that sync it |
+| **Cloud sessions** (`claude.ai/code`, scheduled runs) | **Neither of the above reaches them.** See below. | — |
+
+The `/plugin` slash commands do not exist outside the terminal. The app's plugin screen is the
+equivalent path there, and it is the one most adopters will actually use — it was missing from
+this document entirely.
+
+### Cloud and other ephemeral environments
+
+Plugin install state is machine-level: it lives in `~/.claude/plugins/installed_plugins.json`.
+A cloud session, a CI job, or a scheduled run gets a **fresh container**, so that file starts
+empty and any earlier installation — terminal or app — never reaches it.
+
+Committing `.claude/settings.json` with `extraKnownMarketplaces` and `enabledPlugins` is not a
+substitute: measured in a project that had exactly that committed, `installed_plugins.json` was
+still `{"version": 2, "plugins": {}}` on a live container. Measured again on a second cloud
+container, there was no `~/.claude/plugins/` directory at all. **Declaring a marketplace is not
+fetching it.**
+
+So a loop in an ephemeral container cannot be equipped by installing anything once. **Only
+what is in the repository survives** — and `.claude/agents/*.md` and `.claude/skills/*/SKILL.md`
+are read straight from the project directory, with no marketplace and no fetch.
+
+`install.sh` therefore **mirrors the runtime into `.claude/`** (section 1b): the six subagents,
+the twelve skills, and the two hook scripts, with the hooks wired into `.claude/settings.json`
+by merging rather than overwriting. Commit that directory — it is what carries the module into
+an environment that cannot install it.
+
+| | |
+|---|---|
+| **Managed, replaced on update** | `.claude/agents/`, `.claude/skills/dev-*/`, `.claude/hooks/` — recorded in `.claude/.founder-os-manifest` |
+| **Never touched** | your own skills and agents under `.claude/`; only manifest paths are removed |
+| **Merged, not overwritten** | `.claude/settings.json` |
+| **Opt out** | `install.sh --no-claude-assets`, when the plugin is properly installed and you would rather not have both |
+
+Why on by default: a duplicate agent name on a machine that also loads the plugin is visible
+and harmless. A missing `builder` is neither — the loop writes its own code and reviews its own
+diff, and the state looks completely healthy from the outside.
 
 ## Test locally before pushing
 
@@ -97,5 +138,11 @@ different lifecycles and they must not be confused:
   edit it. Rule changes travel upstream as learnings (`/dev-learn --upstream`).
 - `PRODUCT.md`, `ROADMAP.md`, `CLAUDE.md`, `docs/**` belong to the **project** — written once
   by `/dev-onboard`, owned by the project thereafter.
+- `agents/`, `skills/` and `hooks/` are plugin-native — loaded through `plugin.json` where a
+  plugin can be loaded, and **mirrored into `.claude/` where one cannot** (see *Cloud and
+  other ephemeral environments* above). Those copies are managed like `.founder-os/`:
+  replaced on every update, recorded in `.claude/.founder-os-manifest`, never hand-edited.
+  What is *not* managed is everything else under `.claude/` — the project keeps its own
+  skills and agents there, and the installer only ever removes paths it wrote itself.
 
 Getting this wrong is how a rulebook forks into five divergent copies.

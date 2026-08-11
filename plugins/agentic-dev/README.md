@@ -3,8 +3,8 @@
 **Product & Tech Delivery · Pre-Seed**
 
 The development loop for startups where AI agents write the product code.
-11 skills, 6 agent contracts, 5 subagents, 9 workflows, 2 enforcement hooks, CI/CD templates
-and metrics tooling.
+12 skills, 6 agent contracts, 6 subagents, 9 workflows, 1 stack blueprint, 2 enforcement
+hooks, CI/CD templates and metrics tooling.
 
 ---
 
@@ -54,8 +54,8 @@ That is the whole installation. No `git clone`, no `git pull`, no submodule, no 
 
 | | |
 |---|---|
-| Skills | `/dev-onboard` `/dev-product` `/dev-spec` `/dev-loop` `/dev-review` `/dev-ship` `/dev-security` `/dev-metrics` `/dev-checkin` `/dev-learn` `/dev-dashboard` |
-| Subagents | `planner` `builder` `reviewer` `verifier` `security-auditor` |
+| Skills | `/dev-onboard` `/dev-product` `/dev-spec` `/dev-loop` `/dev-review` `/dev-ship` `/dev-security` `/dev-metrics` `/dev-checkin` `/dev-learn` `/dev-dashboard` `/dev-stack` |
+| Subagents | `orchestrator` (acting PO) `planner` `builder` `reviewer` `verifier` `security-auditor` |
 | Hooks | active immediately — force-push to `main`, `--no-verify`, local deploys and `.env` printing are blocked |
 
 ### If you are not using Claude Code
@@ -231,6 +231,25 @@ steps: **who** (contract), **what**, and **the gate** before the next step.
 | [`version-cut`](workflows/version-cut.md) | A product version is complete |
 | [`ux-audit`](workflows/ux-audit.md) | A bundle group shipped — simulated-user check of direction |
 
+## Stack blueprints
+
+A workflow says *how work moves*. A **stack blueprint** ([`stacks/`](stacks/README.md)) says
+*what it runs on and how it gets live* — the building blocks with the reasons, the keyless
+deploy script, the architecture diagram, and a table of every failure the stack has already
+cost someone an afternoon.
+
+| Blueprint | Building blocks | Set up with |
+|---|---|---|
+| [`firebase-flutter`](stacks/firebase-flutter/STACK.md) | Flutter (web + mobile), Firestore + rules, Cloud Functions 2nd gen, Firebase Hosting multi-target, Secret Manager, GitHub Actions deploying keyless via Workload Identity Federation | `/dev-stack firebase-flutter` |
+
+The point is not the file list — it is
+[`keyless-deploy.md`](stacks/firebase-flutter/keyless-deploy.md): the IAM roles that are only
+discovered by failing, the deploy that goes red *after* the site is already live, the
+parameter whose default is silently ignored in CI. **Every entry there is an incident that
+happened once, in one project, and now cannot happen in the next one.** That is the whole
+return on writing a blueprint: the second project does not pay for the first project's
+lesson, and a fix found in either travels back up as an upstream learning.
+
 ---
 
 # Where project knowledge lives
@@ -323,8 +342,10 @@ agentic-dev/
 │   ├── backlog.md                The live, source-weighted backlog
 │   └── contracts/                6 agent contracts
 ├── workflows/                    9 named work sequences
-├── skills/dev-*/SKILL.md         11 skills
-├── agents/                       5 subagents (only `builder` may write)
+├── stacks/                       Stack blueprints — building blocks, keyless deploy,
+│   └── firebase-flutter/         diagram, and the table of failures already paid for
+├── skills/dev-*/SKILL.md         12 skills
+├── agents/                       6 subagents (only `builder` writes product code)
 ├── hooks/                        Guards + scripts
 ├── templates/project/            Copied into a project by /dev-onboard
 │   ├── PRODUCT.md  ROADMAP.md  CLAUDE.md  AGENTS.md
@@ -370,4 +391,4 @@ know: **policy** (where things live, limits, thresholds, role boundaries), **enf
 context. When cutting further: cut knowledge, never policy — and never remove a rule whose
 incident you cannot name as resolved.
 
-*Ocean One Ventures · Founder OS v2.0 · Module 16 · agentic-dev v0.5.0*
+*Ocean One Ventures · Founder OS v2.0 · Module 16 · agentic-dev v0.6.0*

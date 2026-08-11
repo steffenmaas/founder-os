@@ -69,6 +69,7 @@ These apply to every analysis, so they are not reinvented per report:
 
 _None yet._
 
-Pending: `yacht-empire`, `vitacoach`, `3d-boatshow`. In the session of 2026-08-07 the GitHub
-access to those private repositories was blocked and the local clone was out of date, so the
-analysis was deliberately not run rather than computed on a stale state.
+Pending: three internal projects. In the session of 2026-08-07 the GitHub access to those
+private repositories was blocked and the local clone was out of date, so the analysis was
+deliberately not run rather than computed on a stale state. (Names are omitted deliberately —
+this repository is public and the projects are not.)
