@@ -78,6 +78,18 @@ Version: $VERSION
 - \`workflows/\`     — the named sequence for each kind of work
 - \`tools/\`         — metrics and installer
 
+## What is deliberately NOT here
+
+The subagents (\`builder\`, \`verifier\`, \`reviewer\`, \`planner\`, \`security-auditor\`), the
+\`dev-*\` skills and the hooks are **plugin-native** and are not copied into a project. They
+come from the loaded plugin.
+
+**Without the plugin loaded, this project can read the rules but cannot delegate.** The loop
+would then write its own code and review its own diff — the thing the separated contracts
+exist to prevent. Check with \`/plugin list\` before trusting the loop, and note that plugin
+install state is machine-level: in ephemeral CI or cloud containers it does not survive to
+the next session.
+
 ## To change a rule
 
 Write a learning with \`scope: upstream\` in \`docs/learnings/\`, then run
@@ -182,5 +194,14 @@ cat <<'EOF'
      - Environments preview / staging / production, secrets bound to the right one
 
   6. Baseline:  python3 .founder-os/tools/repo_metrics.py .
+
+  7. LIVENESS — the one check that matters. Everything above verifies that files exist.
+     None of it proves the loop can delegate, which is the whole point of the module:
+
+       /plugin list                  # agentic-dev@founder-os must be listed
+       dispatch a one-line task to `builder` and confirm something comes back
+
+     If `builder` is not there, the rulebook is installed and inert. That state looks
+     completely healthy from the outside and stays that way until someone asks.
 EOF
 echo
