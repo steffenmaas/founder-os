@@ -97,5 +97,13 @@ different lifecycles and they must not be confused:
   edit it. Rule changes travel upstream as learnings (`/dev-learn --upstream`).
 - `PRODUCT.md`, `ROADMAP.md`, `CLAUDE.md`, `docs/**` belong to the **project** — written once
   by `/dev-onboard`, owned by the project thereafter.
+- `agents/`, `skills/` and `hooks/` belong to **neither**: they are plugin-native, loaded
+  through `plugin.json`, and are **deliberately not copied into a project**. `install.sh`
+  never touches them. Say this out loud, because the omission is otherwise indistinguishable
+  from a bug — someone who finds `agents/` here and not in their project has nothing to tell
+  them which it is. **Without the plugin loaded, a project has the rulebook but cannot
+  delegate:** `autonomous-loop.md` instructs the orchestrator to dispatch to `builder`, and
+  there is no `builder`. The orchestrator then writes the code itself and reviews its own
+  diff, silently, which is precisely what the contracts exist to prevent.
 
 Getting this wrong is how a rulebook forks into five divergent copies.
