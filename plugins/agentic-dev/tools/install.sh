@@ -57,6 +57,7 @@ if [ "$MODE" != "dry" ]; then
   cp    "$ROOT/knowledge/backlog.md"      .founder-os/
   cp -r "$ROOT/knowledge/contracts"       .founder-os/
   cp -r "$ROOT/workflows"                 .founder-os/
+  cp -r "$ROOT/stacks"                    .founder-os/
   cp    "$ROOT/tools/repo_metrics.py"   .founder-os/tools/
   cp    "$ROOT/tools/install.sh"        .founder-os/tools/
   printf '%s\n' "$VERSION" > .founder-os/VERSION
@@ -76,6 +77,7 @@ Version: $VERSION
 - \`backlog.md\`     — the live-backlog doctrine
 - \`contracts/\`     — one contract per agent role
 - \`workflows/\`     — the named sequence for each kind of work
+- \`stacks/\`        — stack blueprints: building blocks, keyless deploy, known failures
 - \`tools/\`         — metrics and installer
 
 ## To change a rule
@@ -93,7 +95,7 @@ bash .founder-os/tools/install.sh --update   # without Claude Code
 EOF
 fi
 
-say "blueprint.md, harness.md, deploy-gate.md, backlog.md, contracts/ (5), workflows/ (9), tools/"
+say "blueprint.md, harness.md, deploy-gate.md, backlog.md, contracts/ (6), workflows/ (9), stacks/, tools/"
 [ "$MODE" = "update" ] && { head_ "Updated to v$VERSION. Project files untouched."; exit 0; }
 
 # --------------------------------------------------------------------------- #
@@ -171,6 +173,9 @@ cat <<'EOF'
 
   3. Workflows — adjust package manager, test commands, and hosting provider in
      .github/workflows/preview.yml and deploy.yml.
+     On a stack that already has a blueprint (see .founder-os/stacks/), do not write
+     the deploy path by hand — `/dev-stack <name>` writes the keyless setup script,
+     the deploy workflow and the deployment docs with this project's values.
 
   4. ROADMAP.md — seed from your backlog. Maximum 3 items under Now.
 

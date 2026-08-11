@@ -1,0 +1,150 @@
+# Founder OS · Module 16 — stack blueprint: firebase-flutter
+# Copy to .github/workflows/deploy-main.yml and replace the <…> values.
+#
+# Push to `main` → build → deploy → verify that the new version is actually
+# live. Keyless: authentication is OIDC / Workload Identity Federation, so no
+# service-account key and no FIREBASE_TOKEN exist anywhere.
+#
+# One-time IAM setup: ./scripts/setup-keyless-deploy.sh
+# Background, diagram, failure table:
+#   .founder-os/stacks/firebase-flutter/keyless-deploy.md
+#
+# The provider path and service-account e-mail below are NOT secrets. Access is
+# restricted server-side by the provider's attribute-condition, which names this
+# repository; a fork presenting its own token fails the exchange.
+
+name: Deploy to Firebase (live)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # required for WIF (OIDC) — without it the very first run fails
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+env:
+  PROJECT_ID: <your-firebase-project-id>
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # --- Flutter web -----------------------------------------------------
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Build Flutter web
+        working-directory: app
+        run: |
+          flutter --version
+          flutter pub get
+          flutter build web --release --no-web-resources-cdn
+
+      # A deploy is not done when the command exits — it is done when the new
+      # version answers. This file is what the verify job compares against.
+      # Give it a no-cache header in firebase.json, or the check reads a
+      # cached answer and passes while the old app is still being served.
+      - name: Stamp the build with the commit
+        run: |
+          printf '{"commit":"%s","ref":"%s"}\n' "$GITHUB_SHA" "$GITHUB_REF" \
+            > app/build/web/build-id.json
+
+      # --- Cloud Functions dependencies ------------------------------------
+      # The predeploy hook in firebase.json compiles TypeScript.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --prefix functions
+
+      # --- Keyless authentication ------------------------------------------
+      - name: Authenticate to Google Cloud (WIF)
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: <projects/NNN/locations/global/workloadIdentityPools/github/providers/github-oidc>
+          service_account: <github-hosting-deployer@PROJECT_ID.iam.gserviceaccount.com>
+
+      # --- Hosting ----------------------------------------------------------
+      # Targets are named explicitly rather than a blanket `--only hosting`:
+      # the log then says what went where, and a target added later cannot go
+      # live unnoticed by riding along with an unrelated deploy.
+      - name: Deploy Hosting
+        if: steps.auth.outcome == 'success'
+        run: |
+          npx --yes firebase-tools@15 deploy \
+            --only hosting:<app>,hosting:<landing> \
+            --project "$PROJECT_ID" \
+            --non-interactive --force
+
+      # --- Security rules and indexes ---------------------------------------
+      - name: Deploy Firestore + Storage rules
+        if: steps.auth.outcome == 'success'
+        run: |
+          npx --yes firebase-tools@15 deploy \
+            --only firestore:rules,firestore:indexes,storage \
+            --project "$PROJECT_ID" \
+            --non-interactive --force
+
+      # --- Cloud Functions ---------------------------------------------------
+      # Non-secret parameters (defineString) must reach the CLI as a dotenv file
+      # in the functions folder. A default in the code is a prompt suggestion,
+      # not a CI source, and process.env is not consulted — so a step-level
+      # `env:` alone would NOT fix the deploy. The file is written during the
+      # run rather than committed: a checked-in functions/.env becomes a magnet
+      # for secrets. Real secrets stay in Secret Manager (defineSecret).
+      - name: Deploy Functions
+        if: steps.auth.outcome == 'success'
+        env:
+          APP_BASE_URL: <https://your-app-site.web.app>
+        run: |
+          if [ -e functions/.env ]; then
+            echo "::error::functions/.env is committed — this step would overwrite it."
+            exit 1
+          fi
+          printf 'APP_BASE_URL=%s\n' "$APP_BASE_URL" > functions/.env
+          set +e
+          npx --yes firebase-tools@15 deploy \
+            --only functions \
+            --project "$PROJECT_ID" \
+            --non-interactive --force 2>&1 | tee /tmp/deploy.out
+          code="${PIPESTATUS[0]}"
+          set -e
+          # Re-deploying an identical revision is not a failure.
+          if [ "$code" -ne 0 ] && grep -q "is the current active version" /tmp/deploy.out; then
+            echo "Version already live — nothing to do."
+            exit 0
+          fi
+          exit "$code"
+
+  verify:
+    name: post-deploy verification
+    needs: build_and_deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: The site answers
+        run: |
+          for i in 1 2 3 4 5; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "<https://your-app-site.web.app>")
+            [ "$code" = "200" ] && exit 0
+            echo "attempt $i: HTTP $code — retrying in 15s"; sleep 15
+          done
+          echo "::error::The deployed site does not answer after 5 attempts."
+          exit 1
+
+      - name: The live version is this commit
+        run: |
+          deployed=$(curl -s "<https://your-app-site.web.app>/build-id.json" || true)
+          echo "live: $deployed / expected: $GITHUB_SHA"
+          case "$deployed" in
+            *"$GITHUB_SHA"*) exit 0 ;;
+          esac
+          echo "::error::The live build does not carry $GITHUB_SHA — the deploy did not land."
+          exit 1

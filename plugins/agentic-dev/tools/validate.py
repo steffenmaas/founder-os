@@ -147,6 +147,41 @@ def main() -> int:
                 bad.append(f"{r}:{i}: unreplaced placeholder")
     failed |= report("Placeholders", bad, 0)
 
+    # --- Leaked identifiers ------------------------------------------------
+    # This repository is public; the projects it was distilled from are not. A
+    # concrete project number, service-account address or deployed hostname is
+    # of no use to a reader and tells an attacker where to aim. Everything
+    # project-specific must stay a placeholder (<…>) or a shell variable (${…}).
+    #
+    # This is a guard test, not documentation: the leak that matters is the one
+    # nobody notices while copying a working file out of a real project.
+    leaks = [
+        (re.compile(r"\b\d{9,}\b"), "looks like a GCP project number"),
+        (
+            re.compile(r"[\w.%+-]+@[\w.-]*\.iam\.gserviceaccount\.com"),
+            "concrete service-account address",
+        ),
+        (
+            re.compile(r"\b[\w-]+\.(?:web\.app|firebaseapp\.com)\b"),
+            "concrete deployed hostname",
+        ),
+    ]
+    bad = []
+    checked = 0
+    for f in walk(".md", ".sh", ".yml", ".yaml", ".json", ".py"):
+        if f.name == "validate.py":  # the patterns above live here
+            continue
+        checked += 1
+        for i, line in enumerate(f.read_text().splitlines(), 1):
+            # A placeholder or a shell/CI variable is the correct form — skip it.
+            if "<" in line or "${" in line or "$(" in line:
+                continue
+            for pattern, why in leaks:
+                m = pattern.search(line)
+                if m:
+                    bad.append(f"{rel(f)}:{i}: {why} — '{m.group(0)}'")
+    failed |= report("Leaked identifiers", bad, checked)
+
     print("\n" + ("FAILED" if failed else "ALL GREEN"))
     return 1 if failed else 0
 

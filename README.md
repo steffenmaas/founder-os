@@ -24,7 +24,7 @@ plugins inside it (`plugins/<name>/`).
 
 | Plugin | Module | Status |
 |---|---|---|
-| [`agentic-dev`](plugins/agentic-dev/) | 16 · Agentic Dev — Product & Tech Delivery, Pre-Seed | v0.5.0 |
+| [`agentic-dev`](plugins/agentic-dev/) | 16 · Agentic Dev — Product & Tech Delivery, Pre-Seed | v0.6.0 |
 
 ## How to use this — concretely
 
@@ -37,8 +37,8 @@ plugins inside it (`plugins/<name>/`).
 /plugin install agentic-dev@founder-os
 ```
 
-Update later with `/plugin update`. That gives you 11 skills, 6 subagents, and the
-enforcement hooks — active immediately.
+Update later with `/plugin update`. That gives you 12 skills, 6 subagents, the stack
+blueprints, and the enforcement hooks — active immediately.
 
 **Claude Code on the web / cloud sessions:** the `/plugin` commands are terminal- and
 desktop-only. For cloud sessions, the plugin is declared in the **project repo** instead —
@@ -92,6 +92,7 @@ step by step — install, `/dev-onboard` with a prune pass, write the history do
 
 | You want | Type |
 |---|---|
+| Put the project on a proven stack + keyless deploy | `/dev-stack` |
 | Decide what to build next | `/dev-product` |
 | Specify one unit of work | `/dev-spec <item>` |
 | Build it (fresh session) | `/dev-loop <item>` |
@@ -124,7 +125,7 @@ bash /tmp/founder-os/plugins/agentic-dev/tools/install.sh
 ```
 
 That writes the managed rulebook into `.founder-os/` (blueprint, harness, contracts,
-workflows) and creates any missing project files from the templates. Codex reads the rules
+workflows, stack blueprints) and creates any missing project files from the templates. Codex reads the rules
 through `AGENTS.md` automatically; for other agents, start every task with:
 
 ```
