@@ -32,6 +32,21 @@ scheduled trigger** (a cron the agent cannot forget). It does not ask for work.
 
 ## Loop rules
 
+**A tick is a work unit, not a status call.** The most deceptive way this loop fails is
+also the quietest: the trigger keeps firing, every tick writes a tidy check-in, and no
+work happens — for hours, with every signal green. Observed in production: a scheduled
+"check-in" prompt produced status reports all day while zero agents were spawned and zero
+items moved. Three rules close it:
+
+1. **The trigger's prompt carries the mandate, never the report.** It says *pull, bundle,
+   dispatch* — not "check in" or "status". A session asked for a status will deliver
+   exactly that and stop.
+2. **A cycle that dispatched nothing must name its blocker in one line** — empty backlog,
+   gate awaiting approval, red `main` being fixed, runtime missing. "Nothing to report"
+   without a named blocker is not an idle loop, it is a broken one.
+3. **The check-in is written at the end of a work cycle, never instead of one.** Report
+   time is after dispatch time, in the same tick.
+
 **Strictly sequential builders.** One `builder` at a time per codebase. Parallel is for
 read-only work only. Two agents writing produce merge conflicts, not speed.
 

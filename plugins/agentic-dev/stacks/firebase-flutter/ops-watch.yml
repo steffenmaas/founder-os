@@ -1,0 +1,134 @@
+# Founder OS · Module 16 — stack blueprint: firebase-flutter
+# Copy to .github/workflows/ops-watch.yml and replace the <…> values.
+#
+# Scheduled watch over the deploy path and the running functions — keyless, on a
+# READ-ONLY identity. No human login is part of this path; that is the point.
+# Concept and rationale: .founder-os/stacks/firebase-flutter/ops-watch.md
+#
+# On failure it files ONE GitHub issue (label: ops-watch) and keeps it updated.
+# That issue feeds the backlog (source: ops-watch) — an incident becomes a work
+# item mechanically, not when someone happens to look.
+
+name: ops-watch
+
+on:
+  schedule:
+    - cron: "*/30 * * * *" # GitHub may delay; the log window below allows for it
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # WIF (OIDC)
+  issues: write # the alarm channel
+  actions: read # read the deploy workflow's conclusion
+
+env:
+  PROJECT_ID: <your-firebase-project-id>
+  APP_URL: <https://your-app-site.web.app>
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # main — the commit the live site should serve
+
+      # ------------------------------------------------------------------ #
+      # Layer 0 — public signals, no auth
+      # ------------------------------------------------------------------ #
+      - name: Site answers
+        id: alive
+        run: |
+          code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$APP_URL") || code=000
+          echo "HTTP $code"
+          [ "$code" = "200" ] || { echo "FAIL site HTTP $code" >> /tmp/findings; }
+
+      - name: Live version matches main
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          deployed=$(curl -s --max-time 20 "$APP_URL/build-id.json" || true)
+          echo "live: $deployed"
+          echo "main: $GITHUB_SHA"
+          case "$deployed" in *"$GITHUB_SHA"*) echo "match"; exit 0 ;; esac
+          # Mismatch — but a deploy still running is not drift. Judge with context.
+          state=$(gh run list --workflow deploy-main.yml --branch main --limit 1 \
+                    --json status,conclusion -q '.[0] | "\(.status)/\(.conclusion)"' || echo "unknown")
+          echo "latest deploy run: $state"
+          case "$state" in
+            in_progress/*|queued/*) echo "deploy in flight — tolerated" ;;
+            completed/success)      echo "FAIL version drift: deploy green but $GITHUB_SHA not live" >> /tmp/findings ;;
+            completed/*)            echo "FAIL deploy run concluded '$state' — main is not shipping" >> /tmp/findings ;;
+            *)                      echo "FAIL version drift and deploy state unreadable ($state)" >> /tmp/findings ;;
+          esac
+
+      # ------------------------------------------------------------------ #
+      # Layer 1 — function errors, keyless via WIF, read-only identity
+      # ------------------------------------------------------------------ #
+      - name: Authenticate to Google Cloud (WIF, monitor SA)
+        id: auth
+        continue-on-error: true # auth failure is itself a finding, not a crash
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: <projects/NNN/locations/global/workloadIdentityPools/github/providers/github-oidc>
+          service_account: <github-ops-monitor@PROJECT_ID.iam.gserviceaccount.com>
+
+      - name: Function errors since the last tick
+        if: steps.auth.outcome == 'success'
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Read error logs
+        if: steps.auth.outcome == 'success'
+        run: |
+          # 2nd-gen functions log as Cloud Run revisions. Window > cron interval,
+          # because GitHub cron drifts; a doubly-reported error beats a missed one.
+          errors=$(gcloud logging read \
+            'resource.type="cloud_run_revision" AND severity>=ERROR AND timestamp>="-45m"' \
+            --project "$PROJECT_ID" --limit 20 \
+            --format 'value(resource.labels.service_name, severity, textPayload)' 2>/dev/null || echo "READERR")
+          if [ "$errors" = "READERR" ]; then
+            echo "FAIL could not read logs (role or API missing?)" >> /tmp/findings
+          elif [ -n "$errors" ]; then
+            echo "$errors" | head -20
+            echo "FAIL function errors in the last 45m:" >> /tmp/findings
+            echo "$errors" | head -10 >> /tmp/findings
+          else
+            echo "logs clean"
+          fi
+
+      - name: WIF auth itself failed
+        if: steps.auth.outcome != 'success'
+        run: echo "FAIL WIF auth failed — the watch is blind on the log layer" >> /tmp/findings
+
+      # ------------------------------------------------------------------ #
+      # The alarm: one issue, updated — never a new one per tick
+      # ------------------------------------------------------------------ #
+      - name: File or update the ops-watch issue
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ ! -s /tmp/findings ]; then
+            echo "all green"
+            # Close a previously open alarm so the issue tracks CURRENT state.
+            n=$(gh issue list --label ops-watch --state open --json number -q '.[0].number' || true)
+            [ -n "$n" ] && gh issue close "$n" --comment "ops-watch: all checks green again ($(date -u +%FT%TZ))."
+            exit 0
+          fi
+          body="ops-watch findings, $(date -u +%FT%TZ), run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+
+          \`\`\`
+          $(cat /tmp/findings)
+          \`\`\`
+
+          source: ops-watch — treat as a bug in the backlog (bugs outrank features)."
+          n=$(gh issue list --label ops-watch --state open --json number -q '.[0].number' || true)
+          if [ -n "$n" ]; then
+            gh issue comment "$n" --body "$body"
+          else
+            gh issue create --title "ops-watch: deploy path or runtime unhealthy" \
+              --label ops-watch --body "$body" || \
+            gh issue create --title "ops-watch: deploy path or runtime unhealthy" \
+              --body "$body"   # label may not exist yet on first run
+          fi
+          echo "findings filed:"; cat /tmp/findings
+          exit 1
