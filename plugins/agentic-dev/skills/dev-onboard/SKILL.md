@@ -99,14 +99,17 @@ No repository content can set these; they live in GitHub. Do not just list them 
 human through each one with the exact path (or `gh` command), wait for confirmation, and
 record the outcome:
 
+**Paste the URL, do not describe the path.** "Settings → Branches" is a hint; a link is a
+surface the human can click. Substitute `<owner>/<repo>` once and hand over the real address.
+
 | Setting | Exactly where / how | Caveat |
 |---|---|---|
-| **Branch protection on `main`** | Settings → Branches → *Add branch ruleset* for `main`: require PR, require status checks **by the job names just installed** (e.g. `quality`, `secret scan (gitleaks)`), block force pushes, include administrators. CLI: `gh api -X PUT repos/<owner>/<repo>/branches/main/protection --input protection.json` | Check names must match the workflow job names or "required checks" never turn green. |
-| **Actions may create PRs** | Settings → Actions → General → Workflow permissions → tick **"Allow GitHub Actions to create and approve pull requests"** | **Required by `founder-os-update.yml`** — without it the daily update PR dies with 403. |
+| **Branch protection on `main`** | `github.com/<owner>/<repo>/settings/branches` → *Add branch ruleset* for `main`: require PR, require status checks **by the job names just installed** (e.g. `quality`, `secret scan (gitleaks)`), block force pushes, include administrators. CLI: `gh api -X PUT repos/<owner>/<repo>/branches/main/protection --input protection.json` | Check names must match the workflow job names or "required checks" never turn green. |
+| **Actions may create PRs** | `github.com/<owner>/<repo>/settings/actions` → Workflow permissions → tick **"Allow GitHub Actions to create and approve pull requests"** | **Required by `founder-os-update.yml`** — without it the daily update PR dies with 403. |
 | **Actions default permissions** | Same page → *Read repository contents* | Individual jobs widen per-workflow `permissions:` blocks. |
-| **Secret scanning + push protection** | Settings → Advanced Security → enable both | **Private repos need the paid Secret Protection add-on.** Without it, the gitleaks CI job plus the local scan hook are the working control — report this box as *plan-limited*, never as ticked. |
-| **Dependabot alerts + security updates** | Settings → Advanced Security → enable both | Free on all plans. |
-| **Environments** | Settings → Environments → create `preview` / `staging` / `production`; bind secrets to the right one; optional **required reviewer on `production`** | The required reviewer is the manual approval gate for deploy-gated changes. |
+| **Secret scanning + push protection** | `github.com/<owner>/<repo>/settings/security_analysis` → enable both | **Private repos need the paid Secret Protection add-on.** Without it, the gitleaks CI job plus the local scan hook are the working control — report this box as *plan-limited*, never as ticked. |
+| **Dependabot alerts + security updates** | Same page → enable both | Free on all plans. |
+| **Environments** | `github.com/<owner>/<repo>/settings/environments` → create `preview` / `staging` / `production`; bind secrets to the right one; optional **required reviewer on `production`** | The required reviewer is the manual approval gate for deploy-gated changes. |
 
 Report every row as **ticked**, **plan-limited**, or **postponed by the human** — never
 silently skipped. This step is where adoption PRs go red for reasons that look like code
