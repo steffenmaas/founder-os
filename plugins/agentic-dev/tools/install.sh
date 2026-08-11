@@ -17,17 +17,24 @@
 
 set -euo pipefail
 
-MODE="install"
+OP="install"      # "install" or "update" — independent of DRY, see below
+DRY=0             # 1 = preview only, nothing written
 MIRROR=1          # copy agents/skills/hooks into .claude/ — see section 1b
 while [ $# -gt 0 ]; do
   case "$1" in
-    --dry-run)           MODE="dry" ;;
-    --update)            MODE="update" ;;
+    --dry-run)           DRY=1 ;;
+    --update)            OP="update" ;;
     --no-claude-assets)  MIRROR=0 ;;
     *) echo "unknown option: $1" >&2; exit 2 ;;
   esac
   shift
 done
+# OP and DRY are set by separate flags on purpose: `MODE` used to be a single
+# three-way variable ("install" / "update" / "dry"), so whichever of --update
+# and --dry-run came last silently won. `--update --dry-run` previewed a full
+# install instead of an update — the trap being that the safety-first flag
+# order produced the wrong preview. Two independent flags mean order never
+# matters: `--update --dry-run` and `--dry-run --update` are now identical.
 
 # Plugin root: set by Claude Code, otherwise inferred from this script's location.
 ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
@@ -45,14 +52,14 @@ VERSION=$(python3 -c "import json;print(json.load(open('$ROOT/.claude-plugin/plu
 
 head_ "Founder OS · Module 16 — Agentic Dev  (v$VERSION)"
 say "target: $(pwd)"
-[ "$MODE" = "dry" ] && say "(dry run — nothing will be written)"
+[ "$DRY" = "1" ] && say "(dry run — nothing will be written)"
 
 # --------------------------------------------------------------------------- #
 # 1. The managed directory — fully replaced every time
 # --------------------------------------------------------------------------- #
 head_ "1. Managed rulebook → .founder-os/"
 
-if [ "$MODE" != "dry" ]; then
+if [ "$DRY" != "1" ]; then
   rm -rf .founder-os
   mkdir -p .founder-os/tools
   cp    "$ROOT/knowledge/blueprint.md"    .founder-os/
@@ -98,6 +105,10 @@ exactly what the separated contracts exist to prevent. Nothing reports a fault.
 
 - \`.claude/agents/\`, \`.claude/skills/dev-*/\`, \`.claude/hooks/\` — **managed**, replaced on
   every update, listed in \`.claude/.founder-os-manifest\`. Do not edit them here.
+- \`dev-onboard\` is the one skill **not** mirrored. It rewrites \`PRODUCT.md\`, \`ROADMAP.md\`,
+  \`CLAUDE.md\` and \`AGENTS.md\` from blank templates — right for a first-time setup, a loaded
+  weapon in a project that has already been running for weeks. Run it from the plugin, or by
+  hand, when you actually mean to onboard.
 - Your own project skills and agents under \`.claude/\` are untouched: only paths in that
   manifest are ever removed.
 - \`.claude/settings.json\` is **merged**, not overwritten — existing keys are preserved.
@@ -154,7 +165,7 @@ if [ "$MIRROR" = "1" ]; then
   # Remove what a previous run owned, so a renamed or deleted asset does not
   # linger. Only paths in the manifest — never a blanket rm on .claude/, which
   # would take the project's own skills with it.
-  if [ "$MODE" != "dry" ] && [ -f "$MANIFEST" ]; then
+  if [ "$DRY" != "1" ] && [ -f "$MANIFEST" ]; then
     while IFS= read -r old; do
       case "$old" in .claude/*) [ -n "$old" ] && rm -f "$old" ;; esac
     done < "$MANIFEST"
@@ -164,9 +175,18 @@ if [ "$MIRROR" = "1" ]; then
   NEW_MANIFEST=""
   mirror() { # $1 = source file, $2 = destination
     NEW_MANIFEST="${NEW_MANIFEST}$2"$'\n'
-    [ "$MODE" = "dry" ] && return 0
+    [ "$DRY" = "1" ] && return 0
     mkdir -p "$(dirname "$2")"
-    cp "$1" "$2"
+    # Skills reference their own tools and templates as ${CLAUDE_PLUGIN_ROOT}/…, which
+    # only resolves when Claude Code has actually loaded the plugin. In the mirror it
+    # is unset, so the path is dead in exactly the environment the mirror exists for
+    # (cloud sessions, CI, scheduled runs — no plugin install). Rewrite it to where
+    # section 1/2 of this script actually put those files: tools/ under .founder-os/,
+    # templates/project/ flattened onto the project root.
+    sed \
+      -e 's|\${CLAUDE_PLUGIN_ROOT}/tools/|.founder-os/tools/|g' \
+      -e 's|\${CLAUDE_PLUGIN_ROOT}/templates/project/||g' \
+      "$1" > "$2"
   }
 
   N_AGENTS=0
@@ -179,7 +199,16 @@ if [ "$MIRROR" = "1" ]; then
   N_SKILLS=0
   for d in "$ROOT"/skills/*/; do
     [ -f "$d/SKILL.md" ] || continue
-    mirror "$d/SKILL.md" ".claude/skills/$(basename "$d")/SKILL.md"
+    name="$(basename "$d")"
+    # dev-onboard writes PRODUCT.md, ROADMAP.md, CLAUDE.md and AGENTS.md from blank
+    # module templates. Right the first time a repo is set up; a loaded weapon mirrored
+    # into a project that has been running for weeks — an agent reading "onboard this
+    # repo" would overwrite the real product definition with an empty one. It is also a
+    # one-time, human-present setup step (it interviews, it walks through repo
+    # settings), not something a headless cloud session or scheduled run should invoke
+    # on its own, so leaving it out of the mirror costs nothing.
+    [ "$name" = "dev-onboard" ] && continue
+    mirror "$d/SKILL.md" ".claude/skills/$name/SKILL.md"
     N_SKILLS=$((N_SKILLS + 1))
   done
 
@@ -187,7 +216,7 @@ if [ "$MIRROR" = "1" ]; then
   for f in "$ROOT"/hooks/scripts/*.sh; do
     [ -e "$f" ] || continue
     mirror "$f" ".claude/hooks/$(basename "$f")"
-    [ "$MODE" != "dry" ] && chmod +x ".claude/hooks/$(basename "$f")"
+    [ "$DRY" != "1" ] && chmod +x ".claude/hooks/$(basename "$f")"
     N_HOOKS=$((N_HOOKS + 1))
   done
 
@@ -196,7 +225,7 @@ if [ "$MIRROR" = "1" ]; then
   # The hooks still need wiring. Merge into .claude/settings.json rather than
   # writing it: that file usually already carries extraKnownMarketplaces and
   # enabledPlugins, and overwriting it would silently undo the cloud setup.
-  if [ "$MODE" != "dry" ]; then
+  if [ "$DRY" != "1" ]; then
     mkdir -p .claude
     python3 - <<'PY'
 import json, os
@@ -239,7 +268,14 @@ PY
   say "managed — replaced on every update; do not edit under .claude/"
 fi
 
-[ "$MODE" = "update" ] && { head_ "Updated to v$VERSION. Project files untouched."; exit 0; }
+if [ "$OP" = "update" ]; then
+  if [ "$DRY" = "1" ]; then
+    head_ "Dry run: would update to v$VERSION. Project files untouched."
+  else
+    head_ "Updated to v$VERSION. Project files untouched."
+  fi
+  exit 0
+fi
 
 # --------------------------------------------------------------------------- #
 # 2. Project files — created only when absent, never overwritten
@@ -254,7 +290,7 @@ copy_if_absent() { # $1 = path under templates/project, $2 = destination
     if cmp -s "$src" "$dst"; then SAME+=("$dst"); else CONFLICT+=("$1|$dst"); fi
     return 0
   fi
-  if [ "$MODE" != "dry" ]; then mkdir -p "$(dirname "$dst")"; cp "$src" "$dst"; fi
+  if [ "$DRY" != "1" ]; then mkdir -p "$(dirname "$dst")"; cp "$src" "$dst"; fi
   CREATED+=("$dst")
 }
 
@@ -276,7 +312,7 @@ for w in ci security preview deploy founder-os-update; do
   copy_if_absent ".github/workflows/$w.yml" ".github/workflows/$w.yml"
 done
 
-if [ "$MODE" != "dry" ]; then
+if [ "$DRY" != "1" ]; then
   mkdir -p docs/checkins docs/specs docs/decisions docs/learnings
   for d in checkins specs decisions learnings; do
     [ -e "docs/$d/.gitkeep" ] || touch "docs/$d/.gitkeep"
@@ -289,14 +325,14 @@ for entry in "${CONFLICT[@]:-}"; do
   [ -z "$entry" ] && continue
   src="${entry%%|*}"; dst="${entry##*|}"
   warn "≠ $dst exists and differs — template placed alongside as $dst.founder-os-new"
-  [ "$MODE" != "dry" ] && cp "$ROOT/templates/project/$src" "$dst.founder-os-new"
+  [ "$DRY" != "1" ] && cp "$ROOT/templates/project/$src" "$dst.founder-os-new"
 done
 
 # --------------------------------------------------------------------------- #
 # 3. .gitignore safety net
 # --------------------------------------------------------------------------- #
 head_ "3. .gitignore"
-if [ "$MODE" != "dry" ]; then
+if [ "$DRY" != "1" ]; then
   for pattern in ".env" ".env.*" "!.env.example" "*.pem" "*.key"; do
     grep -qxF "$pattern" .gitignore 2>/dev/null || echo "$pattern" >> .gitignore
   done

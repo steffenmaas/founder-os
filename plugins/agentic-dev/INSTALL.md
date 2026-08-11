@@ -76,9 +76,12 @@ what is in the repository survives** — and `.claude/agents/*.md` and `.claude/
 are read straight from the project directory, with no marketplace and no fetch.
 
 `install.sh` therefore **mirrors the runtime into `.claude/`** (section 1b): the six subagents,
-the twelve skills, and the two hook scripts, with the hooks wired into `.claude/settings.json`
-by merging rather than overwriting. Commit that directory — it is what carries the module into
-an environment that cannot install it.
+eleven of the twelve skills, and the two hook scripts, with the hooks wired into
+`.claude/settings.json` by merging rather than overwriting. `dev-onboard` is the one skill left
+out — it rewrites `PRODUCT.md`, `ROADMAP.md`, `CLAUDE.md` and `AGENTS.md` from blank templates,
+correct for a first-time setup and dangerous mirrored into a project that has been running for
+weeks. Commit `.claude/` — it is what carries the module into an environment that cannot
+install it.
 
 | | |
 |---|---|
