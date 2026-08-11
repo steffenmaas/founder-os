@@ -39,13 +39,42 @@ done
 # Plugin root: set by Claude Code, otherwise inferred from this script's location.
 ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 TARGET="${FOUNDER_OS_TARGET:-$PWD}"
+REPO_URL="${FOUNDER_OS_REPO:-https://github.com/steffenmaas/founder-os}"
 
 say()  { printf '  %s\n' "$*"; }
 head_() { printf '\n\033[1m%s\033[0m\n' "$*"; }
 warn() { printf '  ! %s\n' "$*" >&2; }
 
+# One EXIT trap for every temporary path. Individual traps would overwrite each
+# other — the staging swap in section 1 used to clear the trap and with it any
+# earlier cleanup registration.
+CLEANUP_PATHS=()
+cleanup() { for p in "${CLEANUP_PATHS[@]:-}"; do [ -n "$p" ] && rm -rf "$p"; done; }
+trap cleanup EXIT
+
 cd "$TARGET"
 [ -d .git ] || { warn "Not a git repository: $(pwd)"; exit 1; }
+
+# The copy of this script that lives in a project (.founder-os/tools/install.sh)
+# has NO module source around it — .founder-os/ holds the flattened rulebook, not
+# the plugin tree. So `bash .founder-os/tools/install.sh --update`, exactly as the
+# docs advertise, used to die here with "Cannot find the module". An updater that
+# cannot reach its source fetches it: clone the latest release (falling back to
+# the default branch when no tag is reachable) and use that as ROOT.
+if [ ! -d "$ROOT/knowledge" ]; then
+  say "module source not present at $ROOT — fetching from $REPO_URL"
+  command -v git >/dev/null || { warn "git is required to fetch the module"; exit 1; }
+  TMP_SRC="$(mktemp -d)"
+  CLEANUP_PATHS+=("$TMP_SRC")
+  TAG="$(git ls-remote --tags --refs "$REPO_URL" 'agentic-dev/v*' 2>/dev/null \
+          | sed 's|.*refs/tags/||' | sort -V | tail -1)"
+  say "release: ${TAG:-<none found — using the default branch>}"
+  git -c advice.detachedHead=false clone --quiet --depth 1 \
+      ${TAG:+--branch "$TAG"} "$REPO_URL" "$TMP_SRC" \
+    || { warn "could not clone $REPO_URL"; exit 1; }
+  ROOT="$TMP_SRC/plugins/agentic-dev"
+fi
+
 [ -d "$ROOT/knowledge" ] || { warn "Cannot find the module at $ROOT"; exit 1; }
 
 VERSION=$(python3 -c "import json;print(json.load(open('$ROOT/.claude-plugin/plugin.json'))['version'])" 2>/dev/null || echo "unknown")
@@ -67,7 +96,7 @@ if [ "$DRY" != "1" ]; then
   # missing", after which the loop could not read its own procedure. An update
   # must be atomic: the old state or the new state, never neither.
   STAGE=".founder-os.staging.$$"
-  trap 'rm -rf "$STAGE"' EXIT
+  CLEANUP_PATHS+=("$STAGE")
   rm -rf "$STAGE"
   mkdir -p "$STAGE/tools"
   cp    "$ROOT/knowledge/blueprint.md"    "$STAGE/"
@@ -140,9 +169,10 @@ bash .founder-os/tools/install.sh --update   # without Claude Code
 \`\`\`
 EOF
   # Everything staged completely — now the swap, the only destructive moment.
+  # (After the mv the staged path no longer exists; the EXIT cleanup on it
+  # becomes a no-op, so the trap stays armed for the fetched source.)
   rm -rf .founder-os
   mv "$STAGE" .founder-os
-  trap - EXIT
 fi
 
 say "blueprint.md, harness.md, deploy-gate.md, backlog.md, contracts/ (6), workflows/ (9), stacks/, tools/"
