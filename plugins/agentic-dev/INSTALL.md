@@ -35,8 +35,8 @@ This mirrors how `fund-os` is structured: one marketplace, one or more plugins i
     {
       "name": "agentic-dev",
       "source": "./plugins/agentic-dev",
-      "description": "Module 16 (Agentic Dev) — continuous agentic software development: product-anchored roadmap, specs, separated dev and QA contracts, CI/CD with preview channels, security gate, DORA metrics, and a learning loop back into this repo.",
-      "version": "0.2.0",
+      "description": "… keep in sync with plugins/agentic-dev/.claude-plugin/plugin.json — that file is the source of truth for description and version …",
+      "version": "X.Y.Z",
       "category": "product-tech-delivery"
     }
   ]

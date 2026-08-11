@@ -60,19 +60,27 @@ say "target: $(pwd)"
 head_ "1. Managed rulebook → .founder-os/"
 
 if [ "$DRY" != "1" ]; then
-  rm -rf .founder-os
-  mkdir -p .founder-os/tools
-  cp    "$ROOT/knowledge/blueprint.md"    .founder-os/
-  cp    "$ROOT/knowledge/harness.md"      .founder-os/
-  cp    "$ROOT/knowledge/deploy-gate.md"  .founder-os/
-  cp    "$ROOT/knowledge/backlog.md"      .founder-os/
-  cp -r "$ROOT/knowledge/contracts"       .founder-os/
-  cp -r "$ROOT/workflows"                 .founder-os/
-  cp -r "$ROOT/stacks"                    .founder-os/
-  cp    "$ROOT/tools/repo_metrics.py"   .founder-os/tools/
-  cp    "$ROOT/tools/install.sh"        .founder-os/tools/
-  printf '%s\n' "$VERSION" > .founder-os/VERSION
-  cat > .founder-os/README.md <<EOF
+  # Build the new rulebook NEXT TO the old one and swap only at the end. The
+  # previous order — rm -rf first, then copy — left a project with NO rulebook
+  # at all whenever any copy failed mid-run (set -e aborts between the rm and
+  # the last cp). Observed in production as ".founder-os incomplete, stacks/
+  # missing", after which the loop could not read its own procedure. An update
+  # must be atomic: the old state or the new state, never neither.
+  STAGE=".founder-os.staging.$$"
+  trap 'rm -rf "$STAGE"' EXIT
+  rm -rf "$STAGE"
+  mkdir -p "$STAGE/tools"
+  cp    "$ROOT/knowledge/blueprint.md"    "$STAGE/"
+  cp    "$ROOT/knowledge/harness.md"      "$STAGE/"
+  cp    "$ROOT/knowledge/deploy-gate.md"  "$STAGE/"
+  cp    "$ROOT/knowledge/backlog.md"      "$STAGE/"
+  cp -r "$ROOT/knowledge/contracts"       "$STAGE/"
+  cp -r "$ROOT/workflows"                 "$STAGE/"
+  cp -r "$ROOT/stacks"                    "$STAGE/"
+  cp    "$ROOT/tools/repo_metrics.py"   "$STAGE/tools/"
+  cp    "$ROOT/tools/install.sh"        "$STAGE/tools/"
+  printf '%s\n' "$VERSION" > "$STAGE/VERSION"
+  cat > "$STAGE/README.md" <<EOF
 # Managed — do not edit
 
 This directory is written by Founder OS Module 16 and is **replaced on every update**.
@@ -131,6 +139,10 @@ Write a learning with \`scope: upstream\` in \`docs/learnings/\`, then run
 bash .founder-os/tools/install.sh --update   # without Claude Code
 \`\`\`
 EOF
+  # Everything staged completely — now the swap, the only destructive moment.
+  rm -rf .founder-os
+  mv "$STAGE" .founder-os
+  trap - EXIT
 fi
 
 say "blueprint.md, harness.md, deploy-gate.md, backlog.md, contracts/ (6), workflows/ (9), stacks/, tools/"
