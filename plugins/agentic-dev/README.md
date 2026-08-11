@@ -391,4 +391,4 @@ know: **policy** (where things live, limits, thresholds, role boundaries), **enf
 context. When cutting further: cut knowledge, never policy — and never remove a rule whose
 incident you cannot name as resolved.
 
-*Ocean One Ventures · Founder OS v2.0 · Module 16 · agentic-dev v0.8.1*
+*Ocean One Ventures · Founder OS v2.0 · Module 16 · agentic-dev v0.8.2*

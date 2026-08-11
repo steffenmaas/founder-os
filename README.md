@@ -24,7 +24,7 @@ plugins inside it (`plugins/<name>/`).
 
 | Plugin | Module | Status |
 |---|---|---|
-| [`agentic-dev`](plugins/agentic-dev/) | 16 · Agentic Dev — Product & Tech Delivery, Pre-Seed | v0.8.1 |
+| [`agentic-dev`](plugins/agentic-dev/) | 16 · Agentic Dev — Product & Tech Delivery, Pre-Seed | v0.8.2 |
 
 ## How to use this — concretely
 
