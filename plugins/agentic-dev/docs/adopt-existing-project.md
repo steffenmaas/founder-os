@@ -25,20 +25,20 @@ handoff, dev/QA separation, the deploy gate, Conventional Commits from adoption 
 ```
 
    **Working in Claude Code on the web (cloud sessions)?** The `/plugin` commands are not
-   available there. Instead, commit `.claude/settings.json` to the project (the template
-   ships it — `templates/project/.claude/settings.json`): it declares the marketplace under
-   `extraKnownMarketplaces` and the plugin under `enabledPlugins`, and every cloud session
-   of the repo loads the module automatically. Commit that file as the *first* step of the
-   onboarding branch; the rest of this guide is identical in cloud and terminal.
+   available there, and **installing the plugin does not reach those sessions at all** —
+   install state is machine-level and every cloud session gets a fresh container. Committing
+   `.claude/settings.json` declares a marketplace; it does not fetch one.
 
-   **No manual file handling needed:** don't download or copy anything — tell the session
-   to do it. One paste-able prompt in a cloud session on the target repo covers this whole
-   step: *"Write `.claude/settings.json` declaring the `founder-os` marketplace
-   (`github: steffenmaas/founder-os`) and enabling `agentic-dev@founder-os`, commit and
-   push. Then clone `steffenmaas/founder-os` and follow
-   `plugins/agentic-dev/docs/adopt-existing-project.md` from step 1."* The clone gives the
-   *current* session the rulebook right away; the settings file makes every *future*
-   session load the plugin natively (plugins load at session start).
+   What carries the module there is the repository: `install.sh` mirrors the subagents,
+   skills and hooks into `.claude/` (step 4 below writes them, and you commit them). Skip
+   this and the loop has the rulebook but no `builder` — it will write its own code and
+   review its own diff, silently.
+
+   **No manual file handling needed:** tell the session to do it. One paste-able prompt in a
+   cloud session on the target repo: *"Clone `steffenmaas/founder-os` and follow
+   `plugins/agentic-dev/docs/adopt-existing-project.md` from step 1. Commit `.claude/`
+   along with everything else."* The clone gives the *current* session the rulebook right
+   away; the committed `.claude/` gives every *future* session the runtime.
 
 3. Open the project, start from a clean tree, and create the onboarding branch:
 

@@ -67,15 +67,29 @@ empty and any earlier installation — terminal or app — never reaches it.
 
 Committing `.claude/settings.json` with `extraKnownMarketplaces` and `enabledPlugins` is not a
 substitute: measured in a project that had exactly that committed, `installed_plugins.json` was
-still `{"version": 2, "plugins": {}}` on a live container. **Declaring a marketplace is not
+still `{"version": 2, "plugins": {}}` on a live container. Measured again on a second cloud
+container, there was no `~/.claude/plugins/` directory at all. **Declaring a marketplace is not
 fetching it.**
 
-So a loop that runs in ephemeral containers cannot be equipped by installing anything once.
-Only what is in the repository survives — `.claude/agents/*.md` is read straight from the
-project directory, with no marketplace and no fetch, and mirroring the agent definitions there
-is currently the only way to give such a loop a `builder` at all. Whether the module should
-offer a blessed path for this (an `install.sh --with-agents`, say) is an open question; today
-it does not, and adopters discover the gap by watching their loop write its own code.
+So a loop in an ephemeral container cannot be equipped by installing anything once. **Only
+what is in the repository survives** — and `.claude/agents/*.md` and `.claude/skills/*/SKILL.md`
+are read straight from the project directory, with no marketplace and no fetch.
+
+`install.sh` therefore **mirrors the runtime into `.claude/`** (section 1b): the six subagents,
+the twelve skills, and the two hook scripts, with the hooks wired into `.claude/settings.json`
+by merging rather than overwriting. Commit that directory — it is what carries the module into
+an environment that cannot install it.
+
+| | |
+|---|---|
+| **Managed, replaced on update** | `.claude/agents/`, `.claude/skills/dev-*/`, `.claude/hooks/` — recorded in `.claude/.founder-os-manifest` |
+| **Never touched** | your own skills and agents under `.claude/`; only manifest paths are removed |
+| **Merged, not overwritten** | `.claude/settings.json` |
+| **Opt out** | `install.sh --no-claude-assets`, when the plugin is properly installed and you would rather not have both |
+
+Why on by default: a duplicate agent name on a machine that also loads the plugin is visible
+and harmless. A missing `builder` is neither — the loop writes its own code and reviews its own
+diff, and the state looks completely healthy from the outside.
 
 ## Test locally before pushing
 
@@ -124,13 +138,11 @@ different lifecycles and they must not be confused:
   edit it. Rule changes travel upstream as learnings (`/dev-learn --upstream`).
 - `PRODUCT.md`, `ROADMAP.md`, `CLAUDE.md`, `docs/**` belong to the **project** — written once
   by `/dev-onboard`, owned by the project thereafter.
-- `agents/`, `skills/` and `hooks/` belong to **neither**: they are plugin-native, loaded
-  through `plugin.json`, and are **deliberately not copied into a project**. `install.sh`
-  never touches them. Say this out loud, because the omission is otherwise indistinguishable
-  from a bug — someone who finds `agents/` here and not in their project has nothing to tell
-  them which it is. **Without the plugin loaded, a project has the rulebook but cannot
-  delegate** — see *Install* above for which environments that actually bites in: `autonomous-loop.md` instructs the orchestrator to dispatch to `builder`, and
-  there is no `builder`. The orchestrator then writes the code itself and reviews its own
-  diff, silently, which is precisely what the contracts exist to prevent.
+- `agents/`, `skills/` and `hooks/` are plugin-native — loaded through `plugin.json` where a
+  plugin can be loaded, and **mirrored into `.claude/` where one cannot** (see *Cloud and
+  other ephemeral environments* above). Those copies are managed like `.founder-os/`:
+  replaced on every update, recorded in `.claude/.founder-os-manifest`, never hand-edited.
+  What is *not* managed is everything else under `.claude/` — the project keeps its own
+  skills and agents there, and the installer only ever removes paths it wrote itself.
 
 Getting this wrong is how a rulebook forks into five divergent copies.

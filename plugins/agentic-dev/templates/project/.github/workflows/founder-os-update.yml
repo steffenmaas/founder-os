@@ -56,9 +56,12 @@ jobs:
           git config user.name  "founder-os-update"
           git config user.email "noreply@github.com"
           git checkout -B "$BRANCH"
-          git add .founder-os
+          # .claude/ too — install.sh --update refreshes the mirrored runtime
+          # (subagents, skills, hooks) alongside the rulebook. Staging only
+          # .founder-os would leave the runtime a version behind, silently.
+          git add .founder-os .claude
           git diff --cached --quiet && { echo "no effective change"; exit 0; }
-          git commit -m "chore: update .founder-os to v${{ steps.cmp.outputs.latest }}"
+          git commit -m "chore: update .founder-os and .claude runtime to v${{ steps.cmp.outputs.latest }}"
           git push -f origin "$BRANCH"
           gh pr list --head "$BRANCH" --state open --json number -q '.[0].number' | grep -q . || \
             gh pr create --head "$BRANCH" \

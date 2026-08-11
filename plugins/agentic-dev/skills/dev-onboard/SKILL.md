@@ -81,11 +81,18 @@ Then write, from the templates in `${CLAUDE_PLUGIN_ROOT}/templates/project/`:
 | `.github/dependabot.yml` | Ecosystem |
 | `.github/CODEOWNERS` | Names |
 | `.github/PULL_REQUEST_TEMPLATE.md` | No |
-| `.claude/settings.json` | No — makes every cloud session load the plugin |
+| `.claude/settings.json` | No — merged, existing keys kept |
+| `.claude/agents/`, `.claude/skills/dev-*/`, `.claude/hooks/` | No — **managed**, mirrored by `install.sh` §1b |
 
 **`CLAUDE.md` and `PRODUCT.md` are the two that matter.** A template left full of
 `<PLACEHOLDERS>` is worse than no file at all — it produces agents that guess commands and
 build things the product does not want.
+
+**`.claude/` must be committed.** It is the runtime — the subagents, skills and hooks — and
+it is the only thing that reaches a cloud session, a CI job or a scheduled run, none of
+which can install a plugin. Confirm `.claude/agents/builder.md` is in the commit before
+calling the onboarding done; without it the loop writes its own code and reviews its own
+diff, and nothing reports a fault.
 
 ### Step 4 — Retrospective ADRs
 
