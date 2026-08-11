@@ -21,6 +21,7 @@ the work that decides whether the product runs and can legally be published.
 | [`payments.md`](payments.md) | Client sends an id and nothing else; signed idempotent webhook; grant and record in one transaction; refunds and revocation; test/live secret separation |
 | [`observability.md`](observability.md) | Error reporting (the piece most often missing entirely), the visible build id, analytics behind one consent gate, what to check after every deploy |
 | [`keyless-deploy.md`](keyless-deploy.md) | Merge to production with no stored credential — the OIDC exchange, the one-time setup, and the table of failures already paid for |
+| [`ops-watch.md`](ops-watch.md) | Watching the deploy path and the runtime **without any human login** — public signals, a scheduled read-only CI watch that files issues into the backlog, managed uptime checks |
 | [`going-live.md`](going-live.md) | Legal pages, account deletion, caching and service workers, the pre-launch checklist, store submission |
 
 ---

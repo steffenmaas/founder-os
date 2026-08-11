@@ -196,17 +196,56 @@ run gcloud iam service-accounts add-iam-policy-binding "${SA_EMAIL}" \
   --role="roles/iam.workloadIdentityUser" \
   --member="principalSet://iam.googleapis.com/projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/${POOL_ID}/attribute.repository/${REPO}"
 
+# --------------------------------------------------------------------------- #
+# 5. Read-only monitor identity (ops-watch)
+# --------------------------------------------------------------------------- #
+# The scheduled watch (ops-watch.yml) runs as its OWN service account, not as the
+# deployer: a watcher never needs write access, and if the watch workflow is ever
+# compromised, a read-only identity turns "attacker can deploy" into "attacker can
+# read logs". This is also what removes the daily `gcloud auth login` from a human's
+# routine — the watch renews its own identity through the same OIDC exchange.
+SA_MONITOR="${SA_MONITOR:-github-ops-monitor}"
+MONITOR_EMAIL="${SA_MONITOR}@${PROJECT_ID}.iam.gserviceaccount.com"
+
+echo "==> Monitor service account (read-only)"
+if gcloud iam service-accounts describe "${MONITOR_EMAIL}" >/dev/null 2>&1; then
+  echo "    already exists: ${MONITOR_EMAIL}"
+else
+  run gcloud iam service-accounts create "${SA_MONITOR}" \
+    --display-name="GitHub Actions Ops Monitor (read-only)"
+fi
+
+for ROLE in \
+  roles/logging.viewer \
+  roles/monitoring.viewer
+do
+  run gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+    --member="serviceAccount:${MONITOR_EMAIL}" \
+    --role="${ROLE}" \
+    --condition=None
+done
+
+echo "==> Allowing only ${REPO} to impersonate the monitor"
+run gcloud iam service-accounts add-iam-policy-binding "${MONITOR_EMAIL}" \
+  --role="roles/iam.workloadIdentityUser" \
+  --member="principalSet://iam.googleapis.com/projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/${POOL_ID}/attribute.repository/${REPO}"
+
 WIF_PROVIDER="projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/${POOL_ID}/providers/${PROVIDER_ID}"
 
 cat <<EOF
 
 ==================================================================
-Setup complete. These two values go into .github/workflows/deploy-main.yml.
-They are NOT secrets — access is restricted server-side by the provider's
-attribute-condition (repository == ${REPO}):
+Setup complete. These values go into the workflows. They are NOT secrets —
+access is restricted server-side by the provider's attribute-condition
+(repository == ${REPO}):
 
-  workload_identity_provider: ${WIF_PROVIDER}
-  service_account:            ${SA_EMAIL}
+  deploy-main.yml:
+    workload_identity_provider: ${WIF_PROVIDER}
+    service_account:            ${SA_EMAIL}
+
+  ops-watch.yml (read-only watch — see ops-watch.md):
+    workload_identity_provider: ${WIF_PROVIDER}
+    service_account:            ${MONITOR_EMAIL}
 
 Still to do by hand, once per project:
   - Blaze billing enabled (2nd-gen Functions require it)

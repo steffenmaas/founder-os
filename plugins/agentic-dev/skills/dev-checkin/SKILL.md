@@ -57,7 +57,15 @@ PROGRESS:  <version scope: x of y · delivery pace · first-pass quality>
 Never explain package internals, settings, or which line changed. If they want that, they
 open the diff.
 
-Then write the full record to `docs/checkins/YYYY-MM-DD.md` **and** print it below:
+Then write the full record to `docs/checkins/YYYY-MM-DD.md` **and** print it below.
+That path is canonical — one file per day, nowhere else. If the project carries a
+root-level status file instead (`docs/autonomous-checkin.md` or similar), fold its
+content into today's file and delete it: two status locations means neither is trusted,
+and the human checks the empty one.
+
+A check-in records work; it does not replace it. In the autonomous loop this skill runs
+at the **end** of a cycle — a tick whose only output is a check-in is a failed tick
+(`workflows/autonomous-loop.md`, "A tick is a work unit").
 
 ```markdown
 # Check-in <date>
