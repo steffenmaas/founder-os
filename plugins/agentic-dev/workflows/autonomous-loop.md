@@ -47,6 +47,14 @@ items moved. Three rules close it:
 3. **The check-in is written at the end of a work cycle, never instead of one.** Report
    time is after dispatch time, in the same tick.
 
+**Name the source before you groom it.** Where an ADR designates a source of truth for the
+backlog, read that ADR first and groom against the store it names. A projection or cache
+answers plausibly with stale data, and a plausible answer gives no sign that the wrong store
+was asked — a loop once concluded from a stale projection that six real tickets had never been
+written, and published that as a finding. If a projection exists, also confirm that something
+actually writes it: a projection nothing updates looks complete, which makes it the more
+expensive failure.
+
 **Strictly sequential builders.** One `builder` at a time per codebase. Parallel is for
 read-only work only. Two agents writing produce merge conflicts, not speed.
 

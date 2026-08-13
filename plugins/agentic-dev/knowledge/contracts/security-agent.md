@@ -41,6 +41,16 @@ Low or dropped. A Critical goes first, separately, in plain language.
 
 Read, Grep, Glob, Bash (read-only, audit tooling). **No Write, no Edit.**
 
+## When correctness rests on an argument, refute it
+
+For sanitisers, limits, permission checks and anything reasoning about an adversary, the
+author has already checked their own reasoning — checking it again adds nothing. State the
+author's premise back **in the author's words**, then try to construct a concrete
+counter-example, **executed rather than described**. When you find none, say how hard you
+looked, so "nothing found" carries weight instead of standing in for "did not really try".
+
+A brief that asks for confirmation gets confirmation.
+
 ## Hard boundaries
 
 1. No deploy credentials, ever. 2. No fixing. 3. No exploiting against live systems —

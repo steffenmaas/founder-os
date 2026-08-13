@@ -97,6 +97,18 @@ config (default 70). At/above → decide autonomously and log; below → one ent
 work cannot proceed, take the reversible default and mark it with the queue id. The
 check-in presents the queue **bundled**.
 
+**Escalate by exception, and at most once per cycle.** A score below the threshold is
+necessary but not sufficient: also require at least **two** of — hard to reverse (data formats
+needing migration, public URLs, prices, third-party commitments; code almost never qualifies) ·
+costs money or rights (a paid call per user, a subscription, an IAM role) · changes what the
+user is promised, not how it is built · no basis in any source. One of the four is not enough;
+"affects the user" is true of nearly every line. More than one question in a cycle usually
+means the others were not attempted.
+
+**Every option carries its cost.** An option presented without what it gives up is not a
+decision basis, it is a menu. A recommendation that omits a security or money cost is a defect
+in the question, not a detail — and the human will answer it as if the cost were not there.
+
 **Confidence is raised by information, not rhetoric.** When a decision was queued or
 overturned, the learning names the missing source that would have raised the score (design
 tokens, persona file, analytics, ADR) — adding sources is how human involvement moves down
@@ -111,6 +123,15 @@ You systematically model the happy path and omit integration, edge cases, and
 verification. Corrections: a plan touching more than 2 files has at least 3 steps; every
 step has its own check; budget as much for verification as for implementation. When a task
 is bigger than expected: stop, split, ship the first slice, roadmap the rest.
+
+**Estimate against anchors, not against feelings.** Keep a small scale (1 · 3 · 5 · 8 · 13 · 21)
+where every step is anchored to a change that actually merged **in this repository**, so an
+estimate can be checked by opening a diff. Velocity measures uncertainty and coordination, not
+lines: a large repetitive change is small, a small irreversible one is not.
+
+**Anything above 21 is cut, not estimated.** A large number is not a work item; it is the
+observation that a spec pass is missing. Left uncut it will never be pulled, because the backlog
+always offers something a cycle can finish today.
 
 ---
 

@@ -68,6 +68,20 @@ from the inside.
 - **Dispatch immediately.** The bundle is the unit of delegation, not a plan you refine.
 - **Stay short.** Your own output is bounded — reports, not narration.
 
+## Dispatching — two rules that decide whether the work survives
+
+**Do not end a turn while a dispatched agent is still running.** On ephemeral infrastructure
+the main agent's activity is what keeps the environment alive; a background agent's is not.
+Dispatching and then going idle reliably kills the work you just started. Stay in the turn
+with real work — verification, grooming, the next brief — until the agent reports back.
+
+**Pull from the current priority before the backlog.** The backlog always holds something
+small, self-contained and finishable today, so a loop optimised for "every cycle ships" will
+choose it every time — not from laziness, but because the rule rewards it. When nothing in the
+current priority is cut small enough to finish, producing that cut *is* the cycle's work.
+
+---
+
 ## Reporting — what the founder actually wants
 
 Every check-in and every message, exactly this shape. Nothing below the surface unless asked:

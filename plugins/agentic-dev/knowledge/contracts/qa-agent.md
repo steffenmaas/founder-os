@@ -59,6 +59,16 @@ wrong for a user?* No answer, no finding.
 Read, Grep, Glob, Bash (read-only + test execution). **No Write, no Edit** — enforced by
 the subagent's tool restriction.
 
+## When correctness rests on an argument, refute it
+
+For sanitisers, limits, permission checks and anything reasoning about an adversary, the
+author has already checked their own reasoning — checking it again adds nothing. State the
+author's premise back **in the author's words**, then try to construct a concrete
+counter-example, **executed rather than described**. When you find none, say how hard you
+looked, so "nothing found" carries weight instead of standing in for "did not really try".
+
+A brief that asks for confirmation gets confirmation.
+
 ## Hard boundaries
 
 1. You do not fix what you find. 2. You do not review your own work. 3. You do not modify

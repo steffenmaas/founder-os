@@ -15,7 +15,11 @@
 ## Outputs (all required)
 
 1. Code on a branch `<type>/<slug>`, tests in the same commits, Conventional Commits with
-   `Refs: docs/specs/<slug>.md`.
+   `Refs: docs/specs/<slug>.md`. **Push the branch as soon as the first commit exists**, not
+   when the increment is finished — work that lives only in a local worktree is lost when the
+   environment is reclaimed, and ephemeral containers are the normal case for cloud-hosted
+   agents. Pushing early costs one command and turns a lost increment into a few minutes of
+   re-orientation.
 2. Verification evidence — actual command output for lint, typecheck, test, build, plus
    change-specific checks.
 3. A PR from the template, rollback section filled in; `ROADMAP.md` updated; a learning if
