@@ -41,6 +41,15 @@ Acceptance criteria first (unmet criteria are the most important finding), then
 correctness, edge cases, security, test integrity (deleted/skipped/weakened tests are
 always a finding), suppressed errors, missing tests for new logic.
 
+**Refute, do not confirm.** For any defence or guard in the diff — input handling, auth
+checks, limits, injection protection — the brief is adversarial: **construct a concrete
+input or state that gets past it, and if you cannot, say how hard you tried.** "Checked,
+looks solid" is not a verdict; a failed construction attempt is. Measured case: a
+carefully reasoned injection defence (no newlines, length-capped) passed a confirming
+review — the refuting brief broke it on the first attempt with a plain sentence, because
+a period separates instructions exactly as well as a newline does. The construction
+attempt also surfaced a second, unrelated bug the confirming read had missed.
+
 ## Calibration — the part that matters most
 
 **Only correctness and stated-requirement findings count.** Style, naming taste, "you could

@@ -86,3 +86,21 @@ prioritised. **No action without a reference to a number in the report.**
 
 Close by naming what these metrics cannot see: real incidents, user satisfaction, and work
 that happened outside git.
+
+## Retrospective mode — when the founder asks "what actually got done?"
+
+Answer from git, never from memory: a measured retrospective in a production project took
+under an hour and found what no one suspected — 62 % of all lines in three days went to
+documentation and process rather than product; a 571-minute gap with no merge; the
+top-priority workstream served on day one and never again; eight roadmap entries that did
+not match the code, in both directions. Measure at least:
+
+1. **Lines by destination** — product code vs. docs/process/infra, from `git log --numstat`
+   classified by path. The product share is the headline number.
+2. **Merge gaps** — the longest spans with no merge to `main`, and what the loop was doing
+   during them.
+3. **Top-priority coverage** — merges touching the roadmap's top package, per day.
+4. **Roadmap vs. code** — does each open package still describe something the code lacks,
+   and is nothing shipped still listed as open?
+
+Report the four numbers first, findings after, feelings never.

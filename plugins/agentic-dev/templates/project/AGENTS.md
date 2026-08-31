@@ -23,7 +23,7 @@ those are signals. If no executable check exists, building one is your first ste
 ## Before you start
 
 1. `PRODUCT.md` — what this is, what it is not, which version we are on
-2. `ROADMAP.md` — work only on **Now**, unless told otherwise
+2. `ROADMAP.md` — one ordered package list; work the **top package**, unless told otherwise
 3. `docs/decisions/` — binding, not re-litigated
 4. `docs/learnings/` — skim the ones in your area
 5. CI on `main` — **if it is red, fixing it is your task**

@@ -24,7 +24,7 @@ plugins inside it (`plugins/<name>/`).
 
 | Plugin | Module | Status |
 |---|---|---|
-| [`agentic-dev`](plugins/agentic-dev/) | 16 · Agentic Dev — Product & Tech Delivery, Pre-Seed | v0.8.4 |
+| [`agentic-dev`](plugins/agentic-dev/) | 16 · Agentic Dev — Product & Tech Delivery, Pre-Seed | v0.9.0 |
 
 ## How to use this — concretely
 
@@ -105,11 +105,13 @@ step by step — install, `/dev-onboard` with a prune pass, write the history do
 **Run it autonomously:** start a session and say —
 
 ```
-Work autonomously per .founder-os/workflows/autonomous-loop.md: pull from the backlog,
-bundle, ship through the deploy gate, refresh the dashboard, re-arm every ~15 minutes.
-Spawn every delegated dispatch, check and watchdog as a named background task so I can
-see what is running. Only contact me for deploy-gate approvals, queued decisions, or
-finished milestones.
+Work autonomously per .founder-os/workflows/autonomous-loop.md: work the roadmap's top
+package, ship through the deploy gate, refresh the dashboard, re-arm every ~15 minutes.
+Spawn every delegated dispatch as a named background task and STAY ON YOUR TURN while it
+runs; have the builder push from its first commit. When intake is empty, continue with
+the roadmap — never stop because feedback is worked off. Only contact me for deploy-gate
+approvals, queued decisions (as one block, with each option's cost), or finished
+milestones.
 ```
 
 ### In Codex, Cursor, or any other agent

@@ -75,8 +75,10 @@ Every check-in and every message, exactly this shape:
 DONE:      <what a user can now do that they could not before — one line each>
 IN FLIGHT: <current bundle, how far>
 DECISIONS: <blocked on the founder — split into PRODUCT (what/for whom) and TECHNICAL
-            (how, only when architectural or costly). Each: question, options, your
-            recommendation. Empty is a valid and good answer.>
+            (how, only when architectural or costly). Each: question, options WITH THEIR
+            COST (money, time, security blast radius — an option without its price is a
+            menu, not a decision basis), your recommendation. Presented as one block,
+            during the founder's day. Empty is a valid and good answer.>
 PROGRESS:  <version scope: x of y items; pace and quality per /dev-metrics>
 ```
 

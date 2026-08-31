@@ -27,6 +27,7 @@ just the happy path of writing code.
 | `observability.md` | Error reporting, the visible build id, consent-gated analytics, what to check after a deploy. |
 | `keyless-deploy.md` | How code gets from a merge to production without a single long-lived credential. Diagram, one-time setup, and the failure-mode table. |
 | `ops-watch.md` | Monitoring with no human login in the path: public signals, a scheduled read-only CI watch, managed uptime checks. Failures become backlog items mechanically. |
+| `stage-access.md` | Access by stage: pre-live the loop provisions and self-serves infrastructure (databases, roles, backups, service MCPs); go-live flips the dial back. |
 | `iam-repair.md` | Keyless IAM repair: a click-gated workflow whose only payload is the setup script — plus the trust analysis of an owner-equivalent identity, and why an MCP write path is rejected. |
 | `going-live.md` | The publishing project: legal pages, account deletion, the pre-launch checklist, store submission. |
 | `setup-keyless-deploy.sh` | The one-time setup, idempotent, parameterless — it reads the project from the repo. Creates the deployer **and** the read-only monitor identity. |

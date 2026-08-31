@@ -53,6 +53,12 @@ actually happened, including what you could **not** run.
 
 ### 4. Checklist — in this order
 
+**Brief every delegated reviewer to refute, not confirm.** For any guard or defence in
+the diff the instruction is: *construct a concrete input or state that gets past it; if
+you cannot, say how hard you tried.* A read-through that "looks solid" is not evidence —
+a failed construction attempt is, and the attempt regularly finds unrelated bugs on the
+way.
+
 1. **Does the diff meet the acceptance criteria?** Each individually. Unmet criteria are the
    most important finding.
 2. **Correctness.** Off-by-one, null/undefined paths, race conditions, unhandled errors,

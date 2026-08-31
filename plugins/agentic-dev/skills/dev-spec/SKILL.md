@@ -55,7 +55,14 @@ Do not read half the codebase yourself.
 ### 4. Write it
 
 Follow `${CLAUDE_PLUGIN_ROOT}/templates/project/docs/specs/_template.md`, save as
-`docs/specs/<slug>.md`.
+`docs/specs/<ID-slug>.md` — the ID is the roadmap package id (`F001-onboarding.md`), so
+spec and package map without lookup, and the roadmap entry links it.
+
+**Specify behaviour, not implementation.** The codebase moves while a package waits its
+turn — a spec that names functions and files is stale the day it is built; the builder
+reads the code fresh on build day anyway. And specify the **future only**: what will work,
+never the history of how the idea developed. **Estimate against two named, merged packages
+as anchors; anything above 21 is a theme — split it before it becomes a package.**
 
 The spec is finished only when:
 

@@ -11,9 +11,18 @@
 
 <One sentence: what this is, for whom.>
 
+<!-- This file is written once at onboarding and edited by humans (or on their explicit
+     instruction). The loop does NOT churn it: project state lives in ROADMAP.md, specs
+     and the dashboard — never here. A stable CLAUDE.md is what keeps every agent's
+     orientation cheap. -->
+
 ## Operating mode — binding
 
 This project runs on **Founder OS Module 16 — Agentic Dev**.
+
+**The standing instruction, in one line:** look at `ROADMAP.md` for what is next, work it
+per the loop, verify, document forward (spec, release note), and drop finished work from
+your context — the past lives in the dashboard and `docs/releases/`, not in your window.
 
 @AGENTS.md
 
