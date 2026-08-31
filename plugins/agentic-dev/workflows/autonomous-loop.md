@@ -21,7 +21,7 @@ scheduled trigger** (a cron the agent cannot forget). It does not ask for work.
 | 1 | Orchestrator | **HEALTH** — CI and deploy state on `main`: last pipeline run green, **deployed version marker matches the last shipped commit**, logs clean since the last cycle (`deploy-gate.md`, "after the deploy"). Analyze clean, dispatch watchdogs armed, **and the loop's own recurring trigger present and last fired within one interval**. **Module current:** loaded plugin version vs. `.founder-os/VERSION` — on mismatch, refreshing the managed copy (`install.sh --update`, one commit) is the first increment of the cycle. **No runtime is a health FAILURE, not a pass:** with one operand missing the comparison succeeds by having nothing to compare, and a loop with no `builder` to dispatch to writes its own code and reviews its own diff. Check the runtime is reachable **before** comparing versions — either the plugin is loaded, or `.claude/agents/builder.md` exists in the project (the mirrored runtime, `install.sh` §1b). In a cloud or CI session only the second can be true. | Healthy. A red `main` or a deploy that did not land is the task, nothing else. |
 | 2 | Product | **GROOM + PULL** — sweep the backlog first (merge duplicates, drop what no longer serves `PRODUCT.md`, cut items to user-observable size), then pull the top items per the backlog doctrine (`backlog.md`): **reachable before refined** → security → bugs → improvements → features, weighted by source. | Item traces to `PRODUCT.md`. State the yardstick in one line: *closest gap to the current version scope*. |
 | 3 | Product | **BUNDLE** — group 2–5 related items (same feature area, shared verification path) into one bundle. One bundle = one branch. | Each item describable in one sentence. The bundle fits in one day. |
-| 4 | Dev | **BUILD** — one `builder` dispatch per increment, **spawned as a named background task** (see below): one increment = one commit, **named files, never `git add -A`**, max 3 attempts, heartbeat while running. | Increment's own check green. |
+| 4 | Dev | **BUILD** — one `builder` dispatch per increment, **spawned as a named background task** (see below): one increment = one commit, **named files, never `git add -A`**, max 3 attempts, heartbeat while running. **The branch is pushed as soon as the first commit exists** — work that lives only in a local worktree is lost when the environment is reclaimed, and ephemeral containers are the normal case. | Increment's own check green. |
 | 5 | Dev + QA | **VERIFY (scoped)** — `verifier` runs analyze plus the tests of the touched scope; `reviewer` judges the diff at increment scope. **The full suite does not run here.** | QA PASS at increment scope. |
 | 6 | Release | **DEPLOY GATE** — run the checklist (`deploy-gate.md`): auto-ship, or preview channel + notify + wait for approval. The loop continues with the next item either way. | Gate outcome recorded in the PR/commit. |
 | 7 | QA | **BUNDLE QA** — when the bundle is complete: `verifier` runs the full test suite plus guard tests, once; `reviewer` looks specifically for cross-increment interactions. | Full suite green. Red → fix enters the loop as the top item. |
@@ -113,17 +113,23 @@ the read-only ones may run in parallel.
 **Everything delegated runs as a background task.** A founder looking at the session has to
 see *that* work is happening, not infer it from commits appearing later. So:
 
-- **Spawn, never block.** Every delegated unit — subagent dispatch, verification run,
+- **Spawn, then stay.** Every delegated unit — subagent dispatch, verification run,
   script, watchdog — is started as a **background task** so it appears in the client's task
-  list while it runs. The orchestrator never blocks its turn waiting for one, and never
-  sleeps in the foreground: a session that looks frozen is indistinguishable from a session
-  that died.
+  list while it runs. But spawning is only half the rule, and the half this document used
+  to state alone was measured killing the work it dispatched: **on ephemeral infrastructure
+  a running background sub-agent does not count as activity — only the main agent's own
+  work does.** An orchestrator that spawns and ends its turn hands the platform an idle
+  session, and the container is reclaimed with the sub-agent inside it. Measured in
+  production: six of seven sub-agents lost overnight, one increment started four times,
+  **571 minutes without a merge** across nine cycles that all ran and all produced nothing.
+- **So the orchestrator does not end its turn while a sub-agent is running.** Its own
+  activity is the only lever against the inactivity reclaim. While a dispatch runs, the
+  orchestrator does bounded useful foreground work — grooming, spec-writing, reading
+  results — and checks on its dispatches; it hands back only when nothing is running.
 - **The task label is the status display.** Name every task for what it does and what it
   touches — `build:water-tracking · increment 2/4`, `verify:nutrition-scope`,
   `watchdog:build-2` — never `task` or `agent`. The list of running labels *is* what the
   human reads to know where the loop stands.
-- **The orchestrator's turn stays short:** spawn, record, hand back. Results arrive as
-  completion notifications; the next step starts from those.
 - **No orphans.** Every background task is either finished, killed by its watchdog, or
   reported at the end of the cycle. Nothing keeps running unnamed and unwatched.
 

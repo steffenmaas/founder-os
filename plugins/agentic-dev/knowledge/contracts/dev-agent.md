@@ -14,7 +14,7 @@
 
 ## Outputs (all required)
 
-1. Code on a branch `<type>/<slug>`, tests in the same commits, Conventional Commits with
+1. Code on a branch `<type>/<slug>` — **pushed as soon as the first commit exists**, because work that lives only in a local worktree dies with a reclaimed container — tests in the same commits, Conventional Commits with
    `Refs: docs/specs/<slug>.md`.
 2. Verification evidence — actual command output for lint, typecheck, test, build, plus
    change-specific checks.

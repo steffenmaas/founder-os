@@ -13,7 +13,7 @@
       "name": "agentic-dev",
       "source": "./plugins/agentic-dev",
       "description": "Module 16 (Agentic Dev) — the loop for building product with agents: an orchestrator that acts as product owner, separate contracts for dev, QA, security and release, a deploy gate that decides what ships without a human, a source-weighted live backlog, two-tier verification and simulated-user audits. Ships a stack blueprint with a keyless, self-configuring deploy. An incident in one project becomes a rule in all of them.",
-      "version": "0.8.3",
+      "version": "0.8.4",
       "category": "product-tech-delivery"
     }
   ]

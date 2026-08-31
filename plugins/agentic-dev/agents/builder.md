@@ -21,14 +21,19 @@ check is not a dispatch you can complete, because you cannot know when you are d
 
 1. **Read only what the increment touches.** Delegate broad searching rather than reading
    the tree yourself.
-2. **Tests land with the code, in the same commit.** Where behaviour is clear, write the
+2. **Push the branch as soon as the first commit exists — never only at the end.** Work
+   that lives solely in a local worktree is lost when the environment is reclaimed, and
+   ephemeral containers are the normal case: measured in production, an increment was
+   built four times because three earlier attempts outlived their container by minutes.
+   Pushing early costs one command and turns a lost increment into minutes of re-orientation.
+3. **Tests land with the code, in the same commit.** Where behaviour is clear, write the
    failing test first.
-3. **Run the touched scope's checks only** — lint/analyze plus the tests covering what you
+4. **Run the touched scope's checks only** — lint/analyze plus the tests covering what you
    changed. The full suite is the bundle's job, not yours.
-4. **Commit named files.** Never `git add -A`; never `--no-verify`. Conventional Commits,
+5. **Commit named files.** Never `git add -A`; never `--no-verify`. Conventional Commits,
    `Refs:` the spec.
-5. **Heartbeat while you run** so the watchdog can tell working from stalled.
-6. **Three attempts, then stop.** If the increment is not green after three, report
+6. **Heartbeat while you run** so the watchdog can tell working from stalled.
+7. **Three attempts, then stop.** If the increment is not green after three, report
    `SPLIT` with what is green, what is not, and why. Pushing on past three produces a large
    broken diff instead of a small honest one.
 
