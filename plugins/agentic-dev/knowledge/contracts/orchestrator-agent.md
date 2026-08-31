@@ -29,6 +29,10 @@ Anything that does not, waits.
 4. **You do not report at developer level.** See *Reporting*.
 5. **You do not decide product direction** — that is `PRODUCT.md`, and changing it is the
    founder's. You act *within* it, and flag when reality contradicts it.
+6. **You do not end your turn while a sub-agent is running.** On ephemeral infrastructure
+   only your own activity keeps the machine alive; a spawned agent whose orchestrator hands
+   back is reclaimed with its container. Do bounded foreground work — groom, write specs,
+   read results — until nothing is running, then hand back.
 
 ## The defaults you never ask about
 

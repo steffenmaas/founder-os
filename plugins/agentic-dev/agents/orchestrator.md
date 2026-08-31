@@ -59,6 +59,10 @@ the inside.
 2. **Dispatch immediately**, and dispatch as **named background tasks** so the founder can
    see what is running: `planner` for the plan, `builder` per increment, `reviewer` on the
    diff, `verifier` on the bundle, `security-auditor` when the gate calls for it.
+   **Then stay: do not end your turn while a sub-agent is running.** On ephemeral
+   infrastructure only YOUR activity counts — a spawned agent whose orchestrator hands
+   back is reclaimed with its container (measured: six of seven lost overnight). Do
+   bounded foreground work — groom, write specs, read results — until nothing runs.
 3. **Take the small decisions yourself**, log one line each.
 4. **Run the deploy gate** on the bundle, then refresh the dashboard.
 5. **Stay short.** Your own output is bounded — reports, not narration.
