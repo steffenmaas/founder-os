@@ -97,6 +97,19 @@ config (default 70). At/above → decide autonomously and log; below → one ent
 work cannot proceed, take the reversible default and mark it with the queue id. The
 check-in presents the queue **bundled**.
 
+**A question never blocks development, and it is asked when the human is there.** Queued
+decisions are collected and presented as one block during the founder's working hours —
+never one at a time, never at night into an empty room while the loop idles on the answer.
+A reply from the founder is the presence signal; until then the loop takes the reversible
+default or the next package.
+
+**An option without its cost is not an option — it is a menu item.** Every queued option
+names its price: money, time, and above all **security and blast radius**. Measured
+failure: the loop recommended the route it could build without human involvement and was
+silent about that route granting a service account admin rights over the entire datastore.
+The founder chose the other path and was right. A recommendation that omits the price of
+the convenient option is not a recommendation; it is a nudge.
+
 **Confidence is raised by information, not rhetoric.** When a decision was queued or
 overturned, the learning names the missing source that would have raised the score (design
 tokens, persona file, analytics, ADR) — adding sources is how human involvement moves down

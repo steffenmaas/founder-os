@@ -27,7 +27,7 @@ step, not your last.
 |---|---|---|
 | What are we building and why? | `PRODUCT.md` | Human (agent proposes) |
 | What are we building next? | `ROADMAP.md` | Human decides, agent maintains |
-| What exactly is this one change? | `docs/specs/<slug>.md` | Agent |
+| What exactly is this one change? | `docs/specs/<ID-slug>.md` — ID = roadmap package (`F01`…) | Agent |
 | How do I decide beyond the rules? | `.founder-os/harness.md` | Founder OS (upstream) |
 | What is my mandate and my limits? | `.founder-os/contracts/<role>.md` | Founder OS (upstream) |
 | Which steps does this work take? | `.founder-os/workflows/<name>.md` | Founder OS (upstream) |
@@ -48,7 +48,7 @@ changes travel upstream (§9.3).
 ## 2. The hierarchy of intent
 
 ```
-  PRODUCT.md   →   ROADMAP.md (Now ≤ 3 / Next ≤ 7 / Later / Done)   →   docs/specs/   →   Plan   →   Commits
+  PRODUCT.md   →   ROADMAP.md (one ordered package list, F/B/T ids, position = priority)   →   docs/specs/   →   Plan   →   Commits
 ```
 
 Nothing may contradict the level above it. Three rules:
@@ -70,16 +70,17 @@ No phase is skipped, but each may be small.
 
 ### 3.1 ORIENT
 
-Read `PRODUCT.md`, `ROADMAP.md` (work only on *Now*), `docs/decisions/`, relevant
+Read `PRODUCT.md`, `ROADMAP.md` (work the top package of the one ordered list), `docs/decisions/`, relevant
 learnings. `git status`, recent log, CI. **A red `main` blocks everything — it becomes the
 task.** Goal unclear after this → ask; do not guess.
 
 ### 3.2 SPEC
 
-Anything touching more than one file or ~30 minutes gets a spec at `docs/specs/<slug>.md`,
+Anything touching more than one file or ~30 minutes gets a spec at `docs/specs/<ID-slug>.md`,
 written so an agent with empty context could implement it alone. Required sections:
-**Problem · Goal · Non-goal (never empty) · Affected files · Acceptance criteria (executable
-checks, not prose) · Verification step (one command) · Risks & rollback.**
+**Problem · Goal · Non-goal (never empty) · Contract changes · Acceptance criteria (executable
+checks, not prose) · Verification step (one command) · Risks & rollback.** Behaviour, not
+implementation — the codebase moves while a package waits; and the future only.
 
 One-sentence changes skip the spec. If the requirement is unclear, interview the human
 first — questions bundled in one pass. Implementation then starts in a fresh session with
@@ -130,8 +131,9 @@ reproducing your work.
 - **Auto-ship vs. human approval is decided by the deploy gate** (`deploy-gate.md`), run
   every time. Human review is not a standing requirement — the QA-agent pass is; a human
   looks at a change only when the gate says so.
-- Merge to `main` only with green CI and a QA PASS. Deploy through the pipeline — never
-  from a local machine (hook-enforced).
+- Merge to `main` only with the **full local suite green at package level** and a QA PASS
+  (§7 — the merge is the gate). Deploy through the single workflow — never from a local
+  machine (hook-enforced).
 - Rollback plan is part of the PR.
 - After the deploy: verify from the primary sources per `deploy-gate.md` ("after the
   deploy") — pipeline run, version marker, health.
@@ -207,11 +209,26 @@ Prefer one guard test that enforces a rule forever over ten that restate behavio
 
 ---
 
-## 7. CI/CD & previews
+## 7. Verification, CI/CD & cost
 
-Pipeline per PR: lint + typecheck + unit → integration → security scan → build → preview.
-On `main`: the same, then deploy and post-deploy verification. **Blocking part under 10
-minutes** — a slower pipeline gets bypassed. Templates: `templates/project/.github/`.
+**Verification runs locally; GitHub runs one workflow.** The default posture, set by the
+founder after measuring the cost of the alternative:
+
+- **Per increment, locally:** lint/analyze plus the tests of the touched scope only.
+- **Per package (bundle), locally:** the full suite plus guard tests, once. **Only a
+  package whose full local suite is green gets merged** — the merge is the gate, and the
+  gate runs on the machine that is already there.
+- **On GitHub, exactly one workflow:** test-then-deploy on `main` — the full suite once
+  more as the remote backstop, then deploy, then post-deploy verification (the live build
+  carries the commit). Per-PR CI batteries, scheduled security scans and preview builds on
+  GitHub are **opt-in** (`templates/project/.github/workflows/`), not the default: they
+  buy an independent gate at a real per-run price, and the local hooks plus the
+  verification-chain rule (the orchestrator runs the decisive check itself, it does not
+  trust the builder's report) cover the common failure honestly.
+
+Stated cost of the trade: without per-PR CI there is no remote check between push and
+merge — the single workflow catches it on `main`, one step later. **Blocking part under 10
+minutes** either way; a slower pipeline gets bypassed.
 
 **Deploy credentials are keyless** (OIDC / workload identity). No long-lived deploy key or
 service-account key exists in the repository, in CI secrets, or on a laptop. Where the stack
@@ -253,6 +270,13 @@ with deploy rights read no untrusted sources; fork-PR CI gets no repository secr
 
 Secret scanning + push protection (any hit blocks) · dependency audit (high/critical) ·
 SAST (high/critical) · branch protection. Templates: `templates/project/.github/`.
+
+**A control that lives in `.git/config` does not exist.** `core.hooksPath` and everything
+else set per clone is unset in every fresh container — and agent sessions are fresh clones,
+so a git-hook guard "activated by a setup script" silently never runs there. Controls bind
+only from committed files (the `.claude/settings.json` hooks, which fire in every agent
+session) or from the deploy workflow. Found in production: a fail-closed gitleaks pre-commit
+hook that had never once executed in an agent session.
 
 ### 8.4 Permissions
 

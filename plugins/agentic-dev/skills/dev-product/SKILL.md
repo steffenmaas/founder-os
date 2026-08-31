@@ -25,7 +25,7 @@ Run this skill when the user says any of:
 
 **Request:** $ARGUMENTS
 
-Current state: !`head -5 PRODUCT.md 2>/dev/null; echo '---'; awk '/^## Now/{f=1} /^## Later/{f=0} f' ROADMAP.md 2>/dev/null | head -12`
+Current state: !`head -5 PRODUCT.md 2>/dev/null; echo '---'; grep -E '^- \\[ \\] \\*\\*[FBT][0-9]' ROADMAP.md 2>/dev/null | head -12`
 Recent work: !`git log --oneline -15 2>/dev/null`
 
 ---
@@ -35,32 +35,38 @@ Recent work: !`git log --oneline -15 2>/dev/null`
 ```
   PRODUCT.md   version, vision, principles, non-goals, target user
        ▼
-  ROADMAP.md   Now (max 3) / Next (max 7) / Later / Done
+  ROADMAP.md   ONE ordered list of packages — F/B/T ids, position = priority
        ▼
-  docs/specs/  one spec per unit of work
+  docs/specs/  one spec per package, file named after its id (F01-<slug>.md)
 ```
 
-Two invariants, checked every time you run:
+Three invariants, checked every time you run:
 
-1. **Every roadmap item traces to something in `PRODUCT.md`.** Flag any that does not.
+1. **Every package traces to something in `PRODUCT.md`.** Flag any that does not.
    Do not silently keep it.
-2. **Every item in *Now* has a linked spec.** If one does not, either write the spec
-   (`/dev-spec`) or move the item back to *Next*.
+2. **The top package has a spec.** If not, writing the spec is that package's first
+   increment — never a reason to skip past it to something easier.
+3. **Ids follow the roadmap's rules:** one prefix per package (a defect and an extension
+   are two packages), numbers never reused or renumbered, id in the package name and the
+   PR title.
 
 ### Your boundary
 
 **You propose priority. You never set it.**
 
-- You may add to *Later* freely — tech debt, missing tests, security gaps, ideas found during
-  other work. That is expected and useful.
-- You may **not** promote anything to *Now*. Recommend, with a reason, and wait.
+- You may append packages and fold intake into existing ones freely — tech debt, missing
+  tests, security gaps, ideas found during other work become `T`/`B` packages or join one.
+- You may reorder below the founder's pins per the backlog doctrine. You may **not**
+  override an order the founder set by saying so. Recommend, with a reason, and wait.
 - You may **not** bump the product version. Prepare the proposal; the human decides.
 
 ### Modes
 
-**"Update the roadmap"** — reconcile `ROADMAP.md` against what actually shipped. Move
-completed items to *Done* with date and commit hash. Surface drift: was work done that was
-not in *Now*? Report it; do not retro-fit the roadmap to hide it.
+**"Update the roadmap"** — reconcile `ROADMAP.md` against what actually shipped. A shipped
+package **leaves the file** — its record is the release note, the roadmap describes only
+the future. Surface drift: was work merged that belongs to no package? Report it; do not
+retro-fit the roadmap to hide it. (The reconciliation belongs in the PR that ships the
+change, not in a cleanup afterwards.)
 
 **"What should we build next"** — read `PRODUCT.md` current version scope, check what is
 missing from it, and propose an ordered shortlist with one line of reasoning each. End with

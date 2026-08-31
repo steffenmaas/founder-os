@@ -19,14 +19,14 @@ scheduled trigger** (a cron the agent cannot forget). It does not ask for work.
 | # | Who | What | Gate before the next step |
 |---|---|---|---|
 | 1 | Orchestrator | **HEALTH** — CI and deploy state on `main`: last pipeline run green, **deployed version marker matches the last shipped commit**, logs clean since the last cycle (`deploy-gate.md`, "after the deploy"). Analyze clean, dispatch watchdogs armed, **and the loop's own recurring trigger present and last fired within one interval**. **Module current:** loaded plugin version vs. `.founder-os/VERSION` — on mismatch, refreshing the managed copy (`install.sh --update`, one commit) is the first increment of the cycle. **No runtime is a health FAILURE, not a pass:** with one operand missing the comparison succeeds by having nothing to compare, and a loop with no `builder` to dispatch to writes its own code and reviews its own diff. Check the runtime is reachable **before** comparing versions — either the plugin is loaded, or `.claude/agents/builder.md` exists in the project (the mirrored runtime, `install.sh` §1b). In a cloud or CI session only the second can be true. | Healthy. A red `main` or a deploy that did not land is the task, nothing else. |
-| 2 | Product | **GROOM + PULL** — sweep the backlog first (merge duplicates, drop what no longer serves `PRODUCT.md`, cut items to user-observable size), then pull the top items per the backlog doctrine (`backlog.md`): **reachable before refined** → security → bugs → improvements → features, weighted by source. | Item traces to `PRODUCT.md`. State the yardstick in one line: *closest gap to the current version scope*. |
-| 3 | Product | **BUNDLE** — group 2–5 related items (same feature area, shared verification path) into one bundle. One bundle = one branch. | Each item describable in one sentence. The bundle fits in one day. |
+| 2 | Product | **GROOM + PULL** — name the source-of-truth store out loud (never groom a projection; check `docs/decisions/` when in doubt), sweep intake (merge duplicates, drop what no longer serves `PRODUCT.md`, fold items into roadmap packages), then pull **the top package of `ROADMAP.md`** — the one ordered list is the master. **Intake empty is not work done:** when yesterday's feedback is worked off, the next roadmap package is the work; the observed failure is a loop that clears feedback overnight and then stops. | Package traces to `PRODUCT.md`. State the yardstick in one line: *closest gap to the current version scope*. |
+| 3 | Product | **BUNDLE** — the roadmap package IS the bundle (`ROADMAP.md`: a package is a release, not a ticket). Confirm its spec exists — a missing spec is the package's first increment. One package = one branch, id in the branch and PR title (`B04 · …`). | Spec present (or being written), each increment describable in one sentence, the package fits in days, not weeks. |
 | 4 | Dev | **BUILD** — one `builder` dispatch per increment, **spawned as a named background task** (see below): one increment = one commit, **named files, never `git add -A`**, max 3 attempts, heartbeat while running. **The branch is pushed as soon as the first commit exists** — work that lives only in a local worktree is lost when the environment is reclaimed, and ephemeral containers are the normal case. | Increment's own check green. |
 | 5 | Dev + QA | **VERIFY (scoped)** — `verifier` runs analyze plus the tests of the touched scope; `reviewer` judges the diff at increment scope. **The full suite does not run here.** | QA PASS at increment scope. |
-| 6 | Release | **DEPLOY GATE** — run the checklist (`deploy-gate.md`): auto-ship, or preview channel + notify + wait for approval. The loop continues with the next item either way. | Gate outcome recorded in the PR/commit. |
-| 7 | QA | **BUNDLE QA** — when the bundle is complete: `verifier` runs the full test suite plus guard tests, once; `reviewer` looks specifically for cross-increment interactions. | Full suite green. Red → fix enters the loop as the top item. |
+| 6 | QA | **PACKAGE QA** — when the package is complete: `verifier` runs the **full test suite plus guard tests, locally, once**; `reviewer` looks specifically for cross-increment interactions. This is the merge gate — GitHub runs no per-PR CI in the default posture (blueprint §7). | Full suite green. Red → fix enters the loop as the top item. **No merge before this is green.** |
+| 7 | Release | **GATE + SHIP** — run the checklist (`deploy-gate.md`): auto-ship (merge — the single test-then-deploy workflow takes it from `main`), or preview + notify + wait for approval. The loop continues with the next package either way. | Gate outcome recorded in the PR. One package = one merge. |
 | 8 | QA | **UX AUDIT** — after a bundle group or milestone: simulated-user audit (`ux-audit.md`). | Findings filed to the backlog (`source: ux-audit`). |
-| 9 | Dev | **LEARN + RE-ARM** — queued decisions into the check-in, learnings written, **dashboard artifact refreshed** (`/dev-dashboard`, same URL), next cycle armed. **Re-anchor:** restate the mandate for the next cycle in one line — *stay brief, groom the backlog, work in bundles, keep the version scope in sight* — so the loop corrects itself instead of waiting to be corrected. | **The loop never ends a cycle without re-arming the next one** — including blocked and no-op paths. Re-arming is *checked*, not assumed, and it never replaces the recurring trigger. |
+| 9 | Dev | **LEARN + RE-ARM** — queued decisions into the check-in, learnings written, **dashboard artifact refreshed** (`/dev-dashboard`, same URL), **then the context compacted: finished packages leave the working context** — old topics carried forward are pure token cost, and the dashboard is where the past lives now — and the next cycle armed. **Re-anchor:** restate the mandate for the next cycle in one line — *stay brief, groom the backlog, work in bundles, keep the version scope in sight* — so the loop corrects itself instead of waiting to be corrected. | **The loop never ends a cycle without re-arming the next one** — including blocked and no-op paths. Re-arming is *checked*, not assumed, and it never replaces the recurring trigger. |
 
 ---
 
@@ -47,8 +47,15 @@ items moved. Three rules close it:
 3. **The check-in is written at the end of a work cycle, never instead of one.** Report
    time is after dispatch time, in the same tick.
 
-**Strictly sequential builders.** One `builder` at a time per codebase. Parallel is for
-read-only work only. Two agents writing produce merge conflicts, not speed.
+**Strictly sequential builders — and the SAME builder across a package.** One `builder`
+at a time per codebase; parallel is for read-only work only (two agents writing produce
+merge conflicts, not speed). Within a package, continue the same builder conversation from
+increment to increment wherever the platform supports it: a fresh builder re-orients on the
+codebase every time, and that orientation is the single largest avoidable token cost in the
+loop. **Dispatch prompts are pointers, not essays** — the spec path, the increment, the
+acceptance check. The builder's standing orientation lives in `CLAUDE.md` and the spec, not
+in the prompt; explaining the why costs tokens on every dispatch and adds nothing the
+contract does not already bind.
 
 **Thin orchestrator — under contract.** The orchestrator runs under
 `../knowledge/contracts/orchestrator-agent.md`: it acts as the **standing product owner**

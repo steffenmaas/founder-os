@@ -1,10 +1,15 @@
 # TEMPLATE — copy to .github/workflows/deploy.yml
-# Production deploy on push to main. Two proven rules baked in:
+# THE one GitHub workflow (blueprint §7 — cost posture): test, then deploy, on push to
+# main. Everything else — per-increment checks, the full suite at package level, security
+# scans — runs locally before the merge; this workflow is the single remote backstop.
+# Three proven rules baked in:
 #
-#   1. KEYLESS. Auth is OIDC / Workload Identity Federation — no long-lived deploy key
+#   1. TEST BEFORE DEPLOY. The full suite runs here once more — the last line against a
+#      merge whose local run lied or was skipped. Red suite = no deploy.
+#   2. KEYLESS. Auth is OIDC / Workload Identity Federation — no long-lived deploy key
 #      exists anywhere. Secrets live in GitHub Actions secrets or a cloud secret manager
 #      (blueprint §8.2); nothing secret is in the repo.
-#   2. A DEPLOY IS NOT DONE WHEN THE COMMAND EXITS. The verify job checks that the deployed
+#   3. A DEPLOY IS NOT DONE WHEN THE COMMAND EXITS. The verify job checks that the deployed
 #      version actually serves — deployments that fail silently and are discovered days
 #      later in the Actions list are the incident this step exists for (deploy-gate.md,
 #      "after the deploy").
@@ -33,6 +38,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Full suite — red means no deploy
+        run: <npm run lint && npm run typecheck && npm test>
       - name: Build (stamped with the commit)
         run: npm run build
         env:

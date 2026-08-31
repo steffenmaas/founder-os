@@ -1,8 +1,11 @@
 # The Live Backlog — weighted by source, processed continuously
 
-> `ROADMAP.md` holds **intent**: the path from this product version to the next. The live
-> backlog holds **execution**: the queue the loop actually pulls from, around the clock.
-> Confusing the two produces either a roadmap nobody executes or a queue nobody steers.
+> `ROADMAP.md` is the **orchestration master**: one ordered list of packages (`F`/`B`/`T`
+> ids), and the position is the priority. The live backlog is **intake**: where feedback
+> and findings arrive and get triaged. Triage folds items *into* roadmap packages — an item
+> either joins the package it belongs to, or (rarely) founds a new one. Two lists that both
+> claim to say what happens next produce either a roadmap nobody executes or a queue nobody
+> steers; here, the roadmap decides and the backlog feeds it.
 
 ## Where it lives — the store is pluggable
 
@@ -18,6 +21,14 @@ the project chooses one in `project-config.json` (`backlog.store`):
 Whichever store: the loop reads and writes it through the same rules below, and switching
 stores must never change what gets built next.
 
+**Groom against the source of truth, not a projection.** When a store has been moved (say,
+from a database collection into a versioned file) the old store often stays alive as a
+read-only projection for the app — and it keeps answering *plausibly*, just with an older
+set. A grooming pass that reads the projection concluded six existing tickets had never
+been written and published that as fact; the ADR naming the real source would have settled
+it in one minute. Before grooming: name which store is the source of truth, out loud, and
+check `docs/decisions/` if there is any doubt.
+
 ## Ticket size — cut to user-observable value
 
 A ticket is **one change a user (or the founder) could notice**, describable in one sentence
@@ -31,6 +42,14 @@ increments of a bundle; they are never tickets themselves.
   sentence of user-visible effect describes it.
 - The test: **would this ticket's completion be worth telling the reporting user about?**
   If not, merge it into one that would.
+
+**Estimate against anchors you can open — and cut anything above 21.** An estimate argued
+from the work's description drifts; an estimate compared against two or three *merged*
+packages of known size does not, because anyone can open the anchor and look. Whatever
+relative scale the project uses: an item scoring above 21 is not an item, it is a theme —
+split it before it enters a package. Measured over three days of autonomous work, the
+top-priority workstream got its merges on day one and then none, while the loop kept
+shipping smaller things; oversized, unanchored items are how that happens.
 
 ## Item shape
 
@@ -75,8 +94,11 @@ increments of a bundle; they are never tickets themselves.
 
 ## Relationship to the roadmap
 
-- Roadmap items enter the backlog as `feature` / `source: admin` — they compete under the
-  same rules as everything else, which is exactly why rule 2 and 3 matter: the founder's
-  feature list waits while the product is broken.
-- At a version cut (`workflows/version-cut.md`), the backlog's `done` list is the evidence
-  for what the version actually delivered.
+- Triage folds backlog items into roadmap packages: a `bug` joins (or founds) a `B`
+  package, `improvement`/`feature` an `F` package, agent-internal work a `T` package. The
+  package lists the ids it closes; done propagates back to every folded item.
+- **Intake empty is not work done.** When the backlog has nothing new, the loop continues
+  with the next package on the roadmap — the observed failure is a loop that works off
+  yesterday's feedback overnight and then stops, with the roadmap untouched.
+- At a version cut (`workflows/version-cut.md`), the shipped packages' ids (F/B/T) are the
+  release's table of contents — see the release note step there.

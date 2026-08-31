@@ -97,7 +97,7 @@ Then:
 
 | Step | Command | What happens |
 |---|---|---|
-| 1 | `/dev-product` | Turn `PRODUCT.md`'s version scope into a roadmap. Max 3 items in *Now*. |
+| 1 | `/dev-product` | Turn `PRODUCT.md`'s version scope into the ordered package list (`F`/`B`/`T` ids). |
 | 2 | `/dev-spec <first item>` | Interview → spec with executable acceptance criteria. **Stops before code.** |
 | 3 | *(new session)* `/dev-loop <first item>` | Orient → plan → build → verify → hand to review |
 | 4 | `/dev-review` | QA Agent, fresh context, sees only the diff and the criteria |
@@ -130,8 +130,9 @@ For an existing project, four things need your attention:
 1. **`PRODUCT.md` is written retrospectively.** You have a product; write down what it is and
    what it is not. The non-goals section is the one that pays off — it is what stops agents
    proposing adjacent features forever.
-2. **`ROADMAP.md` is seeded from your real backlog**, then cut to 3 items in *Now*. That
-   limit will feel wrong. It is the point.
+2. **`ROADMAP.md` is seeded from your real backlog**, cut into few, large packages —
+   all findings in one area are ONE package. Twenty entries is a ticket pile, not a
+   roadmap.
 3. **Write 3–5 retrospective ADRs** for decisions already made. Without them, every new agent
    re-litigates them, every time.
 4. **Run `/dev-metrics` as a baseline** before changing how you work. Otherwise you will
@@ -150,9 +151,9 @@ Everything derives downward. Nothing may contradict the level above it.
 ```
   PRODUCT.md      version · vision · principles · non-goals · target user
        ▼          "What is this product, and what is it not?"
-  ROADMAP.md      Now (max 3) · Next (max 7) · Later · Done
-       ▼          "What do we build, in what order?"
-  docs/specs/     one spec per unit of work
+  ROADMAP.md      ONE ordered package list — F/B/T ids, position = priority
+       ▼          "What do we build next?" (a package is a release, not a ticket)
+  docs/specs/     one spec per package (F01-<slug>.md), behaviour not implementation
        ▼          "What exactly does this one change do?"
   Plan            ordered steps, each with its own check
        ▼

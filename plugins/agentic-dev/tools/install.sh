@@ -357,17 +357,22 @@ copy_if_absent SECURITY.md                      SECURITY.md
 copy_if_absent docs/specs/_template.md          docs/specs/_template.md
 copy_if_absent docs/decisions/0000-template.md  docs/decisions/0000-template.md
 copy_if_absent docs/learnings/_template.md      docs/learnings/_template.md
+copy_if_absent docs/releases/_template.md       docs/releases/_template.md
 copy_if_absent docs/personas/_template.md       docs/personas/_template.md
 copy_if_absent .github/dependabot.yml           .github/dependabot.yml
 copy_if_absent .github/CODEOWNERS               .github/CODEOWNERS
 copy_if_absent .github/PULL_REQUEST_TEMPLATE.md .github/PULL_REQUEST_TEMPLATE.md
-for w in ci security preview deploy founder-os-update; do
+# Cost posture (blueprint §7, founder decision): verification runs locally, GitHub runs
+# exactly ONE workflow — test-then-deploy — plus the module updater. The per-PR CI
+# battery, scheduled security scans and preview builds stay available as templates and
+# are adopted by copying them in deliberately, never installed by default.
+for w in deploy founder-os-update; do
   copy_if_absent ".github/workflows/$w.yml" ".github/workflows/$w.yml"
 done
 
 if [ "$DRY" != "1" ]; then
-  mkdir -p docs/checkins docs/specs docs/decisions docs/learnings
-  for d in checkins specs decisions learnings; do
+  mkdir -p docs/checkins docs/specs docs/decisions docs/learnings docs/releases
+  for d in checkins specs decisions learnings releases; do
     [ -e "docs/$d/.gitkeep" ] || touch "docs/$d/.gitkeep"
   done
 fi

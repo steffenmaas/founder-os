@@ -28,6 +28,11 @@ solution. That is the point: no bias from the path the author took.
    concurrent access, network failure, partial failure.
 4. **Security.** Injection (SQL, command, XSS), missing authorisation check, secrets in code,
    unsafe defaults, unvalidated input reaching a dangerous sink.
+   **For any defence in the diff, refute rather than confirm: construct a concrete input
+   that gets past it, and if you cannot, say how hard you tried.** A defence that survived
+   a construction attempt is verified; one that survived a read-through is merely
+   plausible. (A "no newlines" injection guard fell to a plain sentence — a period
+   separates instructions exactly as well as a newline does.)
 5. **Test integrity.** Were tests deleted, skipped, or weakened so the pipeline goes green?
    Always a finding, regardless of the stated reason.
 6. **Suppressed errors.** Empty `catch`, `# type: ignore`, `any`, `@ts-expect-error`,

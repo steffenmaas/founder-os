@@ -1,6 +1,6 @@
 ---
 name: dev-onboard
-description: Sets up Agentic Dev in a repository — writes PRODUCT.md, ROADMAP.md, CLAUDE.md, AGENTS.md, spec/ADR/learning templates, CI, security, preview and deploy workflows, and the managed .founder-os directory. Use this skill when the user says "set up agentic dev", "onboard this repo", "apply the blueprint here" or any natural variant. Module 16 (Agentic Dev) — Product & Tech Delivery. Pre-Seed.
+description: Sets up Agentic Dev in a repository — writes PRODUCT.md, ROADMAP.md, CLAUDE.md, AGENTS.md, spec/ADR/learning/release templates, the single test-then-deploy workflow (CI/security templates stay opt-in), and the managed .founder-os directory. Use this skill when the user says "set up agentic dev", "onboard this repo", "apply the blueprint here" or any natural variant. Module 16 (Agentic Dev) — Product & Tech Delivery. Pre-Seed.
 ---
 
 # Onboard a repository
@@ -69,7 +69,7 @@ Then write, from the templates in `${CLAUDE_PLUGIN_ROOT}/templates/project/`:
 | File | Adapt |
 |---|---|
 | `PRODUCT.md` | **Yes — from the interview.** Nothing derives correctly without it. |
-| `ROADMAP.md` | Yes — seed from existing issues/backlog, max 3 in *Now* |
+| `ROADMAP.md` | Yes — seed from existing issues/backlog as few, LARGE packages (`F`/`B`/`T` ids) |
 | `CLAUDE.md` | **Yes — real commands, real architecture** |
 | `AGENTS.md` | Light — project name only |
 | `CONTRIBUTING.md` | Rarely |
@@ -111,7 +111,7 @@ surface the human can click. Substitute `<owner>/<repo>` once and hand over the 
 
 | Setting | Exactly where / how | Caveat |
 |---|---|---|
-| **Branch protection on `main`** | `github.com/<owner>/<repo>/settings/branches` → *Add branch ruleset* for `main`: require PR, require status checks **by the job names just installed** (e.g. `quality`, `secret scan (gitleaks)`), block force pushes, include administrators. CLI: `gh api -X PUT repos/<owner>/<repo>/branches/main/protection --input protection.json` | Check names must match the workflow job names or "required checks" never turn green. |
+| **Branch protection on `main`** | `github.com/<owner>/<repo>/settings/branches` → *Add branch ruleset* for `main`: require PR, block force pushes, include administrators. CLI: `gh api -X PUT repos/<owner>/<repo>/branches/main/protection --input protection.json` | **Default posture has no per-PR CI** (blueprint §7 — the gate is the full local suite; the single deploy workflow is the remote backstop on `main`). Require status checks only if the project opted into the CI templates — then names must match the job names or "required checks" never turn green. |
 | **Actions may create PRs** | `github.com/<owner>/<repo>/settings/actions` → Workflow permissions → tick **"Allow GitHub Actions to create and approve pull requests"** | **Required by `founder-os-update.yml`** — without it the daily update PR dies with 403. |
 | **Actions default permissions** | Same page → *Read repository contents* | Individual jobs widen per-workflow `permissions:` blocks. |
 | **Secret scanning + push protection** | `github.com/<owner>/<repo>/settings/security_analysis` → enable both | **Private repos need the paid Secret Protection add-on.** Without it, the gitleaks CI job plus the local scan hook are the working control — report this box as *plan-limited*, never as ticked. |

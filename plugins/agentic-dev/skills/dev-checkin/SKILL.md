@@ -65,7 +65,9 @@ and the human checks the empty one.
 
 A check-in records work; it does not replace it. In the autonomous loop this skill runs
 at the **end** of a cycle — a tick whose only output is a check-in is a failed tick
-(`workflows/autonomous-loop.md`, "A tick is a work unit").
+(`workflows/autonomous-loop.md`, "A tick is a work unit"). And **intake empty is not work
+done**: if the report says "feedback worked off" but the roadmap's top package was not
+advanced, say that out loud — it is the loop's known way of stopping while looking busy.
 
 ```markdown
 # Check-in <date>
