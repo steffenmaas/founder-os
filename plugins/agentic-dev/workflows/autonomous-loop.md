@@ -47,9 +47,14 @@ items moved. Three rules close it:
 3. **The check-in is written at the end of a work cycle, never instead of one.** Report
    time is after dispatch time, in the same tick.
 
-**Strictly sequential builders — and the SAME builder across a package.** One `builder`
-at a time per codebase; parallel is for read-only work only (two agents writing produce
-merge conflicts, not speed). Within a package, continue the same builder conversation from
+**One agent per type at a time — and the SAME builder across a package.** One `builder`
+at a time per codebase: two agents writing the same surface produce merge conflicts, not
+speed. But the boundary is the **write surface, not writing itself** — an asset agent
+producing images, video or 3D objects, a docs writer, or a design agent may run in
+parallel to the builder as long as their outputs do not overlap; read-only agents
+(`reviewer`, `verifier`, explorers) parallelise freely. The rule stated precisely: **never
+two agents of the same type at once, never two writers on the same surface.** Within a
+package, continue the same builder conversation from
 increment to increment wherever the platform supports it: a fresh builder re-orients on the
 codebase every time, and that orientation is the single largest avoidable token cost in the
 loop. **Dispatch prompts are pointers, not essays** — the spec path, the increment, the
@@ -113,7 +118,9 @@ subagent, under one contract, as one background task:
 **Only `builder` may write product code.** That is what makes the dev/QA separation structural rather
 than a promise: the reviewing agents physically cannot change the code they judge, and the
 writing agent never issues a verdict on its own work. One `builder` at a time per codebase;
-the read-only ones may run in parallel.
+read-only agents parallelise freely, and writers of **non-code artifacts** (images, video,
+3D, docs) may run alongside the builder — one agent per type, never two writers on the
+same surface.
 
 ### Visibility — the loop must be watchable while it runs
 
@@ -133,10 +140,11 @@ see *that* work is happening, not infer it from commits appearing later. So:
   activity is the only lever against the inactivity reclaim. While a dispatch runs, the
   orchestrator does bounded useful foreground work — grooming, spec-writing, reading
   results — and checks on its dispatches; it hands back only when nothing is running.
-- **The task label is the status display.** Name every task for what it does and what it
-  touches — `build:water-tracking · increment 2/4`, `verify:nutrition-scope`,
-  `watchdog:build-2` — never `task` or `agent`. The list of running labels *is* what the
-  human reads to know where the loop stands.
+- **The task label is the status display.** The notation is fixed: **agent type first,
+  then the package being worked** — `build:F03-onboarding · increment 2/4`,
+  `verify:F03-onboarding`, `asset:F03-hero-video`, `watchdog:build-F03` — never `task` or
+  `agent`. Type first means one glance at the running labels shows which stage every
+  package is in; that list *is* what the human reads to know where the loop stands.
 - **No orphans.** Every background task is either finished, killed by its watchdog, or
   reported at the end of the cycle. Nothing keeps running unnamed and unwatched.
 
@@ -176,3 +184,9 @@ enough that the deep tier stays fast:
   (a banned API, a build-flag invariant, doc/code consistency, a pacing property) and pays
   rent forever. Breadth for its own sake is how a suite reaches thousands of cases that take
   longer to run than the change took to write.
+- **The full suite is journeys plus guards, nothing else.** Does onboarding run through,
+  does the purchase run through, does the core action work — against the **test
+  environment, never production**. Pixel-level and visual-detail assertions do not enter
+  the suite; they belong to manual tests and design review. A feature normally extends an
+  existing journey rather than adding a test file — when the suite grows faster than the
+  functionality, pruning it is the next `T` package.

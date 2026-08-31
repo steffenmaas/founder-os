@@ -184,9 +184,20 @@ resolution. Read once per session. The ladder, higher wins:
 
 Standard pyramid — unit base, integration middle, thin E2E tip, human spot checks.
 **Verification is two-tier** (`workflows/autonomous-loop.md`): per increment only the
-touched scope runs; the **full suite runs once per bundle** and has a **runtime budget**
+touched scope runs; the **full suite runs once per package** and has a **runtime budget**
 (`testing.full_suite_budget_minutes`) — exceeding it makes suite-trimming a backlog item.
 Prefer one guard test that enforces a rule forever over ten that restate behaviour.
+
+**The full suite answers one question: is anything broken?** It is a small set of
+**journey tests** — the critical user paths end to end (onboarding completes, the purchase
+completes, the core action works) — plus the guard tests. What it is NOT: a pixel
+inspector. Whether an element sits one pixel off is a manual-test and design-review
+matter, never a suite case; a suite of visual micro-assertions grows one to five cases
+per feature until there are more tests than functionality, and it breaks on every
+intentional change while catching no real regression. Growth rule: **a feature normally
+extends an existing journey; a new journey test needs a new user path to justify it.**
+Tests run **against the test environment, never against production** — a suite that
+touches production data is an incident, not a safety net.
 
 ### 6.2 Non-negotiable
 
