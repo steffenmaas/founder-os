@@ -55,7 +55,7 @@ Do not read half the codebase yourself.
 ### 4. Write it
 
 Follow `${CLAUDE_PLUGIN_ROOT}/templates/project/docs/specs/_template.md`, save as
-`docs/specs/<ID-slug>.md` — the ID is the roadmap package id (`F01-onboarding.md`), so
+`docs/specs/<ID-slug>.md` — the ID is the roadmap package id (`F001-onboarding.md`), so
 spec and package map without lookup, and the roadmap entry links it.
 
 **Specify behaviour, not implementation.** The codebase moves while a package waits its

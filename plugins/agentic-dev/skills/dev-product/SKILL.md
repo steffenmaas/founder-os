@@ -37,7 +37,7 @@ Recent work: !`git log --oneline -15 2>/dev/null`
        ▼
   ROADMAP.md   ONE ordered list of packages — F/B/T ids, position = priority
        ▼
-  docs/specs/  one spec per package, file named after its id (F01-<slug>.md)
+  docs/specs/  one spec per package, file named after its id (F001-<slug>.md)
 ```
 
 Three invariants, checked every time you run:

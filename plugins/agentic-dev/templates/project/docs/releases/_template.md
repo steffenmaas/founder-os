@@ -5,9 +5,9 @@
      now? One screenshot per feature, no videos (videos are for meta-releases, later).
      No history, no process, no file names. -->
 
-**Contains:** <F03, B04–B06, T02 — the package ids say what kind of release this is>
+**Contains:** <F003, B004–B006, T002 — the package ids say what kind of release this is>
 
-## <F03 · What you can do now>
+## <F003 · What you can do now>
 
 <Two or three sentences, addressed to the user: what works now that did not before, and
 why they would want it.>

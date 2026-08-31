@@ -25,27 +25,28 @@
 
 | Prefix | Means | Example |
 |---|---|---|
-| `F` | **Feature** — afterwards a user can do something that did not work before | `F01` |
-| `B` | **Bug** — something does not do what it claims, or lies | `B04` |
-| `T` | **Technical** — tooling, build, process; invisible to the user | `T02` |
+| `F` | **Feature** — afterwards a user can do something that did not work before | `F001` |
+| `B` | **Bug** — something does not do what it claims, or lies | `B004` |
+| `T` | **Technical** — tooling, build, process; invisible to the user | `T002` |
 
 Rules, and they are the actual point:
 
-1. **One running number per prefix**, two digits from `01`, so lists sort themselves.
+1. **One running number per prefix**, at least three digits from `001`, so lists sort
+   themselves and the number circle never wraps within a product's life.
 2. **A number is never reused and never renumbered** — it is an identity, not a position.
    Reordering changes the order, not the names.
 3. **One prefix per package.** A defect *and* an extension are two packages.
-4. **The id leads the package name and the PR title** — `B04 · <name>` — so both map
-   without lookup. A release then reads cleanly: "contains F03, B04–B06, T02".
+4. **The id leads the package name and the PR title** — `B004 · <name>` — so both map
+   without lookup. A release then reads cleanly: "contains F003, B004–B006, T002".
 
 ## The list — position = priority
 
 <!-- One entry per package. Spec missing? Then writing the spec is the package's first
      increment. Keep each entry to the four lines below — the past is not documented here. -->
 
-- [ ] **F01 · <speaking name>** — <one sentence: what a user can do afterwards>
-      Spec: [docs/specs/F01-<slug>.md](docs/specs/F01-<slug>.md) · closes: <feedback ids>
-- [ ] **B01 · <speaking name>** — <one sentence: what stops being broken>
+- [ ] **F001 · <speaking name>** — <one sentence: what a user can do afterwards>
+      Spec: [docs/specs/F001-<slug>.md](docs/specs/F001-<slug>.md) · closes: <feedback ids>
+- [ ] **B001 · <speaking name>** — <one sentence: what stops being broken>
       Spec: <link or "to write — first increment">
-- [ ] **T01 · <speaking name>** — <one sentence: what the loop or build can do afterwards>
+- [ ] **T001 · <speaking name>** — <one sentence: what the loop or build can do afterwards>
       Spec: <link>

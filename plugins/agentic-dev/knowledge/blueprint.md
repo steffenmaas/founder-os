@@ -27,7 +27,7 @@ step, not your last.
 |---|---|---|
 | What are we building and why? | `PRODUCT.md` | Human (agent proposes) |
 | What are we building next? | `ROADMAP.md` | Human decides, agent maintains |
-| What exactly is this one change? | `docs/specs/<ID-slug>.md` — ID = roadmap package (`F01`…) | Agent |
+| What exactly is this one change? | `docs/specs/<ID-slug>.md` — ID = roadmap package (`F001`…) | Agent |
 | How do I decide beyond the rules? | `.founder-os/harness.md` | Founder OS (upstream) |
 | What is my mandate and my limits? | `.founder-os/contracts/<role>.md` | Founder OS (upstream) |
 | Which steps does this work take? | `.founder-os/workflows/<name>.md` | Founder OS (upstream) |
@@ -129,7 +129,9 @@ reproducing your work.
 ### 3.6 SHIP
 
 - **Auto-ship vs. human approval is decided by the deploy gate** (`deploy-gate.md`), run
-  every time. Human review is not a standing requirement — the QA-agent pass is; a human
+  every time — and the gate's posture follows the project's **`stage`**: `pre-live` ships
+  everything on green verification (nothing is live, nothing can break that matters, speed
+  wins), `live` runs the full checklist, `scaled` tightens it. Human review is not a standing requirement — the QA-agent pass is; a human
   looks at a change only when the gate says so.
 - Merge to `main` only with the **full local suite green at package level** and a QA PASS
   (§7 — the merge is the gate). Deploy through the single workflow — never from a local

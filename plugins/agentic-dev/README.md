@@ -153,7 +153,7 @@ Everything derives downward. Nothing may contradict the level above it.
        ▼          "What is this product, and what is it not?"
   ROADMAP.md      ONE ordered package list — F/B/T ids, position = priority
        ▼          "What do we build next?" (a package is a release, not a ticket)
-  docs/specs/     one spec per package (F01-<slug>.md), behaviour not implementation
+  docs/specs/     one spec per package (F001-<slug>.md), behaviour not implementation
        ▼          "What exactly does this one change do?"
   Plan            ordered steps, each with its own check
        ▼

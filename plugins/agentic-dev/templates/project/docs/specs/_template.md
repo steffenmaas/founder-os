@@ -1,8 +1,8 @@
-# <F01 · Title>
+# <F001 · Title>
 
-> File: `docs/specs/<F01-slug>.md` — named after the roadmap package it specifies.
+> File: `docs/specs/<F001-slug>.md` — named after the roadmap package it specifies.
 > Status: Draft | Approved | Implemented | Dropped
-> Package: <F01> · Product version: <0.1.0>
+> Package: <F001> · Product version: <0.1.0>
 > Estimate: <n, anchored against two named MERGED packages — anything above 21 is a theme, split it>
 > Author: <human/agent> · Date: <YYYY-MM-DD>
 

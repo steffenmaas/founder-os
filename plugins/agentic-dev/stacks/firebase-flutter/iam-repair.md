@@ -13,6 +13,15 @@ it can grant anyone anything, including itself. So the design question is never 
 yes or no"; it is *who grants the granter, and what stops the granter from granting
 everything*.
 
+## Stage note — who pulls the trigger depends on what is at stake
+
+Everything below describes the **`live` posture**. In `pre-live` (deploy-gate.md, stage
+dial) the same workflow may be **triggered by the loop itself** via the API — nothing is
+live, a wrong grant costs a revision, and waiting overnight on a click costs more. See
+[`stage-access.md`](stage-access.md). The mechanism never changes: the only payload is the
+reviewed script, the identity is short-lived, and going live returns the trigger to the
+human.
+
 ## The answer: a click-gated workflow whose only API is the script
 
 [`iam-repair.yml`](iam-repair.yml) — a workflow that:

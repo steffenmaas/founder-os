@@ -5,6 +5,21 @@
 > it matters; the second makes the human the bottleneck everywhere it does not. The gate is
 > the explicit line between the two — a checklist, not a judgement call.
 
+**How much gate a change gets follows what is actually at stake** — the project's
+`stage`, the master dial in `project-config.json`:
+
+| `stage` | Reality | Posture |
+|---|---|---|
+| **`pre-live`** *(default for new projects)* | Not live. No users, no revenue, no data anyone would miss. **Nothing can break that matters.** | **Speed is everything.** Checklist lines 1–3 and 7 are suspended: every change auto-ships once verification (line 4) is green. Merges, tests, releases happen immediately — package done, merge, next. Decisions: **decide whenever the cost of being wrong is bearable and the call is revisable; collect and present only what is irreversible or existential.** The worst case of a wrong autonomous decision here is revising it — that is cheaper than waiting a night for an answer. Confidence threshold default drops to 40 (harness §5). |
+| **`live`** | First real users. | The checklist below, as written. Threshold default 70. First user-visible versions and the untouchable surfaces see a human. |
+| **`scaled`** | Paying users at volume. | The checklist plus: untouchable surfaces (line 2) are **always** gated, `mode: strict` is the recommended setting, threshold default 85. |
+
+**Moving to `live` is a founder decision and a checklist** (the go-live list in the stack
+blueprint: backups on, error reporting live, legal pages up). Tightening the stage is a
+config change; loosening it back is an ADR. And one line survives every stage, including
+`pre-live`: **verification green before merge** — speed comes from skipping approvals, never
+from skipping the proof that it works.
+
 Run at SHIP time, in **every** workflow. Two outcomes, nothing in between:
 
 ```
@@ -49,7 +64,8 @@ Per project, in `project-config.json` (`deploy_gate`):
 
 | Key | Meaning | Default |
 |---|---|---|
-| `mode` | `strict` = every change is gated · `standard` = this checklist · never looser than this checklist | `standard` |
+| `stage` | `pre-live` · `live` · `scaled` — the master dial above; sets gate posture and the confidence-threshold default | `pre-live` |
+| `mode` | `strict` = every change is gated · `standard` = this checklist · never looser than the stage's posture | `standard` |
 | `always_gate` | Path globs that force the gate regardless of change class (e.g. `lib/payments/**`) | `[]` |
 
 Tightening is a config change. **Loosening is an ADR** — it removes a human from a loop, and

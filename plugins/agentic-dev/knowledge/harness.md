@@ -92,7 +92,9 @@ See `contracts/orchestrator-agent.md`. Asking the human to choose between two op
 these already settle is a failure, not diligence.
 
 **The threshold is the human's dial:** `decisions.confidence_threshold` in the project
-config (default 70). At/above → decide autonomously and log; below → one entry in
+config. **Its default follows the project's `stage`** (deploy-gate.md): `pre-live` 40 —
+nothing is live, a wrong call costs a revision, waiting costs a night; `live` 70;
+`scaled` 85. Explicit config overrides the stage default. At/above → decide autonomously and log; below → one entry in
 `docs/decisions/QUEUE.md` (question, options, recommendation, score, why not higher). If
 work cannot proceed, take the reversible default and mark it with the queue id. The
 check-in presents the queue **bundled**.
