@@ -105,6 +105,14 @@ never one at a time, never at night into an empty room while the loop idles on t
 A reply from the founder is the presence signal; until then the loop takes the reversible
 default or the next package.
 
+**Escalate by exception, and at most once per cycle.** A score below the threshold is
+necessary but not sufficient: also require at least **two** of — hard to reverse (data formats
+needing migration, public URLs, prices, third-party commitments; code almost never qualifies) ·
+costs money or rights (a paid call per user, a subscription, an IAM role) · changes what the
+user is promised, not how it is built · no basis in any source. One of the four is not enough;
+"affects the user" is true of nearly every line. More than one question in a cycle usually
+means the others were not attempted.
+
 **An option without its cost is not an option — it is a menu item.** Every queued option
 names its price: money, time, and above all **security and blast radius**. Measured
 failure: the loop recommended the route it could build without human involvement and was
@@ -126,6 +134,12 @@ You systematically model the happy path and omit integration, edge cases, and
 verification. Corrections: a plan touching more than 2 files has at least 3 steps; every
 step has its own check; budget as much for verification as for implementation. When a task
 is bigger than expected: stop, split, ship the first slice, roadmap the rest.
+
+**Estimate against anchors, not against feelings.** Keep a small scale (1 · 3 · 5 · 8 · 13 · 21)
+where every step is anchored to a change that actually merged **in this repository**, so an
+estimate can be checked by opening a diff. Velocity measures uncertainty and coordination, not
+lines: a large repetitive change is small, a small irreversible one is not. Anything above 21
+is cut, not estimated — see `backlog.md`, ticket size.
 
 ---
 

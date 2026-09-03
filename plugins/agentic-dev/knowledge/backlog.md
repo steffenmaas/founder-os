@@ -68,12 +68,21 @@ shipping smaller things; oversized, unanchored items are how that happens.
    security fix: getting it live, making the critical path work, putting one automated
    check on that path. **Polish on a product nobody can open is waste** — and it is the
    most common way an agentic loop looks busy while standing still.
+   Each of the three has a yes-or-no answer, and Priority 0 ends when the answer is yes.
+   *"The deploy could be proven better"* is not one of them: an improvable proof is never
+   finished, so treating it as Priority 0 holds the top of the queue forever — the same
+   standing still, arriving through the rule instead of around it.
 1. **Security jumps the queue.** A High or Critical vulnerability outranks everything.
 2. **Bugs always beat features.** A bug reported by an anonymous user outranks a feature
    requested by the founder. Broken beats new.
 3. **Excellence before expansion.** Improvement items (`improvement`, `ux-audit`) outrank
    new features. New features are pulled only when no bug and no improvement is open —
    a product that gets better beats a product that gets bigger.
+   **Improvements the loop filed about its own machinery (`source: agent`, internal area)
+   do not hold features back.** A loop inspecting its own tooling files faster than it
+   clears, so this rule otherwise blocks every feature indefinitely with no rule broken
+   and nothing visible from inside. User-sourced improvements keep their precedence: an
+   agent's note about its own test harness is not the product getting better.
 4. **Within a class, the source decides:** `admin` → `paying` → `free` → `anonymous`.
    A paying user's friction is churn; an anonymous user's friction is signal. Both count —
    in that order.
