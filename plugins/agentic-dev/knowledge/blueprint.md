@@ -314,7 +314,11 @@ non-obvious workaround, or a rule here did not fit.
 --upstream` bundles them into one PR against `steffenmaas/founder-os` with the proposed
 rule change and its enforcement level; on merge, `/plugin update` carries it everywhere;
 the learning is marked `submitted:`. **A rule is created after an incident, never
-preventively.**
+preventively.** And **a rule change ships with its check wherever one is mechanically
+possible** — a validator rule, a hook case in `test_hooks.sh`, a guard test — because the
+module's own configuration regresses like code does: a rule that only prose enforces is
+re-broken by the next edit, and nothing reports it. Where no mechanical check exists, the
+rule states its incident tersely so a later reader can test against reality.
 
 **Upstream is public. Scrub before sending** — the module repository is public, so an
 upstream learning is a publication, not an internal note:

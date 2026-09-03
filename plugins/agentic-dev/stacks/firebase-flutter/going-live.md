@@ -86,6 +86,8 @@ surprised; a user who finds out later files a complaint.
 [ ] Feedback path reaches the backlog, and the user gets an answer
 [ ] Secrets in Secret Manager only — nothing in the repo, nothing in the workflow
 [ ] Analytics gate verified: after objecting, nothing is measured and no instance is built
+[ ] Rollback rehearsed once against the preview channel — deploy a previous version and
+    verify it serves. The most-needed path under pressure is the least-practised one.
 [ ] Backups on AND restored once into a scratch database (stage-access.md — a backup that
     has never been restored is a wish)
 [ ] Stage dial flipped: `stage: live` — self-served IAM repair off, full deploy-gate checklist on

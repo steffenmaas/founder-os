@@ -55,6 +55,21 @@ anywhere:
    `severity>=ERROR` over the cron window — the runtime `PERMISSION_DENIED`s and crash
    loops that only show up under real traffic.
 
+**The response is tiered, and detection stays deterministic.** A watch that treats every
+deviation as an incident trains everyone to ignore it. Three tiers, decided by plain
+thresholds in the workflow (no model in the detection path):
+
+| Tier | Signal | Response |
+|---|---|---|
+| **Note** | a single soft miss (one slow probe, one transient error) | log in the run summary, no issue |
+| **Diagnose** | repeated misses or error-log findings | file/update the issue with the evidence — read-only diagnosis, no fix attempted |
+| **Act** | version drift with a green deploy, red deploy run, site down | the issue is filed as a `B` package candidate; the loop pulls it under the backlog doctrine (bugs outrank features) and proposes the fix as a PR |
+
+**Founder dismissals tune the thresholds.** An issue closed as "not a problem" is not
+noise to swallow silently — it is calibration: the workflow's threshold for that check is
+raised in the same commit that closes the discussion. A watch nobody has to dismiss twice
+for the same reason stays trusted.
+
 **On failure it files a GitHub issue** (one, updated — not a new one per tick). That
 closes the loop: the issue lands in the backlog as `source: ops-watch`, the autonomous
 loop pulls it as a bug — bugs outrank features (`backlog.md`) — and GitHub notifies the
