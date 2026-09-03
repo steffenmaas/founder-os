@@ -7,6 +7,10 @@ Research current as of August 2026.
 
 ## Agentic development — practice and patterns
 
+- Anthropic — *The AI-Native SDLC Playbook*
+  https://claude.com/blog/the-ai-native-sdlc-playbook
+  → artifact chain (intent/spec/plan) as audit trail, evals gating configuration changes,
+    control-band monitoring with tiered response, rollback as the most-rehearsed path
 - Anthropic — *Best practices for Claude Code*
   https://code.claude.com/docs/en/best-practices
   → verification loop, explore/plan/implement/commit, context hygiene, failure patterns
