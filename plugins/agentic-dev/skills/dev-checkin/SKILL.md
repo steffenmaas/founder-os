@@ -51,7 +51,7 @@ IN FLIGHT: <current bundle, how far>
 DECISIONS: <needing the founder — PRODUCT (what/for whom) and TECHNICAL (only when
             architectural or costly), each with options and your recommendation.
             "none" is a valid and good answer.>
-PROGRESS:  <version scope: x of y · delivery pace · first-pass quality>
+PROGRESS:  <version scope: x of y · DORA: deploy cadence + drift · lead time (intake→deploy) · change failure rate>
 ```
 
 Never explain package internals, settings, or which line changed. If they want that, they
