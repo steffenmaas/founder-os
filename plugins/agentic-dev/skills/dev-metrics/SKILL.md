@@ -58,29 +58,33 @@ Always say this when you report numbers:
 | No CI files, no security files | Infrastructure gap, highest priority |
 | Conventional-commit share under 30% | Every other number here is a trend, not a value |
 
-### The two headline numbers
+### The headline numbers — DORA, adapted
 
-Everything else is diagnosis; these two are the score. Report them first, always, and track
-them over time — the point is the trend, not the absolute value.
+The four DORA metrics are the score (founder decision, 2026-09-04). Two of them are
+redefined here, deliberately, because the standard definitions measure pipeline friction a
+merged-package loop does not have. Report all four first, always, and track them over
+time — the point is the trend, not the absolute value.
 
-| KPI | What it is | Read it as |
+| DORA | Here it means | Read it as |
 |---|---|---|
-| **Delivery pace** | Bundles shipped per active development hour (from the backlog store: items moved to `done`, grouped by bundle, over the loop's running time) | How fast the loop converts intent into working product |
-| **First-pass quality** | Share of bundles that reached production **without** a follow-up fix, revert, or red pipeline | Whether the pace is real or borrowed from tomorrow |
+| **D — Deployment frequency** | Deploys (shipped packages) per day — and the target is a **steady cadence, not a maximum**. Report the longest gap and whether the cadence is drifting; D drifts often, and the drift is the finding. | A loop that is healthy deploys with the regularity of a pulse; growing gaps mean it is standing still while looking busy. |
+| **L — Lead time** | **From backlog intake to live deployment**: the item's arrival in the backlog store to the deploy of the package that closes it, median per package. *Not* commit-to-deploy — that is minutes here and measures nothing; the queue is where the time goes. | How long a user who reported something waits until it is live. |
+| **C — Change failure rate** | Share of packages that needed a follow-up fix, revert, or hit a red pipeline after merge (the inverse of first-pass quality). Estimated from commit patterns — carry the data-quality caveat. | Whether the pace is real or borrowed from tomorrow. |
+| **R — Time to restore** | From the ops-watch issue opening on an incident to its close-on-recovery (`ops-watch.md` closes the issue itself when the check is green again). | How long production stays broken when it breaks. |
 
-**Pace without first-pass quality is not speed, it is debt** — always report the pair, never
-one alone.
+**D and C are a pair** — cadence without first-pass quality is not speed, it is debt. Never
+report one alone.
 
-**Guard against gaming.** Pace rises trivially if bundles get smaller, so the number is only
-honest while the sizing rule holds (`backlog.md`): one item = one change a user could
-notice. Report the **median items per bundle** alongside the pace. If it falls while pace
-rises, say so plainly — that is measurement drift, not improvement.
+**Guard against gaming.** D rises and L falls trivially if packages get smaller, so the
+numbers are only honest while the sizing rule holds (`backlog.md`): one item = one change a
+user could notice. Report the **median items per package** alongside D and L. If it falls
+while they improve, say so plainly — that is measurement drift, not improvement.
 
 Lines of code are not a metric here, in either direction.
 
 ### Output
 
-Short report: the two headline numbers with their trend, three sentences of assessment per
+Short report: the four DORA numbers with their trend, three sentences of assessment per
 repository, then a table of the remaining numbers, then **at most five** concrete actions,
 prioritised. **No action without a reference to a number in the report.**
 
