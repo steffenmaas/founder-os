@@ -52,12 +52,13 @@ Three invariants, checked every time you run:
 
 ### Your boundary
 
-**You propose priority. You never set it.**
+**You re-order freely; an order the founder set, you never override.**
 
 - You may append packages and fold intake into existing ones freely — tech debt, missing
   tests, security gaps, ideas found during other work become `T`/`B` packages or join one.
-- You may reorder below the founder's pins per the backlog doctrine. You may **not**
-  override an order the founder set by saying so. Recommend, with a reason, and wait.
+- You may re-order per the backlog doctrine, in the commit that changes the file. You may
+  **not** override an order the founder set by saying so. There, recommend with a reason,
+  and wait.
 - You may **not** bump the product version. Prepare the proposal; the human decides.
 
 ### Modes
