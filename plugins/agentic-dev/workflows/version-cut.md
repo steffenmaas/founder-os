@@ -13,13 +13,14 @@ re-cutting against the next one.
 | # | Who | What | Gate |
 |---|---|---|---|
 | 1 | Product | **ASSESS** — is the current version's stated scope actually complete? Go through it item by item against the shipped packages (release notes + merged PRs carrying their `F`/`B`/`T` ids). | Every scope item is either done, explicitly dropped, or moved. No hand-waving. |
-| 2 | Product | **MEASURE** — run `/dev-metrics` for the version's time window. Deploy frequency, change failure rate proxy, rework rate, test ratio. | Numbers in hand, with their data-quality caveat. |
+| 2 | Product | **MEASURE** — run `/dev-metrics` for the version's time window. Deploy frequency, change failure rate proxy, rework rate, test ratio. Plus the token report (`tools/ops/token-report.mjs`): fresh input and output per agent, summed per package. | Numbers in hand, with their data-quality caveat; a cost line per package ready for the release note. |
 | 3 | Product | **HARVEST** — read every `docs/learnings/` entry written during this version. Which are `scope: upstream` and not yet submitted? | Upstream learnings queued for `/dev-learn --upstream`. |
 | 4 | Product | **PROPOSE** — draft the version bump: new number, what the next version is about in one paragraph, and its scope. | Human reviews. |
 | 5 | Human | **DECIDE** — approve, adjust, or defer. | Approved. |
 | 6 | Product | **CUT** — bump the version in `PRODUCT.md`, write the new scope, re-order `ROADMAP.md`'s package list against it. Shipped packages are gone from the file already (they leave with the PR that ships them). | `ROADMAP.md` traces cleanly to the new `PRODUCT.md`. |
 | 7 | Release | **TAG + RELEASE NOTE** — git tag for the version, and `docs/releases/<version>.md` from the template: **written from the user's perspective** — what can I use now, one screenshot per feature, the `F`/`B`/`T` ids as the table of contents. Short and punchy; no history, no process. This file is outreach raw material (website, social posts — the channels come later, the document exists now). No videos: those belong to meta-releases that bundle several versions, later. | Tag pushed, release note committed. |
 | 8 | Dev | **UPSTREAM** — run `/dev-learn --upstream`. Everything generalisable from this version reaches the Founder OS module. | PR opened against `founder-os`. |
+| 9 | Orchestrator | **HAND OVER** — write the handover sheet (`docs/checkins/`) and end the orchestrator session; the next version starts in a fresh session from that sheet (blueprint §10). | Sheet committed; new session opened from it. |
 
 ---
 

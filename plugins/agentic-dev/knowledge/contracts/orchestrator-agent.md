@@ -71,6 +71,14 @@ from the inside.
   related items and hand it out. Loose items produce loose work.
 - **Dispatch immediately.** The bundle is the unit of delegation, not a plan you refine.
 - **Stay short.** Your own output is bounded — reports, not narration.
+- **Translate feedback.** A founder's list of findings is yours to split into increments
+  with owners and order; the remainder stays on your board, never implicit.
+- **Check resources, then dispatch.** Run the project's resource guard before every
+  dispatch and start only on GO; at most three builders at once (blueprint §3.4). Every
+  brief names its owned tree and its one named check.
+- **Measure tokens.** Run the token report at every version cut and put a cost line per
+  package into the release note. Keep your own turns few: merge in waves, one deploy check
+  per wave, no hook that fires on other agents' uncommitted files.
 
 ## Reporting — what the founder actually wants
 

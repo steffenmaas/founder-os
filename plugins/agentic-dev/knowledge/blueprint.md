@@ -112,6 +112,31 @@ Refs: docs/specs/<slug>.md
 
 Types: `feat` `fix` `refactor` `test` `docs` `chore` `perf` `build` `ci` `revert` `hotfix`.
 
+**Shared workspace.** When several agents share one container and one working tree
+(learnings 2026-09-07, 2026-09-08 — three destroyed work states in one session):
+
+1. **File ownership is in the dispatch.** Every brief names the files the agent owns and the
+   trees it must not touch. Without that sentence the brief is incomplete.
+2. **Two agents on the same file run one after the other** — as a continuation of the same
+   agent, never as a second dispatch.
+3. **Never kill processes you did not start.** No `pkill`, no `killall`; own processes by PID.
+4. **No `stash`, `add -A`, `reset --hard`, `checkout -- .`, `clean`.** Commit your own files,
+   then pull — a collided `--autostash` stays behind and blocks **everyone**. (Enforced by
+   `guard-bash.sh`.)
+5. **A run that died under load is "not run"** — neither green nor red. Up to three retries
+   under `nice`; after that report it as not performed.
+6. **Prefer a worktree per agent** (`isolation: worktree`, dependencies linked): no shared
+   index, no hook noise on the main tree; the orchestrator merges the worktree branches.
+
+**Resources before dispatch.** An orchestrator starts an agent only after a resource check
+says GO — load, memory, disk, heavy processes (headless browsers, renderers). Guide values
+for a 4-core VM: load below 1.5 × cores, at most three builders, at most one of them
+rendering, at most two driving a headless browser (`templates/project/tools/ops/resources.sh`).
+Every builder **commits each step separately** — a session restart then costs the current
+step, not half an hour of reasoning. An agent that died is restarted with "continue from the
+working tree", never from scratch. (Incident: session process restarted at load 15 on 4
+cores with four builders running, all four lost, 2026-09-08.)
+
 ### 3.5 VERIFY
 
 Before "done", every time: `<lint> && <typecheck> && <test> && <build>` (commands from
@@ -164,6 +189,12 @@ One contract at a time; read yours before starting (`contracts/`).
 
 Dev/QA separation is the single most important structural rule here: an agent that writes
 and approves its own code has a rubber stamp, not a review.
+
+**Models are a default, not wiring.** The module recommends a model per role; a project may
+override it in `preferences/project-config.json` (`agents.models`) without touching a managed
+file, with one line saying why — the reason, not the permission, is the value. A default that
+cannot be overridden cannot be measured either (learning 2026-09-07: brief quality, not model
+size, decided every measurable failure — the switch exists to make that question decidable).
 
 ---
 
@@ -218,6 +249,13 @@ touches production data is an incident, not a safety net.
 - [ ] QA review passed, no open correctness findings
 - [ ] Deploy gate run, outcome recorded; preview looked at when gated
 - [ ] Docs and `ROADMAP.md` updated; rollback plan in the PR
+- [ ] **The delivery channel is part of the increment:** if the founder checks through a
+      channel (artifact, preview, test site) and the work is not visible there, the
+      increment is not done — a channel limit (size, rights, reach) is fixed inside the
+      increment, not declared as its precondition
+- [ ] **Every check lives in the repository:** scripts, fixtures and the tool that builds
+      the delivery are versioned, with a README saying per script what it proves — a test
+      bench in a scratchpad disappears with the session, and with it the claim
 - [ ] Learning written, if anything was surprising
 
 ---
@@ -247,6 +285,17 @@ minutes** either way; a slower pipeline gets bypassed.
 service-account key exists in the repository, in CI secrets, or on a laptop. Where the stack
 has a blueprint (`.founder-os/stacks/`), the deploy path is taken from it rather than written
 by hand — and a deploy failure it does not already describe is written back upstream (§9.3).
+
+**The orchestrator is the most expensive process.** Its context is re-read on every call,
+and every hook, every notification, every deploy check is a call. Measured in one day of
+Module 16 orchestration: the orchestrator alone used more output tokens than fifty
+sub-agents together, at ~350 k context per call. So: hooks that react to *other agents'*
+uncommitted files are off in orchestrator sessions; merges run in **waves** (one PR and one
+deploy check per wave of finished agents, not per agent); briefs are cut so a builder needs
+one increment and one named check (guide value 150–400 k fresh input tokens — a brief that
+needs ten times that was too open); and **tokens are measured, not estimated** — the
+transcripts carry `usage` per model reply, `templates/project/tools/ops/token-report.mjs`
+sums it per agent, and every release note carries a cost line per package.
 
 Previews: every gated PR gets an isolated URL; **previews never get production data or
 production secrets.** Feature flags make trunk-based work: unfinished code ships dark; a
@@ -340,7 +389,9 @@ it carries aggregates, never identifying detail.
 ## 10. Context hygiene
 
 One session = one task. After two failed correction attempts: stop, clear context, restate,
-restart. Delegate broad exploration to subagents that return summaries. Keep `CLAUDE.md`
+restart. **An orchestrator session ends at the version cut:** the next one starts from the
+handover sheet in `docs/checkins/`, not from the grown context — the grown context is the
+single largest cost item (§7). Delegate broad exploration to subagents that return summaries. Keep `CLAUDE.md`
 lean — per line: *would removing this cause a mistake?* Recurring domain knowledge belongs
 in a skill, not `CLAUDE.md`.
 

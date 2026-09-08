@@ -159,6 +159,27 @@ Delegate reading, not deciding. Give a subagent a contract, a goal, an output fo
 a boundary. Never let one agent both produce and approve. Parallel only for independent
 work; multi-agent is worth its token multiple for broad search, rarely for implementation.
 
+**A missing tool is rarely a blocker.** Before reporting "blocked": (1) the intended tool,
+(2) an equivalent one, (3) the primitive underneath — `git` instead of a git front end,
+`curl` instead of a connector, the shell instead of a tool. "Blocked" is true only when all
+three rungs are empty. The exception that is none: a **permission** boundary is never worked
+around, even when the transport underneath is open. The difference between a missing tool
+and a missing permission is the whole rule.
+
+**Contract before the spike.** For technology decisions, first write the case as **data**
+(one scene, one dataset, one flow), then implement it N times, then measure **from the
+outside** — and fix the decision rule beforehand so it is not bent to the result.
+
+**Instrument, not single fix.** When a quality complaint repeats, the next action is not the
+fix but the instrument that makes the *class* of errors visible — with a built-in self-check
+(known references whose measurements must match). An instrument without a self-check also
+measures its own error.
+
+**Feedback translation is orchestrator work.** Founder feedback arrives as a list; builders
+deliver an increment. Splitting the list into increments, ordering them and owning the
+remainder belongs to the orchestrator contract — otherwise a contract-abiding builder
+correctly delivers a quarter and nobody owns the rest.
+
 ---
 
 ## 9. Code judgement defaults
