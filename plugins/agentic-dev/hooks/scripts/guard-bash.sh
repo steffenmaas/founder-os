@@ -56,6 +56,22 @@ printf '%s' "$CMD" | grep -Eq 'git[[:space:]]+clean\b.*-[a-zA-Z]*[fx]' \
   && printf '%s' "$CMD" | grep -Eq '\-[a-zA-Z]*d' \
   && deny "git clean -fdx" "Irreversibly deletes untracked files including .env."
 
+# --- Shared workspace (blueprint 3.4) -----------------------------------
+# Several agents share one tree: blind adds sweep other agents' files into a commit,
+# a stash or checkout wipes their work, pkill/killall stops their processes.
+printf '%s' "$CMD" | grep -Eq '(^|[;&|][[:space:]]*)(pkill|killall)\b' \
+  && deny "pkill/killall" "Never kill processes you did not start; own processes by PID. (blueprint 3.4)"
+
+printf '%s' "$CMD" | grep -Eq 'git[[:space:]]+stash\b' \
+  && ! printf '%s' "$CMD" | grep -Eq 'git[[:space:]]+stash[[:space:]]+(list|show)\b' \
+  && deny "git stash" "A collided stash blocks every agent in the tree; commit your own files instead. (blueprint 3.4)"
+
+printf '%s' "$CMD" | grep -Eq 'git[[:space:]]+add[[:space:]]+(-A|--all|\.|-u)([[:space:]]|$)' \
+  && deny "git add -A / git add ." "Commit named files only — a blind add sweeps other agents' work. (blueprint 3.4)"
+
+printf '%s' "$CMD" | grep -Eq 'git[[:space:]]+(checkout|restore)[[:space:]]+(--[[:space:]]+)?\.([[:space:]]|$)' \
+  && deny "git checkout -- ." "Discards every agent's uncommitted work in the tree. (blueprint 3.4)"
+
 # --- Recursive deletion in dangerous places -----------------------------
 printf '%s' "$CMD" | grep -Eq 'rm[[:space:]]+(-[a-zA-Z]*[[:space:]]+)*-?[a-zA-Z]*r[a-zA-Z]*f?[[:space:]]+(/|~|\$HOME|\.\.)' \
   && deny "rm -rf outside the project" "Delete only inside the working directory."

@@ -1,0 +1,29 @@
+{
+  "_note": "Founder OS Module 16 — project preferences. Written by onboarding even when the founder skips a question, so every choice is a recorded default, not an assumed one.",
+  "learnings": {
+    "contribute_upstream": "ask",
+    "_options": "yes | ask | no — whether docs/learnings with scope: upstream may be sent to the module repository (public)"
+  },
+  "agents": {
+    "_note": "Role → model override. Missing entry = the module's recommendation. One line of reason per override so the choice stays reviewable.",
+    "models": {},
+    "_example": {
+      "reviewer": {
+        "model": "opus",
+        "why": "judges large diffs; a missed finding costs a round"
+      },
+      "builder": {
+        "model": "sonnet",
+        "why": "mechanical increments with an executable check"
+      }
+    }
+  },
+  "resources": {
+    "_note": "Limits for tools/ops/resources.sh — the guard an orchestrator runs before every dispatch (blueprint 3.4).",
+    "maxLoad": 6,
+    "maxChrome": 24,
+    "maxBlender": 1,
+    "minAvailGb": 4,
+    "maxBuilders": 3
+  }
+}

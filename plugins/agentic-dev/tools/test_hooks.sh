@@ -33,6 +33,15 @@ check 2 'vercel deploy --prod'
 check 2 'firebase hosting:channel:deploy live'
 check 2 'psql $PRODUCTION_DATABASE_URL'
 check 2 'cat .env'
+check 2 'pkill -f chrome'
+check 2 'killall node'
+check 2 'git stash'
+check 2 'git stash pop'
+check 2 'git add -A'
+check 2 'git add .'
+check 2 'git add --all'
+check 2 'git checkout -- .'
+check 2 'git restore .'
 
 echo
 echo "-- must pass through (exit 0) --"
@@ -42,6 +51,10 @@ check 0 'git push --force-with-lease origin feat/x'
 check 0 'cat .env.example'
 check 0 'rm -rf ./dist'
 check 0 'git commit -m "feat(api): add booking endpoint"'
+check 0 'git add src/app.ts docs/spec.md'
+check 0 'git stash list'
+check 0 'kill 12345'
+check 0 'git checkout -- src/app.ts'
 
 echo
 echo "-- secret scan --"
