@@ -102,17 +102,25 @@ step by step — install, `/dev-onboard` with a prune pass, write the history do
 | Speed / quality numbers | `/dev-metrics` |
 | Security pass | `/dev-security` |
 
-**Run it autonomously:** start a session and say —
+**Run it autonomously:** set up a **recurring trigger** that starts a **fresh session each
+tick** (a cron entry, a scheduled workflow, a routine — anything that fires without the
+agent's participation), with this as its prompt:
 
 ```
-Work autonomously per .founder-os/workflows/autonomous-loop.md: work the roadmap's top
-package, ship through the deploy gate, refresh the dashboard, re-arm every ~15 minutes.
-Spawn every delegated dispatch as a named background task and STAY ON YOUR TURN while it
-runs; have the builder push from its first commit. When intake is empty, continue with
-the roadmap — never stop because feedback is worked off. Only contact me for deploy-gate
-approvals, queued decisions (as one block, with each option's cost), or finished
+Work autonomously per .founder-os/workflows/autonomous-loop.md. Orient from the repository
+— top package of ROADMAP.md, spec status, pushed branch, open PR — then do one useful step
+and leave your state in the repository: commit and push before you end, whatever state the
+increment is in. Verify scoped, run the full suite once per package, ship through the
+deploy gate. When intake is empty, continue with the roadmap — never stop because feedback
+is worked off. If you dispatch, stay on your turn while it runs. Only contact me for
+deploy-gate approvals, queued decisions (one block, each option with its cost), or finished
 milestones.
 ```
+
+The trigger is the loop's spine: the session is **not** what keeps it alive, so a tick that
+dies costs one step instead of the loop. Every way this loop has been measured dying — a
+missed self-re-arm, sub-agents reclaimed with an idle container, a container restart under
+load — was a variant of *the session was the state*.
 
 ### In Codex, Cursor, or any other agent
 

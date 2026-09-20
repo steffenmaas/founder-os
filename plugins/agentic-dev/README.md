@@ -222,7 +222,7 @@ steps: **who** (contract), **what**, and **the gate** before the next step.
 
 | Workflow | Use when |
 |---|---|
-| [`autonomous-loop`](workflows/autonomous-loop.md) | Continuous development from a live backlog — the standing meta-workflow |
+| [`autonomous-loop`](workflows/autonomous-loop.md) | Continuous development from a live backlog — the standing meta-workflow. **The tick is stateless:** a recurring trigger starts a fresh session, which orients from the repository, does one step, pushes, and ends. Nothing has to survive between ticks, because everything measured killing this loop was a variant of *the session was the state*. |
 | [`new-feature`](workflows/new-feature.md) | Building something that does not exist |
 | [`bug-fix`](workflows/bug-fix.md) | Behaves incorrectly, production stable |
 | [`hotfix`](workflows/hotfix.md) | Production is broken right now |

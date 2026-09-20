@@ -3,7 +3,7 @@ date: 2026-09-08
 scope: upstream
 area: deploy
 severity: high
-submitted:
+submitted: https://github.com/steffenmaas/founder-os/pull/34
 ---
 
 # Das Cloud-Setup meldete „Fertig", ohne die WIF-Föderation je angelegt zu haben

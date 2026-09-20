@@ -3,7 +3,7 @@ date: 2026-09-07
 scope: upstream
 area: process
 severity: high
-submitted: <vorbereitet in 2026-09-07-einreichung-founder-os.md — Einreichung braucht eine Sitzung mit Zugriff auf steffenmaas/founder-os>
+submitted: https://github.com/steffenmaas/founder-os/pull/34
 ---
 
 # Parallele Agenten skalieren, wenn Dateien Eigentum haben — und die Lieferstrecke gehört zum Inkrement
