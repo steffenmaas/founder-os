@@ -137,7 +137,8 @@ workflows, stack blueprints) and creates any missing project files from the temp
 through `AGENTS.md` automatically; for other agents, start every task with:
 
 ```
-Read .founder-os/blueprint.md in full. Act under .founder-os/contracts/<role>.md.
+Read .founder-os/blueprint.md §0 (the short form), then open sections by number as the
+work touches them. Act under .founder-os/contracts/<role>.md.
 Follow .founder-os/workflows/<workflow>.md for this kind of work.
 ```
 

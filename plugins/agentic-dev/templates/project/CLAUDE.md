@@ -26,9 +26,14 @@ your context — the past lives in the dashboard and `docs/releases/`, not in yo
 
 @AGENTS.md
 
-Read `.founder-os/blueprint.md` in full before working. Then read the contract for the role
-you are acting in: `.founder-os/contracts/<role>.md`. Then pick the workflow that matches the
-work: `.founder-os/workflows/`.
+**What to read before working, in this order:** `.founder-os/blueprint.md` **§0 — the short
+form** (one page: what binds even if you read nothing else), then the contract for the role
+you are acting in (`.founder-os/contracts/<role>.md`), then the workflow that matches the
+work (`.founder-os/workflows/`). The blueprint's remaining sections are **reference, opened
+by number when the work touches them** — section numbers are stable for exactly that. Read
+it end to end when you are new to the project or the work is unusual; do not re-read it
+every tick, because the context that re-reading costs is the loop's largest avoidable
+expense.
 
 Short version of the non-negotiables:
 
