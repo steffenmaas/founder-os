@@ -19,6 +19,12 @@ the top package of `ROADMAP.md`, the spec's status, the pushed branch, the open 
 check-in. It does one useful step, leaves its state **in the repository**, and ends. The next
 tick picks it up without knowing the previous one existed.
 
+**Orienting is cheap by design.** A tick reads **blueprint §0 (the short form)** plus its
+contract plus this workflow — not the blueprint end to end. The remaining sections are
+reference, opened by number when the work touches them; the numbers are stable for exactly
+that reason. Re-reading the whole rulebook every tick is the loop's largest avoidable token
+cost, and the orchestrator is already its most expensive process (blueprint §7).
+
 Why this shape and not a long-lived session that keeps itself alive: every measured way this
 loop has died is a variant of *the session was the state*.
 

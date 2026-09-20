@@ -131,6 +131,77 @@ covers everything, contracts bind roles, hooks block locally, CI blocks centrall
 the rule of thumb: merely annoying violations stay prose; work-destroying or
 security-relevant ones get a hook *and* a CI gate.
 
+## Why the tick is stateless
+
+Every measured death of the autonomous loop was one failure wearing different clothes: *the
+session was the state*. A self-re-arm chain missed one link and four hours vanished with
+every timer reporting success. Background sub-agents were reclaimed with their idle
+container — six of seven lost overnight, one increment started four times, 571 minutes
+without a merge. A container restarted under load took four builders with it. Three shared-
+tree collisions in one session stopped every agent at once. A broken module update left a
+session unable to work until a human noticed.
+
+Each of those got its own mitigation, and each mitigation was a rule asking the session to
+survive harder: stay on your turn, arm the next tick, check the resource guard, do not run
+tree-wide git commands. The AI-native SDLC playbook removes the premise instead — its
+autonomous stage runs stateless, a scheduler starting a fresh run that reads an artifact,
+does one step, commits, and ends. So the loop was rebuilt that way: the repository carries
+the state, the trigger carries the cadence, and a tick that dies costs one step. The
+mitigations survive where they still apply (inside a tick, and whenever agents genuinely
+share a tree), but the loop no longer depends on them.
+
+## Why `pre-live` relaxes who types but never who judges
+
+Dispatching a builder is the loop's most fragile mechanism — it is where shared trees,
+reclaimed containers and resource exhaustion all bite. What it buys is context hygiene,
+which is real but small while nothing is live. What must not be relaxed is the *verdict*:
+an agent that judges its own work has a rubber stamp, and that holds whether or not a user
+exists yet. Hence the split — `pre-live` may build in the tick session, every stage keeps
+the fresh-context reviewer, and `live` restores the dispatch because with real users
+structural separation beats convenience.
+
+## Why the `pre-live` gate is one line
+
+A gate designed for live users, run against a project with none, once stopped a loop
+outright: the change was fine, the checklist was not written for that situation, and the
+loop waited. Lines 1–3 and 7 ask about user-visible exposure and blast radius, which are
+empty questions before launch; line 5 turned a queued decision into a blocker while the
+harness was simultaneously promising that questions never block. Only line 4 —
+verification — means anything at every stage, so in `pre-live` it is the whole gate.
+The same reasoning runs the decision rule: two-of-four is a `live` test; before launch the
+question is simply whether the call is expensive *and* unsourced.
+
+## Why model choice is configurable
+
+The defaults may well be right, but a default that a project cannot override cannot be
+measured either, and an unfalsifiable default is a foreign body in a module built on
+evidence. The switch exists to make the question decidable, not because bigger is better —
+in the session that raised it, brief quality, not model size, decided every measurable
+failure.
+
+## Why the suite contains no pixel tests
+
+Visual micro-assertions grow one to five cases per feature until there are more tests than
+functionality, and they break on every intentional design change while catching no real
+regression. Journey tests answer the only question the suite is for — is anything broken —
+and visual detail is caught better by a human looking at a preview.
+
+## Why the orchestrator is the cost centre
+
+Its context is re-read on every call, and every hook, notification and deploy check is a
+call. Measured over one day of Module 16 orchestration, the orchestrator alone spent more
+output tokens than fifty sub-agents together, at roughly 350 k context per call. That is why
+the rules aim at call count rather than at the sub-agents: hooks off for other agents' files,
+merges in waves, briefs cut to one increment and one check. A brief needing ten times the
+guide value was not a big task; it was an open one.
+
+## Why a rule change ships with its mechanical check
+
+The module's own configuration regresses exactly like code: a rule that only prose enforces
+is re-broken by the next edit, and nothing reports it. A validator rule, a hook case, a guard
+test — whichever is possible — turns the rule from an intention into a property of the
+repository.
+
 ## Why the rulebook is lean
 
 Instructions for LLMs are shrinking industry-wide because the models already contain the

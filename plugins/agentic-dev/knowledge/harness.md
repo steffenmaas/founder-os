@@ -118,11 +118,10 @@ of the four is not enough; "affects the user" is true of nearly every line. More
 question in a cycle usually means the others were not attempted.
 
 **An option without its cost is not an option — it is a menu item.** Every queued option
-names its price: money, time, and above all **security and blast radius**. Measured
-failure: the loop recommended the route it could build without human involvement and was
-silent about that route granting a service account admin rights over the entire datastore.
-The founder chose the other path and was right. A recommendation that omits the price of
-the convenient option is not a recommendation; it is a nudge.
+names its price: money, time, and above all **security and blast radius**. (Incident: the
+loop recommended the route it could build without human involvement and stayed silent about
+it granting a service account admin rights over the whole datastore.) A recommendation that
+omits the price of the convenient option is a nudge, not a recommendation.
 
 **Confidence is raised by information, not rhetoric.** When a decision was queued or
 overturned, the learning names the missing source that would have raised the score (design
