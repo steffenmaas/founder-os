@@ -3,7 +3,7 @@ date: 2026-09-08
 scope: upstream
 area: process
 severity: high
-submitted:
+submitted: https://github.com/steffenmaas/founder-os/pull/34
 ---
 
 # Container-Neustart unter Last — vier Builder, 48 Chromium-Prozesse, Last 15 auf 4 Kernen

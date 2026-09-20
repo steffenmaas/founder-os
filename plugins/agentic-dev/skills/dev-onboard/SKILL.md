@@ -172,16 +172,25 @@ start, and ask which one they want:
 
 1. **Supervised** (recommended for the first days): `/dev-spec <first item>` → fresh session
    `/dev-loop` → `/dev-review` → `/dev-ship`, item by item.
-2. **Autonomous, this session** — paste:
-   > Work autonomously per `.founder-os/workflows/autonomous-loop.md`: pull from the
-   > backlog, bundle, ship through the deploy gate, refresh the dashboard, re-arm every
-   > ~15 minutes. Spawn every delegated dispatch, check and watchdog as a **named
-   > background task** so I can see what is running. Contact me only for deploy-gate
-   > approvals, queued decisions, or finished milestones.
-3. **Autonomous, around the clock:** the ~15-minute re-arm lives only as long as its
-   session. For 24/7 operation, create a scheduled task / Routine that starts or wakes the
-   orchestrator session on a fixed cadence (e.g. hourly) with exactly the prompt from
-   option 2 — the schedule is the heartbeat, the session is the loop.
+2. **Autonomous — the recurring trigger, and this is the real one.** Create a scheduled
+   task / Routine that starts a **fresh session each tick** on a fixed cadence, with this
+   prompt:
+   > Work autonomously per `.founder-os/workflows/autonomous-loop.md`. Orient from the
+   > repository — top package of `ROADMAP.md`, spec status, pushed branch, open PR — then do
+   > one useful step and **leave your state in the repository: commit and push before you
+   > end**, whatever state the increment is in. Verify scoped, full suite once per package,
+   > ship through the deploy gate. If you dispatch, spawn as a **named background task** and
+   > stay on your turn while it runs. Contact me only for deploy-gate approvals, queued
+   > decisions, or finished milestones.
+3. **Autonomous in this session** (a single stretch of work, not the standing loop): the
+   same prompt, pasted once. Useful to watch the first tick; it is **not** a substitute for
+   the trigger, because a session that ends takes the loop with it unless the schedule
+   exists. Set up option 2 either way.
+
+**Say why the trigger is the spine, once:** the tick is stateless by design — it must be
+able to start with no memory, because every measured death of this loop (a missed self-
+re-arm, sub-agents reclaimed with an idle container, a container restart under load) was a
+variant of *the session was the state*.
 
 **The onboarding report's final line is always one of:**
 `LOOP: not started — awaiting the human's choice` · `LOOP: started (supervised | autonomous | scheduled)`.

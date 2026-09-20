@@ -135,12 +135,12 @@ In `preferences/project-config.json`:
 2. Supervised warm-up (recommended for the first days): work item by item —
    `/dev-spec <item>` → fresh session `/dev-loop <item>` → `/dev-review` → `/dev-ship`.
 3. Autonomous operation — **the loop does not start by itself after onboarding; you start
-   it, once, explicitly.** Either paste the starter prompt from the onboarding skill
-   (step 8) into a session, or — for 24/7 — create a scheduled task / Routine that wakes
-   the orchestrator session on a fixed cadence with that prompt: the ~15-minute re-arm
-   lives only as long as its session, so the schedule is the heartbeat. It pulls from the
-   backlog, bundles, ships through the deploy gate, and re-arms. If the project had a
-   home-grown loop runbook, **retire it explicitly** — one line at its top: "superseded by
+   it, once, explicitly**, by creating a scheduled task / Routine that starts a **fresh
+   session each tick** with the starter prompt from the onboarding skill (step 8). The
+   schedule is the loop; the session is one tick of it, and a tick that dies costs one step
+   rather than the loop. Pasting the prompt into a single session works for watching the
+   first tick, but it is not the standing loop. If the project had a home-grown loop
+   runbook, **retire it explicitly** — one line at its top: "superseded by
    `.founder-os/workflows/autonomous-loop.md`" — so no agent follows two doctrines.
 
 ## How updates reach the project afterwards

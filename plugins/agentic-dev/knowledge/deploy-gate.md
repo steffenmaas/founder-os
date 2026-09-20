@@ -10,7 +10,7 @@
 
 | `stage` | Reality | Posture |
 |---|---|---|
-| **`pre-live`** *(default for new projects)* | Not live. No users, no revenue, no data anyone would miss. **Nothing can break that matters.** | **Speed is everything.** Checklist lines 1–3 and 7 are suspended: every change auto-ships once verification (line 4) is green. Merges, tests, releases happen immediately — package done, merge, next. Decisions: **decide whenever the cost of being wrong is bearable and the call is revisable; collect and present only what is irreversible or existential.** The worst case of a wrong autonomous decision here is revising it — that is cheaper than waiting a night for an answer. Confidence threshold default drops to 40 (harness §5). |
+| **`pre-live`** *(default for new projects)* | Not live. No users, no revenue, no data anyone would miss. **Nothing can break that matters.** | **The gate is one line: verification green → merge, deploy, next.** The checklist below does not run at all — not lines 1–3, not 5, not 6, not 7. Only line 4 survives, and it survives every stage. Decisions: **decide whenever the cost of being wrong is bearable and the call is revisable; collect only what is irreversible or existential** (confidence threshold default 40, harness §5) — and a queued decision does **not** gate the ship here, it takes the reversible default and is reported. The worst case of a wrong autonomous call at this stage is revising it, which is cheaper than waiting a night for an answer. |
 | **`live`** | First real users. | The checklist below, as written. Threshold default 70. First user-visible versions and the untouchable surfaces see a human. |
 | **`scaled`** | Paying users at volume. | The checklist plus: untouchable surfaces (line 2) are **always** gated, `mode: strict` is the recommended setting, threshold default 85. |
 
@@ -20,7 +20,10 @@ config change; loosening it back is an ADR. And one line survives every stage, i
 `pre-live`: **verification green before merge** — speed comes from skipping approvals, never
 from skipping the proof that it works.
 
-Run at SHIP time, in **every** workflow. Two outcomes, nothing in between:
+Run at SHIP time **from `live` onwards**, in every workflow. (In `pre-live` the gate is the
+one line above; the checklist is not evaluated — a gate that stopped the whole loop once did
+so because lines meant for live users were being run against a project with none.) Two
+outcomes, nothing in between:
 
 ```
   AUTO-SHIP     merge → pipeline deploy → health watch. No human in the loop.
@@ -41,7 +44,7 @@ is named in the notification. Never re-argue a line to get to auto-ship.
 | 2 | **Untouchable surfaces untouched** | The diff does **not** touch: auth · payments, money, or pricing · personal-data handling · security rules or secrets handling · CI/deploy configuration · legal texts or store submissions · a destructive or irreversible migration · a breaking public-API change · a new dependency or a major upgrade · anything an ADR reserves for humans. |
 | 3 | **First exposure** | This is **not** the first user-visible version of a new feature. The human sees new features before users do — always. |
 | 4 | **Verification** | Scoped verification chain green, guard tests green, QA verdict PASS at the given scope. Output shown, not asserted. |
-| 5 | **Decision confidence** | No decision in this diff scored below the project's confidence threshold (harness §5). A queued decision inside the diff is an automatic gate. |
+| 5 | **Decision confidence** | No decision in this diff scored below the project's confidence threshold (harness §5). A queued decision inside the diff is an automatic gate. *(From `live` onwards — in `pre-live` a queued decision takes the reversible default and ships.)* |
 | 6 | **Reversibility** | One revert restores the previous state. Rollback plan named. Persisted-data formats stay backward compatible. |
 | 7 | **Blast radius** | One feature area. No cross-cutting change riding along. |
 

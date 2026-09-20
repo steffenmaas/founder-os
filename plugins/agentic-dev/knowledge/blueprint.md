@@ -153,11 +153,11 @@ reproducing your work.
 
 ### 3.6 SHIP
 
-- **Auto-ship vs. human approval is decided by the deploy gate** (`deploy-gate.md`), run
-  every time — and the gate's posture follows the project's **`stage`**: `pre-live` ships
-  everything on green verification (nothing is live, nothing can break that matters, speed
-  wins), `live` runs the full checklist, `scaled` tightens it. Human review is not a standing requirement — the QA-agent pass is; a human
-  looks at a change only when the gate says so.
+- **Auto-ship vs. human approval is decided by the deploy gate** (`deploy-gate.md`), and the
+  gate's posture follows the project's **`stage`**: in `pre-live` the gate is **one line —
+  verification green → merge, deploy, next** (the checklist does not run); `live` runs the
+  full checklist every time; `scaled` tightens it. Human review is not a standing
+  requirement — the QA-agent pass is; a human looks at a change only when the gate says so.
 - Merge to `main` only with the **full local suite green at package level** and a QA PASS
   (§7 — the merge is the gate). Deploy through the single workflow — never from a local
   machine (hook-enforced).

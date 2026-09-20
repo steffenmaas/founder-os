@@ -3,7 +3,7 @@ date: 2026-09-07
 scope: upstream
 area: process
 severity: high
-submitted: <vorbereitet — Einreichung braucht eine Sitzung mit `steffenmaas/founder-os` in der Repository-Freigabe>
+submitted: https://github.com/steffenmaas/founder-os/pull/34
 ---
 
 # Einreichung an Founder OS Modul 16 — PR-fertig, nach `dev-learn` Modus B
