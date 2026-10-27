@@ -182,6 +182,15 @@ start, and ask which one they want:
    > ship through the deploy gate. If you dispatch, spawn as a **named background task** and
    > stay on your turn while it runs. Contact me only for deploy-gate approvals, queued
    > decisions, or finished milestones.
+
+   **Check the precondition before calling this done: can a fresh session of that routine
+   reach the repository?** Fire it once and look. If it starts without a checkout, either
+   bind the routine to an environment that carries the repository, or add the clone as the
+   tick's first step. If the scheduler can do neither, fall back to a session-bound routine
+   and say out loud what that costs — the long-lived-session failure modes come back with it
+   (`.founder-os/workflows/autonomous-loop.md`, the precondition table). Measured: three
+   routines in one project were disabled for exactly this, with the reason "routine session
+   has no repo".
 3. **Autonomous in this session** (a single stretch of work, not the standing loop): the
    same prompt, pasted once. Useful to watch the first tick; it is **not** a substitute for
    the trigger, because a session that ends takes the loop with it unless the schedule
