@@ -25,6 +25,25 @@ reference, opened by number when the work touches them; the numbers are stable f
 that reason. Re-reading the whole rulebook every tick is the loop's largest avoidable token
 cost, and the orchestrator is already its most expensive process (blueprint §7).
 
+**The precondition, and it is not optional: the tick's session must be able to reach the
+repository.** A fresh session is only cheap if the state it orients from is actually there.
+On a scheduler that creates a new session per firing, that session may land in an
+environment with no checkout — measured: three autopilot routines in one project were
+disabled with the reason *"routine session has no repo"* and replaced by session-bound ones,
+which gave the long-lived-session failure modes straight back. So pick one, deliberately, at
+adoption:
+
+| Shape | When it works | What it costs |
+|---|---|---|
+| **Fresh session per tick, environment carries the repo** | The scheduler can bind a routine to an environment that checks the repository out | The intended shape, nothing to give up |
+| **Fresh session per tick, the tick clones first** | No such binding, but the session may clone | One clone per tick, and credentials to clone with |
+| **Session-bound routine** (a fresh tick wakes one standing session) | Neither of the above is available | Back to *the session is the state* — then the long-lived rules bind in full: stay on your turn, push from the first commit, and expect the failures in the table above |
+
+**A tick that cannot reach the repository is a HEALTH failure, named in one line** — never a
+silent no-op. The step-1 check is `git rev-parse HEAD` returning a commit, in the project
+whose roadmap this tick is supposed to work. A tick that orients from nothing writes a tidy
+report about nothing, which is the oldest failure in this document wearing new clothes.
+
 Why this shape and not a long-lived session that keeps itself alive: every measured way this
 loop has died is a variant of *the session was the state*.
 
@@ -60,7 +79,7 @@ ballast, and ballast is where ticks get stuck.
 
 | # | When | What | Gate before the next step |
 |---|---|---|---|
-| 1 | every tick | **HEALTH (short)** — is `main` green, did the last deploy land (deployed version marker matches the last shipped commit), is the runtime reachable (**either the plugin is loaded, or `.claude/agents/builder.md` exists** — with no runtime the loop writes its own code and reviews its own diff, so *no runtime is a FAILURE, not a pass*). Module version vs. `.founder-os/VERSION`: on mismatch, refreshing the managed copy (`install.sh --update`, one commit) is this tick's increment. | Healthy. **A red `main` or a deploy that did not land is the task, nothing else.** |
+| 1 | every tick | **HEALTH (short)** — **is the repository there** (`git rev-parse HEAD` returns a commit in the project this tick works; if not, that is the whole tick: say so in one line, see the precondition above), is `main` green, did the last deploy land (deployed version marker matches the last shipped commit), is the runtime reachable (**either the plugin is loaded, or `.claude/agents/builder.md` exists** — with no runtime the loop writes its own code and reviews its own diff, so *no runtime is a FAILURE, not a pass*). Module version vs. `.founder-os/VERSION`: on mismatch, refreshing the managed copy (`install.sh --update`, one commit) is this tick's increment. | Healthy. **A red `main` or a deploy that did not land is the task, nothing else.** |
 | 2 | every tick | **GROOM + PULL** — name the source-of-truth store out loud (never groom a projection; check `docs/decisions/` when in doubt), sweep intake (merge duplicates, drop what no longer serves `PRODUCT.md`, fold items into roadmap packages), then pull **the top package of `ROADMAP.md`** — the one ordered list is the master, and re-ordering it by the backlog doctrine is grooming, not a violation. **Intake empty is not work done:** when yesterday's feedback is worked off, the next roadmap package is the work. | Package traces to `PRODUCT.md`. State the yardstick in one line: *closest gap to the current version scope*. |
 | 3 | every tick | **BUNDLE** — the roadmap package IS the bundle (`ROADMAP.md`: a package is a release, not a ticket). Confirm its spec exists — a missing spec is the package's first increment. One package = one branch, id in branch and PR title (`B004 · …`). | Spec present (or being written); each increment describable in one sentence. |
 | 4 | every tick | **BUILD** — one increment = one commit, **named files, never `git add -A`**, max 3 attempts. **The branch is pushed as soon as the first commit exists.** Who writes depends on the stage — see *Who builds* below. | Increment's own check green, and **pushed**. |
